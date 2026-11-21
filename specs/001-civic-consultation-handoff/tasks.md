@@ -65,7 +65,7 @@
 
 ### Tests
 
-- [ ] T011 [P] [US1] AI1·10분·선행 T003,T009: frontend/tests/unit/retrieval.test.ts에 자치구/시 공통·미검증·미래 시행·상충 연락처·기준일 미확인·실제 인용 불일치의 음성/양성 검색 시험을 먼저 작성한다. 개발 보정 표본과 독립 평가 fixture를 분리한다.
+- [X] T011 [P] [US1] AI1·10분·선행 T003,T009: frontend/tests/unit/retrieval.test.ts에 자치구/시 공통·미검증·미래 시행·상충 연락처·기준일 미확인·실제 인용 불일치의 음성/양성 검색 시험을 먼저 작성한다. 개발 보정 표본과 독립 평가 fixture를 분리한다.
 
 ### Implementation
 
