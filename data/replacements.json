@@ -68,5 +68,33 @@
       "policy-change/case1-after-climate-card-plus.md/section-2",
       "policy-change/case1-after-climate-pass-qa.md/section-5"
     ]
+  },
+  {
+    "id": "case2-village-bus-ride-time",
+    "predecessorDocId": "policy-change/case2-before-village-bus-regulation.md",
+    "successorDocId": "policy-change/case2-after-2026-h2-changes.md",
+    "claimKey": "policy.village-bus.max-ride-time",
+    "before": "탑승 후 기본요금으로 이용 가능한 최대 시간 1시간",
+    "after": "최대 이용 가능 시간 2시간",
+    "validFrom": "2026-07-01",
+    "validUntil": null,
+    "evidenceChunkIds": [
+      "policy-change/case2-before-village-bus-regulation.md/section-2",
+      "policy-change/case2-after-2026-h2-changes.md/section-2"
+    ]
+  },
+  {
+    "id": "case3-dadungi-householder",
+    "predecessorDocId": "policy-change/case3-before-dadungi-card.md",
+    "successorDocId": "policy-change/case3-after-2026-h2-changes.md",
+    "claimKey": "policy.dadungi-card.app-card.householder-requirement",
+    "before": "부모가 세대주인 경우에만 발급 가능",
+    "after": "부모가 세대주가 아니더라도 자녀와 같은 세대이면 발급 가능",
+    "validFrom": "2026-10-01",
+    "validUntil": null,
+    "evidenceChunkIds": [
+      "policy-change/case3-before-dadungi-card.md/section-3",
+      "policy-change/case3-after-2026-h2-changes.md/section-2"
+    ]
   }
 ]

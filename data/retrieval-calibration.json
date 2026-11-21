@@ -1,7 +1,7 @@
 {
   "task": "T014",
   "purpose": "개발 보정 표본이다. 독립 평가 fixture(frontend/tests/fixtures/generalization.json)와 문항을 공유하지 않으며 그 결과로 임계값을 바꾸지 않는다.",
-  "corpusVersion": "corpus-a6452f316f1f",
+  "corpusVersion": "corpus-2c4dec36a103",
   "thresholds": {
     "ngram": 2,
     "minScore": 0.3,
