@@ -1,6 +1,6 @@
 {
-  "corpusVersion": "corpus-a6452f316f1f",
-  "corpusHash": "a6452f316f1fbcb34f9c77e6064f9eab0f64a9da7037c11e07b1ea2c8d50de87",
+  "corpusVersion": "corpus-2c4dec36a103",
+  "corpusHash": "2c4dec36a103dfe8aac625b91b28513a5a93847d7001a0f02471b2d3c70279b7",
   "ok": true,
   "counts": {
     "records": 36,
@@ -9,7 +9,7 @@
     "answerEligibleChunks": 10,
     "routingEligibleChunks": 3,
     "citations": 22,
-    "replacements": 5,
+    "replacements": 7,
     "byVerificationStatus": {
       "verified": 6,
       "historical": 0,
@@ -20,7 +20,16 @@
     "externalWelfareRecords": 396
   },
   "errors": [],
-  "warnings": [],
+  "warnings": [
+    {
+      "target": "case2-village-bus-ride-time",
+      "message": "변경 후 claim의 검증 승인 citation이 없어 검색에 적용되지 않는다."
+    },
+    {
+      "target": "case3-dadungi-householder",
+      "message": "변경 후 claim의 검증 승인 citation이 없어 검색에 적용되지 않는다."
+    }
+  ],
   "excluded": [
     {
       "target": "parking/law-road-traffic-act-article-160.md",

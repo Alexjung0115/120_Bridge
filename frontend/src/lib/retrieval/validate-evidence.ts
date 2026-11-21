@@ -1,4 +1,5 @@
 import { isEligibleEvidence } from "./evidence-eligibility";
+import { claimScopedDocument } from "./replacements";
 import type { Corpus } from "./search";
 
 export type AnswerUnit = {
@@ -28,7 +29,7 @@ export function validateAnswerUnit(
     const citation = corpus.citations.find((item) => item.chunkId === cited.chunkId && item.claimKey === cited.claimKey);
     if (!doc || !citation) {
       problems.push(`${cited.claimKey}: corpus에 없는 인용이다.`);
-    } else if (!isEligibleEvidence(doc, cited.chunkId, cited.claimKey, context.district, context.businessDate, { ...citation, quote: cited.quote })) {
+    } else if (!isEligibleEvidence(claimScopedDocument(corpus.replacements, doc, cited.claimKey), cited.chunkId, cited.claimKey, context.district, context.businessDate, { ...citation, quote: cited.quote })) {
       problems.push(`${cited.claimKey}: 관할·유효기간·검증·기준일 조건을 통과하지 못했거나 인용문이 청크에 없다.`);
     }
   }
