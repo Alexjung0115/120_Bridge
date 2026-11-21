@@ -14,8 +14,9 @@
     "basisDate": "2026-01-13",
     "basisDateType": "updatedAt",
     "note": "원문 표 7–10번 행: 업소용 1000ℓ이상 25,000 / 500ℓ이상 11,000 / 300ℓ이상 8,000 / 300ℓ미만 6,000. 업소용 행은 정리본 표에 없고 section-8에만 있다. 용량 미확인 시 금액 확정 금지.",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   },
   {
     "claimKey": "waste.mapo.appliance.free-pickup",
@@ -31,8 +32,9 @@
     },
     "basisDate": "2026-01-13",
     "basisDateType": "updatedAt",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   },
   {
     "claimKey": "waste.mapo.appliance.damaged",
@@ -48,8 +50,9 @@
     },
     "basisDate": "2026-01-13",
     "basisDateType": "updatedAt",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   },
   {
     "claimKey": "waste.mapo.bulky.report-procedure",
@@ -65,8 +68,9 @@
     },
     "basisDate": "2026-01-13",
     "basisDateType": "updatedAt",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   },
   {
     "claimKey": "waste.mapo.bulky.cancel-window",
@@ -82,8 +86,9 @@
     },
     "basisDate": "2026-01-13",
     "basisDateType": "updatedAt",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   },
   {
     "claimKey": "waste.mapo.sofa.fee",
@@ -99,8 +104,9 @@
     },
     "basisDate": "2026-01-13",
     "basisDateType": "updatedAt",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   },
   {
     "claimKey": "routing.mapo.bulky-waste.contact",
@@ -116,8 +122,9 @@
     },
     "basisDate": "2026-01-13",
     "basisDateType": "updatedAt",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   },
   {
     "claimKey": "contact.mapo.collector.pyeonghwa",
@@ -134,8 +141,9 @@
     "basisDate": "2026-01-13",
     "basisDateType": "updatedAt",
     "note": "스마트클린 마포 화면 표기 02-3142-6412와 다르다. 업체 목록은 스크립트로 그려져 정적 HTML로 재확인하지 못했다.",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   },
   {
     "claimKey": "waste.mapo.smartclean.label",
@@ -151,8 +159,9 @@
     },
     "basisDate": null,
     "basisDateType": "unknown",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   },
   {
     "claimKey": "waste.mapo.smartclean.procedure",
@@ -168,8 +177,9 @@
     },
     "basisDate": null,
     "basisDateType": "unknown",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   },
   {
     "claimKey": "routing.120.general-scope",
@@ -186,8 +196,9 @@
     },
     "basisDate": null,
     "basisDateType": "unknown",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   },
   {
     "claimKey": "routing.120.water-menu",
@@ -205,8 +216,9 @@
     "basisDate": null,
     "basisDateType": "unknown",
     "note": "수도 요금 개인 조회의 일반 창구 근거. 개별 청구 내역 답변 근거가 아니며 이관 유지.",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   },
   {
     "claimKey": "contact.120.phone-numbers",
@@ -223,8 +235,9 @@
     },
     "basisDate": null,
     "basisDateType": "unknown",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   },
   {
     "claimKey": "contact.120.hours",
@@ -241,8 +254,9 @@
     },
     "basisDate": null,
     "basisDateType": "unknown",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-card.payback.eligibility",
@@ -257,8 +271,9 @@
     },
     "basisDate": "2026-06-07",
     "basisDateType": "publishedAt",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-card.payback.application-period",
@@ -273,8 +288,9 @@
     },
     "basisDate": "2026-06-07",
     "basisDateType": "publishedAt",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-card.payback.deposit-period",
@@ -289,8 +305,9 @@
     },
     "basisDate": "2026-06-07",
     "basisDateType": "publishedAt",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-card.payback.fee-table",
@@ -306,8 +323,9 @@
     "basisDate": "2026-06-07",
     "basisDateType": "publishedAt",
     "note": "원문 표 머리글 7칸에 값 6칸. 저소득·두자녀·세자녀 배치 불명. 금액 청크 제외.",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-card.prepaid-30day.end",
@@ -322,8 +340,9 @@
     },
     "basisDate": "2026-06-17",
     "basisDateType": "publishedAt",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-card.postpaid.end",
@@ -338,8 +357,9 @@
     },
     "basisDate": "2026-06-17",
     "basisDateType": "publishedAt",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-card.payback.deposit-period",
@@ -354,8 +374,9 @@
     },
     "basisDate": "2026-06-17",
     "basisDateType": "publishedAt",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-card.prepaid-30day.end",
@@ -370,8 +391,9 @@
     },
     "basisDate": "2026-08-12",
     "basisDateType": "publishedAt",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-card.postpaid.end",
@@ -386,8 +408,9 @@
     },
     "basisDate": "2026-08-12",
     "basisDateType": "publishedAt",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-card.payback.application-period",
@@ -402,8 +425,9 @@
     },
     "basisDate": "2026-08-12",
     "basisDateType": "publishedAt",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-card.payback.deposit-period",
@@ -418,8 +442,9 @@
     },
     "basisDate": "2026-08-12",
     "basisDateType": "publishedAt",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-card.payback.channel",
@@ -434,8 +459,9 @@
     },
     "basisDate": "2026-08-12",
     "basisDateType": "publishedAt",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-card.short-term-pass",
@@ -450,8 +476,9 @@
     },
     "basisDate": "2026-08-12",
     "basisDateType": "publishedAt",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-pass.prepaid-registration",
@@ -466,8 +493,9 @@
     },
     "basisDate": "2026-08-12",
     "basisDateType": "publishedAt",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-pass.youth-age",
@@ -482,7 +510,8 @@
     },
     "basisDate": "2026-08-12",
     "basisDateType": "publishedAt",
-    "reviewStatus": "machine-checked",
-    "approvedBy": null
+    "reviewStatus": "approved",
+    "approvedBy": "AI1",
+    "approvedAt": "2026-11-21"
   }
 ]

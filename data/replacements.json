@@ -34,7 +34,7 @@
     "claimKey": "policy.climate-card.payback.application-period",
     "before": "2026-06-10~2026-08-31 온라인 신청",
     "after": "2026-09-30까지 신청(연장)",
-    "validFrom": "2026-08-12",
+    "validFrom": "2026-09-17",
     "validUntil": null,
     "evidenceChunkIds": [
       "policy-change/case1-before-climate-card-payback.md/section-4",
@@ -48,10 +48,24 @@
     "claimKey": "policy.climate-card.payback.deposit-period",
     "before": "6월 말부터 9월 중 순차 입금",
     "after": "9월 말부터 11월까지 순차 입금",
-    "validFrom": "2026-08-12",
+    "validFrom": "2026-09-17",
     "validUntil": null,
     "evidenceChunkIds": [
       "policy-change/case1-before-climate-card-payback.md/section-4",
+      "policy-change/case1-after-climate-pass-qa.md/section-5"
+    ]
+  },
+  {
+    "id": "case1-plus-payback-deposit",
+    "predecessorDocId": "policy-change/case1-after-climate-card-plus.md",
+    "successorDocId": "policy-change/case1-after-climate-pass-qa.md",
+    "claimKey": "policy.climate-card.payback.deposit-period",
+    "before": "6월 이용분을 8월에 환급하고 사업 마무리",
+    "after": "9월 말부터 11월까지 순차 입금",
+    "validFrom": "2026-09-17",
+    "validUntil": null,
+    "evidenceChunkIds": [
+      "policy-change/case1-after-climate-card-plus.md/section-2",
       "policy-change/case1-after-climate-pass-qa.md/section-5"
     ]
   }
