@@ -1,3 +1,6 @@
+import { z } from "zod";
+import { createImprovementsApi, withImprovementCandidates } from "../improvements/candidates";
+import { improvementCandidateSchema } from "../schema/improvement";
 import { createHandoffStore } from "../store/handoff-store";
 import { createConsoleApi } from "./console-api";
 import { createConsoleActionApi } from "./console-actions";
@@ -19,10 +22,20 @@ export function consoleApi() {
 }
 
 export function configuredConsoleActionApi() {
-  return createConsoleActionApi((sessionId, agent, command) => serverRpc()("bridge_apply_console_action", {
-    p_session: sessionId, p_agent: agent, p_command: command.commandId,
-    p_base: command.baseRevision, p_action: command.action,
-    p_candidate: command.action === "transfer_demo" ? command.candidateId : null,
-    p_outcome: command.action === "complete_case" ? command.outcome ?? null : null,
-  }), consoleAuth());
+  return createConsoleActionApi(withImprovementCandidates(
+    (sessionId, agent, command) => serverRpc()("bridge_apply_console_action", {
+      p_session: sessionId, p_agent: agent, p_command: command.commandId,
+      p_base: command.baseRevision, p_action: command.action,
+      p_candidate: command.action === "transfer_demo" ? command.candidateId : null,
+      p_outcome: command.action === "complete_case" ? command.outcome ?? null : null,
+    }),
+    (candidate) => serverRpc()("bridge_record_improvement", { p_candidate: candidate }),
+  ), consoleAuth());
+}
+
+export function improvementsApi() {
+  return createImprovementsApi(
+    async () => z.array(improvementCandidateSchema).parse(await serverRpc()("bridge_list_improvements", {})),
+    consoleAuth(),
+  );
 }
