@@ -79,3 +79,9 @@ class AnswerTests(unittest.TestCase):
         response = self.client.post("/answer", json=PAYLOAD, headers=AUTH)
         self.assertEqual(response.status_code, 504)
         self.assertEqual(response.json(), {"detail": {"code": "ai_timeout"}})
+
+    def test_live_provider_fallback_when_unconfigured(self):
+        with patch.dict(os.environ, {"OPENAI_MODEL": "", "OPENAI_API_KEY": "", "GMS_KEY": ""}):
+            response = self.client.post("/answer", json=PAYLOAD, headers=AUTH)
+            self.assertEqual(response.status_code, 503)
+            self.assertEqual(response.json()["detail"]["code"], "ai_unavailable")
