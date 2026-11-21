@@ -281,6 +281,7 @@ test("approved handoff delivery atomically publishes one protected queue entry",
     await seed(db);
     await db.exec(await readFile(new URL("20261121030000_console_handoffs.sql", migrationDir), "utf8"));
     await db.exec(await readFile(new URL("20261121031000_console_actions.sql", migrationDir), "utf8"));
+    await db.exec(await readFile(new URL("20261121031500_citizen_correction.sql", migrationDir), "utf8"));
     await db.exec("set role service_role");
     const storage = persistence(db);
     await storage.initialize(sessionId, { ...initial, state: "sending", corpusVersion: "fixture-v1" });
@@ -334,7 +335,18 @@ test("approved handoff delivery atomically publishes one protected queue entry",
       "select public.bridge_correct_handoff($1,1,$2,$3) as data",
       [sessionId, uid(210), { ...payload.summary, revision: 2, sessionRevision: 1 }]);
     assert.equal(premature.rows[0].data.status, "conflict");
-    assert.equal(await stage(uid(210), "정정 내용"), "pending_confirmation");
+    async function submit(handoffId: string, revision: number, tokenHash: string, correctionText = "정정 내용") {
+      const { rows } = await db.query<{ data: { status: string } }>(
+        "select public.bridge_submit_citizen_correction($1,1,$2,$3,$4,$5,$6) as data",
+        [sessionId, uid(210), handoffId, revision, correctionText, tokenHash]);
+      return rows[0].data.status;
+    }
+    assert.equal(await submit(payload.id, 1, "wrong-hash"), "forbidden");
+    assert.equal(await submit(uid(299), 1, initial.citizenTokenHash), "conflict");
+    assert.equal(await submit(payload.id, 0, initial.citizenTokenHash), "conflict");
+    assert.equal(await submit(payload.id, 1, initial.citizenTokenHash), "pending_confirmation");
+    assert.equal(await submit(payload.id, 1, initial.citizenTokenHash), "pending_confirmation");
+    assert.equal(await submit(payload.id, 1, initial.citizenTokenHash, "다른 내용"), "conflict");
     assert.equal(await stage(uid(210), "정정 내용"), "pending_confirmation");
     const pending = (await db.query<{ data: Record<string, unknown> }>(
       "select public.bridge_console_detail($1) as data", [sessionId])).rows[0].data;
@@ -355,6 +367,8 @@ test("approved handoff delivery atomically publishes one protected queue entry",
     assert.equal(corrected.status, "queued");
     assert.equal(corrected.handoffId, payload.id);
     assert.equal((await correction()).status, "replayed");
+    assert.equal(await submit(payload.id, 1, initial.citizenTokenHash), "replayed");
+    assert.equal(await submit(payload.id, 1, initial.citizenTokenHash, "다른 내용"), "conflict");
     const correctedDetail = (await db.query<{ data: Record<string, unknown> }>(
       "select public.bridge_console_detail($1) as data", [sessionId])).rows[0].data;
     assert.equal(correctedDetail.acknowledgedRevision, 2);
