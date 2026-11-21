@@ -52,6 +52,7 @@ test("session requests replay safely and citizen reads omit credentials", async 
       return { status: "created", snapshot };
     },
     async load(id) { return stored?.id === id ? stored : null; },
+    async end() { return { status: "committed", data: { state: "ended", revision: 1, outcome: "unknown" } }; },
   }, "fixture-secret-".repeat(4), "fixture");
   const body = { clientSessionKey: "10000000-0000-4000-8000-000000000009", inputMode: "text" };
   const create = (data: object) => api.create(new Request("https://example.test/api/sessions", {
@@ -77,4 +78,12 @@ test("session requests replay safely and citizen reads omit credentials", async 
   const response = await valid.text();
   assert.equal(response.includes(data.citizenToken), false);
   assert.equal(response.includes("citizenTokenHash"), false);
+  const end = (token: string) => api.end(new Request("https://example.test/end", {
+    method: "POST", headers: { authorization: "Bearer " + token },
+    body: JSON.stringify({ commandId: body.clientSessionKey, baseRevision: 0 }),
+  }), data.sessionId);
+  assert.equal((await end("wrong")).status, 403);
+  const ended = await end(data.citizenToken);
+  assert.equal(ended.headers.get("cache-control"), "no-store");
+  assert.deepEqual((await ended.json()).data, { state: "ended", revision: 1, outcome: "unknown" });
 });

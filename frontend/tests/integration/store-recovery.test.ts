@@ -269,6 +269,21 @@ test("session admission checks retries ahead of the five-session ceiling", async
     assert.equal(await open(uid(101)), "existing");
     assert.equal(await open(uid(101), "voice"), "conflict");
     await db.exec("reset role");
+    await db.exec(await readFile(new URL("20261121025500_end_session.sql", migrationDir), "utf8"));
+    await db.exec("set role service_role");
+    async function end(hash: string, base = 0) {
+      return (await db.query<{ data: { status: string } }>(
+        "select public.bridge_end_session($1,$2,$3,$4) as data",
+        [uid(101), uid(108), base, hash])).rows[0].data;
+    }
+    assert.equal((await end("wrong-hash")).status, "forbidden");
+    assert.equal(await open(uid(106)), "limit");
+    assert.equal((await end(initial.citizenTokenHash)).status, "committed");
+    assert.equal((await end(initial.citizenTokenHash)).status, "replayed");
+    assert.equal((await end(initial.citizenTokenHash, 1)).status, "conflict");
+    assert.equal(await open(uid(106)), "created");
+    assert.equal(await open(uid(109)), "limit");
+    await db.exec("reset role");
     await db.exec("set role anon");
     await assert.rejects(open(uid(107)), { code: "42501" });
   } finally {

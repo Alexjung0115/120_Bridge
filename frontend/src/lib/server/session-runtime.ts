@@ -15,5 +15,8 @@ export function configuredSessionApi() {
       p_owner: BRIDGE_DEMO_OWNER_ID, p_mode: mode, p_session: session.id, p_snapshot: session,
     }),
     load: (id) => rpc("bridge_load_session", { p_session: id }),
+    end: (id, command, base, hash) => rpc("bridge_end_session", {
+      p_session: id, p_command: command, p_base: base, p_token_hash: hash,
+    }),
   }, BRIDGE_SESSION_SIGNING_SECRET, BRIDGE_CORPUS_VERSION);
 }
