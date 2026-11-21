@@ -6,7 +6,7 @@
 
 성공: {schemaVersion:1, requestId, data}. 오류: {schemaVersion:1, requestId, error:{code,message,retryable}, currentRevision?}.
 400 형식 오류, 401/403 토큰 오류, 404 세션 없음, 409 revision/stale summary/중복 실행 충돌, 429 요청 제한, 503 모델·전송 불가.
-생성 응답의 citizenToken은 해당 세션 호출의 Authorization: Bearer에만 사용한다. 콘솔은 별도 CONSOLE_TOKEN, 모든 응답 Cache-Control:no-store. API 키는 서버 환경에만 둔다.
+생성 응답의 citizenToken은 해당 세션 호출의 Authorization: Bearer에만 사용한다. 콘솔은 별도 CONSOLE_TOKEN과 서버 고정 CONSOLE_AGENT_ID(기본 demo-agent-1)를 사용하며, 모든 응답 Cache-Control:no-store. API 키는 서버 환경에만 둔다.
 command마다 commandId(UUID)와 baseRevision 필요. 동일 commandId 재전송은 기존 결과를 반환하며 명령을 재실행하지 않는다.
 
 ## HTTP
@@ -30,6 +30,8 @@ turns는 모델이 10초 내 완료하면 최종 200, 대기 중 202+processing=
 
 ## 시민 snapshot / 화면
 
+시민 snapshot에 presentationState=consulting|waiting|connection_complete를 제공한다. console claim 성공 후에는 connection_complete와 ‘상담사 연결 완료’ 최종 화면만 표시하고 시연 표기를 유지한다. 콘솔의 complete_case/transfer_demo는 내부 처리 상태·지표만 갱신하며 시민에게 처리 결과를 노출하지 않는다. queued 수신만으로 connection_complete를 만들지 않는다. 최종 화면에서는 상담 입력·TTS·상태 polling을 중지하고 서버는 보호된 콘솔 처리를 계속 지원한다. 향후 문자 상담은 같은 sessionId/handoffId를 참조하는 별도 메시지 계약과 화면 모듈로 확장한다. 이번 API에 양방향 상담사 메시지 송수신 경로는 추가하지 않는다.
+
 revision, state, processing, activeIssueId, issues[{id,request,status}], transcript[], utterances[{id,text,maxSentences:2}], cards[], summary?, delivery?, error?.
 cards는 evidence|information|summary. 사실 카드에는 citations[]와 basisDate 표시, 인사·확인 질문에는 가짜 근거 없음. 발화 id별 재생 여부를 기억해 polling 때 TTS 중복 방지.
 한 번에 질문 하나. 요약은 coreLines와 숫자/날짜 확인 항목·승인·필드별 부분 수정·확인 없이 전달을 표시. summary edit는 correctionText 또는 changes[{fieldKey,value}]를 허용하고 수정하지 않은 필드·원문은 유지한다. 매우 불만+연결 의사 또는 명시적 생략은 낭독/승인 없이 unconfirmed·skipReason을 저장해 전달한다. 30초 경과는 미확인 전달 버튼을 드러낼 뿐 승인/전송을 자동 실행하지 않는다.
@@ -40,9 +42,9 @@ cards는 evidence|information|summary. 사실 카드에는 citations[]와 basisD
 ### 피드백 반영 추가 계약
 
 - POST /sessions/:id/outcome: 시민 토큰, {commandId,baseRevision,decision:resolved|need_more}. resolved는 모든 항목이 안내 완료인 경우에만 ai_confirmed로 종료한다. need_more는 active를 유지하며 이관을 강제하지 않는다.
-- complete_case의 outcome: {resolutionNote,repeatExplanationCount|null,gapReason|null,proposedSourceUrls:[]}. 상담사 토큰으로만 실행, agentId는 인증된 콘솔 사용자 가명으로 저장한다. 원문은 기존 보호 영역에 두고 개선 후보의 기록은 개인정보를 제거한다. 실제 개인정보가 입력되면 공개 내보내기를 차단한다.
+- complete_case의 outcome: {resolutionNote,repeatExplanationCount|null,gapReason|null,proposedSourceUrls:[]}. 상담사 토큰으로만 실행, agentId는 서버의 CONSOLE_TOKEN→CONSOLE_AGENT_ID 매핑값으로 저장한다. 요청자가 담당 ID를 바꿀 수 없고 MVP 지표는 단일 가상 상담사 기준임을 표시한다. 원문은 기존 보호 영역에 두고 개선 후보의 기록은 개인정보를 제거한다. 실제 개인정보가 입력되면 공개 내보내기를 차단한다.
 - GET /console/improvements: 콘솔 토큰, 개선 후보 목록. 데이터 검증·승인·버전 반영은 CLI/수동 파일 워크플로로 수행하고 공개 API 자동 게시 경로는 제공하지 않는다.
-- GET /console/metrics: 콘솔 토큰, {measurementMode,windowStart,windowEnd,endedCount,aiConfirmedCount,unknownCount,handoffCount,handoffReasons,aiResolutionRate|null,handoffRate|null,agents:[{id,completedCount,observationMinutes,averageHandlingSeconds|null,sampleSize}],averageWaitSeconds|null,repeatExplanationCount,missingRepeatCount}. 비율·평균은 분모 0이면 null. 모의 표기 필수.
+- GET /console/metrics: 콘솔 토큰, {measurementMode,windowStart,windowEnd,endedCount,aiConfirmedCount,unknownCount,handoffCount,handoffReasons,aiResolutionRate|null,handoffRate|null,agents:[{id,completedCount,observationMinutes,averageHandlingSeconds|null,sampleSize}],averageWaitSeconds|null,repeatExplanationCount,missingRepeatCount}. 비율·평균은 분모 0이면 null. 종료 관찰 구간의 세션 집합을 분모와 두 비율의 분자에 동일하게 적용한다. session_ended terminal 이벤트로 세션당 1회 집계하며 진행 중은 별도 inProgressCount로 표시한다. 모의 표기 필수.
 - summary의 fieldConfirmations는 {fieldKey,status:confirmed|unconfirmed,value} 배열이다. 전체 요약 미승인과 이미 확인한 개별 정보는 구별해 콘솔에 표시한다. 감정 추정·생략 사유도 원문 확인을 대신하지 않는다.
 - handoff-request 응답이 sending/queued인 경우 시민에게 “확인 절차를 줄여 전달 중/전달했으며 상담사는 대기 중”을 구분해 알린다. 수신 실패면 자동 생략 경로도 delivery_failed로 남기고 재시도한다.
 
@@ -59,6 +61,7 @@ cards는 evidence|information|summary. 사실 카드에는 citations[]와 basisD
 ## 내부 모듈 경계
 
 AI1 retrieve({query,issue,jurisdiction,businessDate,corpusVersion}) → {chunks,excluded,replacements,evidenceSufficient}.
+jurisdiction은 issue.locations 중 문의 목적(배출/발생/거주 등)에 맞는 장소를 선택한 결과다. AI2의 knownFields/missingFields와 proposedQuestion.fieldKey도 목적별 키를 사용하고 originTurnId를 보존한다. 타 목적의 장소로 조용히 대체하지 않는다. 새 발화의 장소 정정 시 기존 검색 결과는 갱신하며 이미 확인된 같은 목적의 장소는 다시 묻지 않는다.
 AI2 interpretAndPropose({sessionSnapshot,input,retrieval}) → 검증 전 LLM candidate.
 AI3 reduce({state,event,validatedCandidate}) → 상태·다음 이벤트·화면 snapshot.
 retrieval query는 질문 의미와 기존 맥락을 사용하며 demo scenario ID를 받지 않는다. AI2의 추출→AI1 검색→AI2 답변은 필요한 경우 두 호출이지만 서버 정책 우회는 불가.
@@ -67,5 +70,13 @@ retrieval query는 질문 의미와 기존 맥락을 사용하며 demo scenario 
 
 ## 회귀·데이터 계약
 
+POST /sessions/:id/corrections: 시민 토큰과 {commandId,baseRevision,handoffId,summaryRevision,correctionText}로 수락 전 정정을 제출한다. 기본 경로는 변경 항목 재확인 후 기존 summary API로 승인하고, 생략 조건이면 unconfirmed·skipReason을 보존해 재전달한다. 응답은 {handoffId,summaryRevision,deliveryRevision,acknowledgedRevision,correctionStatus:pending_confirmation|sending|received|failed|conflict}. 콘솔에는 변경 항목·최신 요약·이전 이력이 표시된다. 일반적인 대기 중 입력은 새 AI 상담을 시작하지 않고 기존 인계 건의 정정만 지원한다. 수락/정정은 세션 명령 직렬 처리로 순서를 확정하며 claim 선행 시 409와 정정 보존을 반환한다. 최신 정정본 수신 전 전달 완료를 표시하지 않는다.
+
+냉장고 기존 fixture의 missing_fields/asks_for에 쓰인 “거주 자치구”는 당시 이름이다. 평가 어댑터에서 해당 시연의 배출 장소 목적 키(disposal.district)에 매핑한다. 사용자는 배출 장소를 질문받으며 거주지를 전역 관할로 고정하지 않는다. 질문 횟수·적용 지역과 SC-025 신규 시험도 함께 검증해 legacy 필드명 때문에 잘못된 지역 안내를 허용하지 않는다.
+
 golden-turns.json은 기존 형식을 보존한다. 평가기에서 하위 항목을 취합해 expected intent/category/sources/stage를 검증한다. console.department_candidates는 화면 표기의 호환 별칭이며 내부 명칭은 candidates.
 summary_confirm/sent_to_console은 기본 경로에서 각각 summary_confirm/queued로 매핑한다. 기존 수도 fixture의 불만은 일반 경로를 유지하며 매우 불만 생략은 별도 정책 시험으로 검증한다. 1턴을 여러 2문장 낭독으로 나눠도 transcript와 alreadyTold에 모두 보존한다. 고정 scenario 응답은 테스트용 fixture 모드에만 허용하고 live 완료 검증에서는 금지한다.
+
+## 후보 결과·완료 매핑 보완
+
+추천 응답은 RoutingResult={candidates:Candidate[],unknownReason:string|null}. 후보 0개면 사유 필수, 후보가 있으면 null. 후보 자체에 unknownReason을 넣지 않는다. complete_case는 Session.state/Handoff.status=completed_demo와 completedAt을 원자 갱신한다. 전송 실패는 Session.delivery_failed/Handoff.failed로 구분해 저장한다. 정정 재전달은 같은 handoffId와 증가한 deliveryRevision을 사용하고 최초 수신 전 acknowledgedRevision=0을 허용한다.
