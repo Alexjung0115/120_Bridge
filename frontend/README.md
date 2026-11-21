@@ -38,6 +38,14 @@
 
 ## 시작하기
 
+### 이메일 로그인 설정
+
+- `NEXT_PUBLIC_SUPABASE_URL`과 `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`를 설정합니다.
+- Supabase 이메일 인증을 활성화하고 기본 가입 확인 및 로그인 링크 템플릿을 사용합니다. URL Configuration의 Redirect URLs에 배포 환경과 로컬의 `/auth/callback` 주소를 등록합니다.
+- 인증 요청과 메일 링크는 같은 브라우저에서 열어야 합니다. Supabase 기본 SMTP는 팀원 주소로만 발송할 수 있어 일반 시민 대상 발송에는 별도 SMTP가 필요합니다.
+- 상담사는 미리 생성한 계정의 서버 관리 `app_metadata.bridge_role`을 `counselor`로 설정해야 합니다. 사용자 편집이 가능한 `user_metadata`는 권한에 사용하지 않습니다.
+- 현재 로그인은 화면 접근을 보호합니다. 상담 API의 인증과 데이터 접근 권한은 AI3의 API 계약에 맞춰 별도로 연결해야 합니다.
+
 `frontend` 디렉터리에서 실행합니다.
 
 ```bash
