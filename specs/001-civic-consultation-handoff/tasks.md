@@ -40,7 +40,7 @@
 
 - [X] T001 AI3·10분·선행 없음: 【부분 완료】frontend/package.json·frontend/package-lock.json·frontend/tsconfig.json과 기본 frontend/src/app/page.tsx·frontend/src/app/layout.tsx의 초기 생성은 프런트 선행 작업으로 완료되었다. 남은 범위는 frontend/package.json의 계획된 테스트/자료 검증 명령·필요 의존성 확인과 frontend/.env.example·.gitignore의 비밀값 제외, 저장소 루트 .gitignore의 data/snapshots 제외다. 현재 앱 버전을 기준으로 진행하고 프로젝트 초기화·기본 파일 생성을 다시 작업으로 잡지 않는다. frontend/.env.example에 CONSOLE_AGENT_ID=demo-agent-1 등 서버 설정 이름만 기록한다. 한국어 메타데이터와 lang 설정은 T004에서 담당한다.
 - [x] T002 [P] AI2·10분·선행 T001: Cloud Run 백엔드의 `backend/preflight_model.py`에서 GMS `gpt-4.1-mini` 한국어 입력·구조화 출력·지연·형식 오류를 확인했다. [실제 호출 기록](../../docs/runtime-preflight.md)은 모델 ID·측정값·검증 결과를 담는다. 배포 환경의 AI·RAG 검증은 통합 단계에서 수행한다.
-- [ ] T003 [P] AI1·10분·선행 T001: rag-data/index.json의 36건·고유 URL·검증 상태·관할·날짜 충돌을 감사해 data/source-manifest.json과 data/audit-report.json에 핵심 6건·미검증·차단·우선순위를 기록한다. data-collection.md의 수집 시간/허용 출처를 적용한다.
+- [X] T003 [P] AI1·10분·선행 T001: rag-data/index.json의 36건·고유 URL·검증 상태·관할·날짜 충돌을 감사해 data/source-manifest.json과 data/audit-report.json에 핵심 6건·미검증·차단·우선순위를 기록한다. data-collection.md의 수집 시간/허용 출처를 적용한다.
 - [ ] T004 [P] FE·15분·선행 T001: 【부분 완료】frontend/src/app/globals.css·color-tokens.css·design-tokens.css의 스타일 기반과 frontend/assets/icon/ 아이콘 준비는 프런트 선행 작업으로 완료되었다. 남은 범위는 frontend/src/components/layout/DemoShell.tsx의 두 서비스 화면 공통 골격·모의 상담 표기·중립 확인 카드·상시 연결 위치와 frontend/src/app/layout.tsx의 한국어 lang/서비스 메타데이터다. 기본 페이지는 서비스 화면 완료로 세지 않는다. 실제 제공되는 서체와 layout/globals의 폰트 적용을 확인하고 docs/deployment-preflight.md에 제출 HTTPS/마이크/상태 공유 검증 전제를 기록한다.
 
 **Checkpoint**: 명령 실행 골격, 실제 모델 가능 여부, 제출 환경 전제, 데이터 감사가 확인되어야 한다. 미확보 전제는 해결하지 않고 완료로 체크하지 않는다.
