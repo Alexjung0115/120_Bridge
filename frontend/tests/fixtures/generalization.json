@@ -1,6 +1,6 @@
 {
   "businessDate": "2026-11-21",
-  "sourceReview": "pending",
+  "sourceReview": "verified",
   "cases": [
     {
       "id": "G01",
@@ -414,5 +414,5 @@
   ],
   "evaluationVersion": 1,
   "frozenOn": "2026-11-21",
-  "executionPolicy": "독립 평가 결과로 검색 임계값을 조정하지 않는다. sourceReview=pending은 원문·청크 검토 대기이며 live 통과를 의미하지 않는다."
+  "executionPolicy": "독립 평가 결과로 검색 임계값을 조정하지 않는다. sourceReview=verified는 AI1의 원문·청크 검증(PR #14)이 완료되어 기대 근거가 확정되었음을 의미한다."
 }
