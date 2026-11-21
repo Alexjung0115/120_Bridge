@@ -7,6 +7,8 @@ import {
   revisionSchema,
 } from "../contracts";
 
+import { issueCollectionSchema } from "./issue";
+
 const timestampSchema = z.iso.datetime({ offset: true });
 const nullableIdSchema = z.uuid().nullable();
 
@@ -59,6 +61,7 @@ export const sessionSchema = z.strictObject({
   state: sessionStateSchema,
   activeIssueId: nullableIdSchema,
   issueIds: z.array(z.uuid()),
+  issues: issueCollectionSchema.optional(),
   transcript: z.array(turnSchema).max(consultationLimits.turnsPerSession),
   handoffId: nullableIdSchema,
   pendingRequestId: nullableIdSchema,

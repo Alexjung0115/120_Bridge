@@ -105,11 +105,11 @@
 
 ### Tests
 
-- [ ] T026 [P] [US4] FE·10분·선행 T001,T004: frontend/tests/unit/speech-controller.test.ts에 기능 미지원·권한 거부·동일 utterance 재조회 중복 재생·연결 시 재생 취소·입력창의 숫자 1 예외를 작성한다.
+- [x] T026 [P] [US4] FE·10분·선행 T001,T004: frontend/tests/unit/speech-controller.test.ts에 기능 미지원·권한 거부·동일 utterance 재조회 중복 재생·연결 시 재생 취소·입력창의 숫자 1 예외를 작성한다.
 
 ### Implementation
 
-- [ ] T027 [US4] FE·20분·선행 T026: frontend/src/components/speech/useSpeechController.ts와 frontend/src/components/speech/MicrophoneControl.tsx에 ko-KR STT/TTS·두 문장 낭독 단위·자막·오류/무음·텍스트 전환을 구현한다. 지원 여부를 탐지하고 음성 실패를 상담 완료로 처리하지 않는다.
+- [x] T027 [US4] FE·20분·선행 T026: frontend/src/components/speech/useSpeechController.ts와 frontend/src/components/speech/MicrophoneControl.tsx에 ko-KR STT/TTS·두 문장 낭독 단위·자막·오류/무음·텍스트 전환을 구현한다. 지원 여부를 탐지하고 음성 실패를 상담 완료로 처리하지 않는다.
 - [ ] T028 [US4] FE·10분·선행 T017,T024,T027: frontend/src/app/page.tsx에 음성/텍스트 상담·항상 보이는 연결 버튼·1번 키·듣는 중/답변 중/확인 중을 통합한다. 모델 응답 중에도 연결 이벤트를 전송하고 늦은 응답을 재생하지 않는다.
 - [ ] T029 [US4] FE·10분·선행 T028: docs/voice-validation.md에 실제 Chrome/시연 기기의 인식→자막→음성 1회 이상, 권한 거부·무음·텍스트 대체 결과를 기록한다. 제출 HTTPS 재검증은 T048에서 수행하며 mock 시험 성공과 구분한다.
 
@@ -128,7 +128,7 @@
 - [ ] T032 [P] [US5] FE·20분·선행 T004,T005: frontend/src/app/console/page.tsx와 frontend/src/components/console/CasePanel.tsx에 토큰 입력·대기열/완료 필터·요약·확인/미확인·기존 안내·원문 접기·창구 카드·처리 결과 입력을 작성한다. fixture 두 건으로 컴포넌트를 검증하고 T045에서 T031,T033 live 경로와 연결한다. 별도 통계/관리 화면은 추가하지 않는다. 현재 console 페이지는 없으므로 상담사 화면 구현은 남은 작업이다. 전체 대화·완료 필터가 실제 동작하기 전 화면 완료로 체크하지 않는다.
 - [ ] T033 [US5] AI3·15분·선행 T031: frontend/src/app/api/console/sessions/[id]/actions/route.ts와 frontend/src/lib/store/metric-events.ts에 claim/transfer_demo/complete_case·가명 담당·처리 시각·재설명 기록·중복 방지를 구현한다. 제약 출처는 data-model.md의 Session.state, Session.outcome, MetricEvent.id, MetricEvent.sessionId, MetricEvent.eventType, MetricEvent.actorPseudonym, MetricEvent.reason, MetricEvent.measurementMode 및 Handoff.completedAt다. 상담 완료를 외부 행정 처리 완료로 표시하지 않는다. 제약 참조 보완: data-model.md의 MetricEvent.timestamp. complete_case는 Session.state와 Handoff.status를 함께 completed_demo로 기록하고 실패는 Session.delivery_failed/Handoff.failed로 매핑한다. 단일 가상 담당자 ID와 session_ended terminal 이벤트의 중복 금지도 구현한다.
 - [ ] T034 [US5] AI3·15분·선행 T033,T016: frontend/src/lib/metrics/aggregate.ts와 frontend/src/app/api/console/metrics/route.ts에서 AI 확인 완료율·이관율/사유·처리 건수/시간·대기·재설명과 누락 수를 산출한다. data-model.md의 Session.outcomeConfirmedAt, MetricEvent.timestamp와 계약의 분모 0/null·미완료/미확인 분리·모의 표기를 적용하고 원문을 집계 응답에 넣지 않는다. 관찰 구간의 session_ended terminal 이벤트에 속한 세션 집합에서만 분모와 ai_confirmed/handoff 분자를 계산한다. queued/serving/transferred_demo는 별도 진행 중 수로 보고하고 종료 세션당 1회만 집계한다.
-- [ ] T035 [P] [US5] AI1·10분·선행 T005,T007: frontend/src/lib/improvements/candidates.ts와 frontend/src/lib/schema/improvement.ts에 비식별 개선 후보 생성·조회·보호된 내보내기를 구현한다. canonical 출처는 data-model.md의 ImprovementCandidate.id, ImprovementCandidate.sessionId, ImprovementCandidate.status, ImprovementCandidate.reviewer, ImprovementCandidate.approvedAt, ImprovementCandidate.publishedCorpusVersion, ImprovementCandidate.regressionResult다. T033 완료 결과에서 호출하고 frontend/src/app/api/console/improvements/route.ts는 콘솔 인증을 재사용한다.
+- [X] T035 [P] [US5] AI1·10분·선행 T005,T007: frontend/src/lib/improvements/candidates.ts와 frontend/src/lib/schema/improvement.ts에 비식별 개선 후보 생성·조회·보호된 내보내기를 구현한다. canonical 출처는 data-model.md의 ImprovementCandidate.id, ImprovementCandidate.sessionId, ImprovementCandidate.status, ImprovementCandidate.reviewer, ImprovementCandidate.approvedAt, ImprovementCandidate.publishedCorpusVersion, ImprovementCandidate.regressionResult다. T033 완료 결과에서 호출하고 frontend/src/app/api/console/improvements/route.ts는 콘솔 인증을 재사용한다.
 - [ ] T036 [US5] AI1·15분·선행 T013,T035,T033: frontend/scripts/review-improvement.ts와 frontend/tests/fixtures/improvement-case.json에서 근거 부족 모의 상담 1건의 비식별 후보→공식 원문 검증→AI2 검토→승인→별도 corpus 버전 생성→회귀/새 질문 통과를 실행한다. data/evidence-log.jsonl와 data/improvement-validation.json에 검토자·자료 버전·결과를 남기고 승인 전 검색 반영을 막는다.
 - [ ] T037 [US5] AI2·10분·선행 T031,T032,T033,T034,T035: frontend/tests/integration/us5-console-metrics.test.ts에 두 상담 기록 분리·부분 수정·전송 실패/중복·미확인·확인 완료·분모 0·미종료·처리량/시간 재계산을 검증하고 data/metrics-validation.json에 모의 결과를 기록한다. SC-026의 정정 재전달·실패/재시도·중복·claim 경합을 검증하고 정정 반영 중 오래된 요약 수락과 정정 유실을 막는다. 종료 1건·대기 2건 표본에서 이관율에 대기 상담이 섞이지 않는지, 서버 고정 담당자 식별·두 객체 완료/실패 매핑·후보 0개 사유·최초 수신 전 revision도 검증한다.
 
@@ -143,7 +143,7 @@
 
 ### Implementation
 
-- [ ] T039 [US3] AI1·10분·선행 T012,T013,T038: data/replacements.json과 frontend/src/lib/retrieval/replacements.ts에 정책 두 문서 쌍의 claimKey별 변경 전후·유효 기간·대체 근거를 정규화하고 T014 필터와 색인에 연결한다. canonical 출처는 data-model.md의 Replacement.id, Replacement.predecessorDocId, Replacement.successorDocId, Replacement.claimKey, Replacement.validFrom, Replacement.validUntil, Replacement.evidenceChunkIds다.
+- [X] T039 [US3] AI1·10분·선행 T012,T013,T038: data/replacements.json과 frontend/src/lib/retrieval/replacements.ts에 정책 두 문서 쌍의 claimKey별 변경 전후·유효 기간·대체 근거를 정규화하고 T014 필터와 색인에 연결한다. canonical 출처는 data-model.md의 Replacement.id, Replacement.predecessorDocId, Replacement.successorDocId, Replacement.claimKey, Replacement.validFrom, Replacement.validUntil, Replacement.evidenceChunkIds다.
 - [x] T040 [P] [US3] AI2·15분·선행 T005,T008: frontend/src/lib/schema/candidate.ts와 frontend/src/lib/dialogue/routing.ts에 미해결 목적별 후보 근거·순위·신뢰를 구현한다. canonical 출처는 data-model.md의 Candidate.id, Candidate.rank, Candidate.confidence, Candidate.issueIds, Candidate.evidence, Candidate.selectedByAgent 및 RoutingResult.candidates, RoutingResult.unknownReason이다. 최대 후보 개수와 근거 부재 규칙은 data-model.md Candidate 절을 따르고 T039 완료 전에는 검증 청크 fixture로 독립 시험한다. 빈 후보의 사유는 RoutingResult에만 저장하고 Candidate 배열 원소에 넣지 않는다. frontend/tests/unit/routing-result.test.ts에서 후보 유무와 nullable 사유의 관계를 검증한다.
 - [ ] T041 [US3] FE·10분·선행 T032,T039,T040: frontend/src/components/console/RoutingEvidenceCard.tsx와 frontend/src/components/console/PolicyChangeCard.tsx에 후보별 처리 이유·발췌·URL·기준일/시행일·신뢰·변경 항목을 표시하고 상담사의 최종 선택을 T033에 연결한다. 출처 미확인은 날짜를 지어내지 않고 표시한다.
 - [ ] T042 [US3] AI2·10분·선행 T039,T040,T041,T023,T031: frontend/tests/integration/us3-policy-handoff.test.ts에서 기후동행카드 시나리오의 두 일정 변경·티머니/정책과 후보 및 수도 분야 낮은 신뢰·부서 미생성을 실제 API/콘솔 payload로 확인한다.

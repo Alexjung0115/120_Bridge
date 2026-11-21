@@ -228,6 +228,17 @@ export function buildCorpus() {
     if (!parsed.success) errors.push({ target: replacement.id, message: parsed.error.message });
     for (const id of replacement.evidenceChunkIds) {
       if (!chunkIds.has(id)) errors.push({ target: replacement.id, message: `없는 근거 청크 ${id}` });
+      else if (!id.startsWith(`${replacement.predecessorDocId}/`) && !id.startsWith(`${replacement.successorDocId}/`)) {
+        errors.push({ target: replacement.id, message: `근거 청크 ${id}가 변경 전후 문서에 속하지 않는다.` });
+      }
+    }
+    // Search applies one window per successor claim, so every predecessor of that claim must agree on it.
+    const sibling = replacements.find((item) => item.successorDocId === replacement.successorDocId && item.claimKey === replacement.claimKey);
+    if (sibling && (sibling.validFrom !== replacement.validFrom || sibling.validUntil !== replacement.validUntil)) {
+      errors.push({ target: replacement.id, message: `${sibling.id}와 같은 claim인데 유효기간이 다르다.` });
+    }
+    if (!citations.some((item) => item.claimKey === replacement.claimKey && item.chunkId.startsWith(`${replacement.successorDocId}/`))) {
+      warnings.push({ target: replacement.id, message: "변경 후 claim의 검증 승인 citation이 없어 검색에 적용되지 않는다." });
     }
   }
 

@@ -24,7 +24,7 @@
 | T035 | 대기 | 10분 | T005, T007 | 비식별 개선 후보 생성·조회·보호된 내보내기를 구현한다. 콘솔 인증을 재사용하고 원문·연락처를 일반 개선 파일에 저장하지 않는다. |
 | T036 | 대기 | 15분 | T013, T035, T033 | 근거 부족 상담 1건을 개선 후보→공식 근거 검증→AI2 검토→승인→별도 corpus 회귀 검증으로 처리한다. 승인 전에는 검색 corpus에 반영하지 않는다. |
 | T038 | 완료, 별도 PR | 10분 | T003, T009 | 선불·후불·페이백 claim 분리, 항목별 유효일, 미변경 창구 claim 유지, 근거 없는 부서명 금지를 실행 테스트로 검증했다. 전체 색인 연결은 T039 범위다. |
-| T039 | 부분 진행 | 10분 | T012, T013, T038 | 두 정책 문서 쌍의 변경 전후, 유효기간, 대체 근거를 `data/replacements.json` 및 검색 모듈에 연결한다. claim별 대체만 적용한다. `data/replacements.json`은 case1 선불·후불·페이백 claim으로 이미 작성되어 T038 테스트가 읽고 있다. 남은 범위는 case2/case3 동일 URL 쌍(AUD-005) 분리, `frontend/src/lib/retrieval/replacements.ts` 구현, T014 필터·색인 연결이다. |
+| T039 | 완료, 별도 PR | 10분 | T012, T013, T038 | `data/replacements.json`에 case1 선불·후불·페이백 claim과 case2 마을버스·case3 다둥이행복카드 claim(동일 URL, AUD-005)을 claimKey별 유효기간으로 분리했다. `frontend/src/lib/retrieval/replacements.ts`로 대체된 claim은 후속 문서 시행일 대신 대체 유효기간 `[validFrom, validUntil)`로 판정하고, 검색 결과에 변경 전 값(`replaces`)을 붙인다. 답변 검증(`validate-evidence.ts`)도 같은 기간을 쓴다. case2/case3 후속 문서는 blocked이므로 재검증 전까지 검색에 적용되지 않는다(빌드 경고). 대체 시작 전 기간의 이전 값은 corpus에 없어 근거 없음으로 처리된다. |
 | T046 | 대기 | 15분 | T018, T025, T039 | 독립 15문항, 미확보 분야·자치구, 복합 문의, 무근거 문의를 실행하고 일반화 보고서와 corpus 동결 정보를 생성한다. |
 
 ## 실행 순서

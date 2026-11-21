@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "corpusVersion": "corpus-2c4dec36a103",
+  "fixtureCases": 15,
+  "unavailableDomains": 6,
+  "districts": 6,
+  "documentChecks": 8,
+  "t025Ready": false,
+  "passed": false,
+  "blockedBy": [
+    "T025 integration test is not present"
+  ]
+}

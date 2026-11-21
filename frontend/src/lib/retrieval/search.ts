@@ -1,5 +1,6 @@
-import type { Citation, Document } from "./document-schema";
+import type { Citation, Document, Replacement } from "./document-schema";
 import { isEligibleEvidence } from "./evidence-eligibility";
+import { claimScopedDocument, governingReplacements } from "./replacements";
 
 // Same shape as EvidenceExcerpt in src/lib/dialogue/answer.ts (AI2).
 export type EvidenceExcerpt = {
@@ -9,7 +10,7 @@ export type EvidenceExcerpt = {
   answerEligible: boolean;
   routingEligible: boolean;
 };
-export type Corpus = { corpusVersion: string; documents: Document[]; citations: Citation[] };
+export type Corpus = { corpusVersion: string; documents: Document[]; citations: Citation[]; replacements?: Replacement[] };
 export type SearchQuery = { text: string; district: string | null; businessDate: string };
 export type SearchHit = {
   chunkId: string;
@@ -20,7 +21,8 @@ export type SearchHit = {
   jurisdiction: Document["jurisdiction"];
   verificationStatus: Document["verificationStatus"];
   score: number;
-  evidence: (EvidenceExcerpt & { basisDate: string | null; basisDateType: string })[];
+  // replaces: earlier values this claim supersedes (empty when the claim was never replaced).
+  evidence: (EvidenceExcerpt & { basisDate: string | null; basisDateType: string; replaces: Replacement[] })[];
 };
 export type SearchResult = {
   corpusVersion: string;
@@ -78,7 +80,7 @@ function appliesTo(doc: Document, district: string | null): boolean {
     (place.districtName === district || place.applicableDistricts.includes(district));
 }
 
-function inEffect(doc: Document, businessDate: string): boolean {
+function inEffect(doc: Pick<Document, "effectiveFrom" | "effectiveUntil">, businessDate: string): boolean {
   return (doc.effectiveFrom === null || doc.effectiveFrom <= businessDate) &&
     (doc.effectiveUntil === null || businessDate < doc.effectiveUntil);
 }
@@ -98,21 +100,27 @@ export function search(corpus: Corpus, query: SearchQuery, thresholds = RETRIEVA
   const hits: SearchHit[] = [];
   const perDoc = new Map<string, number>();
   for (const { doc, chunk, score: value } of matched) {
-    if (doc.verificationStatus !== "verified" || !appliesTo(doc, query.district) || !inEffect(doc, query.businessDate)) continue;
+    if (doc.verificationStatus !== "verified" || !appliesTo(doc, query.district)) continue;
     if (chunk.conflicts.length || (!chunk.answerEligible && !chunk.routingEligible)) continue;
     const evidence = corpus.citations
       .filter((citation) => citation.chunkId === chunk.chunkId && chunk.verifiedClaims.includes(citation.claimKey))
-      .map((citation) => ({
-        chunkId: chunk.chunkId,
-        claimKey: citation.claimKey,
-        quote: citation.quote,
-        answerEligible: chunk.answerEligible &&
-          isEligibleEvidence(doc, chunk.chunkId, citation.claimKey, query.district, query.businessDate, citation),
-        // Routing shows a missing basis date as 미확인 instead of hiding the channel (spec edge case).
-        routingEligible: chunk.routingEligible && citation.claimKey.startsWith("routing."),
-        basisDate: citation.basisDate,
-        basisDateType: citation.basisDateType,
-      }))
+      .map((citation) => {
+        // Validity is decided per claim: a replaced claim uses its replacement window (T039).
+        const claimDoc = claimScopedDocument(corpus.replacements, doc, citation.claimKey);
+        const valid = inEffect(claimDoc, query.businessDate);
+        return {
+          chunkId: chunk.chunkId,
+          claimKey: citation.claimKey,
+          quote: citation.quote,
+          answerEligible: valid && chunk.answerEligible &&
+            isEligibleEvidence(claimDoc, chunk.chunkId, citation.claimKey, query.district, query.businessDate, citation),
+          // Routing shows a missing basis date as 미확인 instead of hiding the channel (spec edge case).
+          routingEligible: valid && chunk.routingEligible && citation.claimKey.startsWith("routing."),
+          basisDate: citation.basisDate,
+          basisDateType: citation.basisDateType,
+          replaces: governingReplacements(corpus.replacements, doc.docId, citation.claimKey),
+        };
+      })
       .filter((item) => item.answerEligible || item.routingEligible);
     if (!evidence.length || (perDoc.get(doc.docId) ?? 0) >= thresholds.maxPerDoc) continue;
     perDoc.set(doc.docId, (perDoc.get(doc.docId) ?? 0) + 1);

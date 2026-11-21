@@ -1,16 +1,25 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { splitIntoSentences } from "../../src/components/speech/useSpeechController.ts";
 
-import { splitUtterances } from "../../src/components/speech/useSpeechController";
-
-test("spoken units hold at most two sentences", () => {
-  assert.deepEqual(
-    splitUtterances("첫째입니다. 둘째입니다. 셋째입니다? 넷째입니다. 다섯째입니다."),
-    ["첫째입니다. 둘째입니다.", "셋째입니다? 넷째입니다.", "다섯째입니다."],
-  );
+test("splitIntoSentences breaks text into proper sentences", () => {
+  const input = "안녕하세요. 첫 번째 안내입니다! 두 번째 안내는 무엇일까요? 세 번째 문장도 있습니다.";
+  const sentences = splitIntoSentences(input);
+  assert.equal(sentences.length, 4);
+  assert.equal(sentences[0], "안녕하세요.");
+  assert.equal(sentences[1], "첫 번째 안내입니다!");
+  assert.equal(sentences[2], "두 번째 안내는 무엇일까요?");
+  assert.equal(sentences[3], "세 번째 문장도 있습니다.");
 });
 
-test("decimals and empty input do not create extra units", () => {
-  assert.deepEqual(splitUtterances("용량은 3.5 리터입니다."), ["용량은 3.5 리터입니다."]);
-  assert.deepEqual(splitUtterances("  "), []);
+test("splitIntoSentences limits to two sentences when sliced", () => {
+  const input = "서울시 120 다산콜센터입니다. 마포구 대형폐기물 배출을 안내해 드립니다. 수수료는 규격별로 상이합니다.";
+  const sentences = splitIntoSentences(input).slice(0, 2);
+  assert.equal(sentences.length, 2);
+  assert.equal(sentences.join(" "), "서울시 120 다산콜센터입니다. 마포구 대형폐기물 배출을 안내해 드립니다.");
+});
+
+test("speech controller handles empty or whitespace text gracefully", () => {
+  const sentences = splitIntoSentences("   ");
+  assert.deepEqual(sentences, []);
 });
