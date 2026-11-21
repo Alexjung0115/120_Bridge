@@ -105,11 +105,11 @@
 
 ### Tests
 
-- [ ] T026 [P] [US4] FE·10분·선행 T001,T004: frontend/tests/unit/speech-controller.test.ts에 기능 미지원·권한 거부·동일 utterance 재조회 중복 재생·연결 시 재생 취소·입력창의 숫자 1 예외를 작성한다.
+- [x] T026 [P] [US4] FE·10분·선행 T001,T004: frontend/tests/unit/speech-controller.test.ts에 기능 미지원·권한 거부·동일 utterance 재조회 중복 재생·연결 시 재생 취소·입력창의 숫자 1 예외를 작성한다.
 
 ### Implementation
 
-- [ ] T027 [US4] FE·20분·선행 T026: frontend/src/components/speech/useSpeechController.ts와 frontend/src/components/speech/MicrophoneControl.tsx에 ko-KR STT/TTS·두 문장 낭독 단위·자막·오류/무음·텍스트 전환을 구현한다. 지원 여부를 탐지하고 음성 실패를 상담 완료로 처리하지 않는다.
+- [x] T027 [US4] FE·20분·선행 T026: frontend/src/components/speech/useSpeechController.ts와 frontend/src/components/speech/MicrophoneControl.tsx에 ko-KR STT/TTS·두 문장 낭독 단위·자막·오류/무음·텍스트 전환을 구현한다. 지원 여부를 탐지하고 음성 실패를 상담 완료로 처리하지 않는다.
 - [ ] T028 [US4] FE·10분·선행 T017,T024,T027: frontend/src/app/page.tsx에 음성/텍스트 상담·항상 보이는 연결 버튼·1번 키·듣는 중/답변 중/확인 중을 통합한다. 모델 응답 중에도 연결 이벤트를 전송하고 늦은 응답을 재생하지 않는다.
 - [ ] T029 [US4] FE·10분·선행 T028: docs/voice-validation.md에 실제 Chrome/시연 기기의 인식→자막→음성 1회 이상, 권한 거부·무음·텍스트 대체 결과를 기록한다. 제출 HTTPS 재검증은 T048에서 수행하며 mock 시험 성공과 구분한다.
 

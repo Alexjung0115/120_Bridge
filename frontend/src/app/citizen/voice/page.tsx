@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
 import { buttonVariants } from "@/components/ui/button";
 import { HandoffLink } from "../_components/handoff-entry";
 import { Badge } from "@/components/ui/badge";
@@ -11,19 +12,65 @@ import { resultHistoryIdKey } from "../_lib/history";
 import { summaryKey } from "../_lib/summary";
 import { removeStorage } from "../_lib/storage";
 import { speakerLabel, voiceMessages } from "../_lib/messages";
+import { useSpeechController } from "@/components/speech/useSpeechController";
+import { MicrophoneControl } from "@/components/speech/MicrophoneControl";
 
 const voiceSummary = "마포구 안심생활 키트 신청 후 처리 결과를 받지 못함";
 const bars = [8, 14, 23, 12, 31, 43, 25, 51, 34, 20, 42, 29, 14, 25, 10];
 
-function MuteIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="size-icon-24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9 9v2a3 3 0 0 0 4.7 2.5M15 9V7a3 3 0 0 0-5.7-1.3M5 11a7 7 0 0 0 11.5 5.4M19 11a7 7 0 0 1-.4 2.3M12 18v3m-3 0h6M3 3l18 18" />
-    </svg>
-  );
-}
 
 export default function VoicePage() {
+  const [messages, setMessages] = useState(voiceMessages);
+  const [statusMessage, setStatusMessage] = useState("대기 중");
+
+  const speakRef = useRef<(text: string) => void>(() => {});
+
+  const { state: speechState, transcript, isSupported, startListening, stopListening, speak } =
+    useSpeechController({
+      lang: "ko-KR",
+      onTranscript: (text) => {
+        const userMsg = {
+          sequence: Date.now(),
+          speaker: "citizen" as const,
+          content: text,
+        };
+        setMessages((prev) => [...prev, userMsg]);
+        setStatusMessage("답변 생성 중...");
+
+        setTimeout(() => {
+          const replyText = text.includes("냉장고")
+            ? "마포구 대형폐기물 배출은 관할 동주민센터 방문 또는 구청 홈페이지 스마트클린에서 신청 가능합니다."
+            : text.includes("안심생활")
+            ? "마포구 안심생활 지원 신청 건은 현재 담당 부서에서 접수 검토 중입니다."
+            : "말씀하신 문의 내용을 확인했습니다. 관련 절차를 안내해 드리겠습니다.";
+
+          const aiMsg = {
+            sequence: Date.now() + 1,
+            speaker: "ai" as const,
+            content: replyText,
+          };
+          setMessages((prev) => [...prev, aiMsg]);
+          setStatusMessage("안내 말씀드리는 중");
+          speakRef.current(replyText);
+        }, 600);
+      },
+      onError: (err) => setStatusMessage(err),
+    });
+
+  useEffect(() => {
+    speakRef.current = speak;
+  }, [speak]);
+
+  const toggleListening = () => {
+    if (speechState === "listening") {
+      stopListening();
+      setStatusMessage("음성 인식 중지됨");
+    } else {
+      startListening();
+      setStatusMessage("말씀을 듣고 있습니다...");
+    }
+  };
+
   return (
     <main className="mx-auto flex min-h-svh w-full max-w-md flex-col sm:max-w-xl sm:px-10 overflow-y-auto bg-background-white px-6 pb-4 pt-6 text-text-basic [@media(max-height:720px)]:pt-4">
       <header aria-label="120Bridge" className="flex items-center guide-gap-3">
@@ -43,14 +90,24 @@ export default function VoicePage() {
           ))}
         </div>
         <div className="mt-2 flex flex-wrap justify-center guide-gap-3 type-body-xsmall">
-          <Badge size="md">듣는 중 · 대기</Badge>
+          <Badge size="md">{speechState === "listening" ? "듣는 중" : speechState === "speaking" ? "답변 재생 중" : statusMessage}</Badge>
         </div>
+      </section>
+
+      <section aria-label="실시간 자막" className="shrink-0 text-center py-2 min-h-10">
+        {transcript ? (
+          <p className="type-body-small text-text-primary bg-element-primary-lighter px-4 py-2 rounded-xl inline-block animate-pulse">
+            {transcript}
+          </p>
+        ) : (
+          <p className="type-body-xsmall text-text-subtle">마이크 버튼을 누르고 말씀하시면 음성이 인식됩니다.</p>
+        )}
       </section>
 
       <section aria-labelledby="caption-title" className="shrink-0 rounded-2xl bg-element-secondary-lighter guide-p-6">
         <h2 id="caption-title" className="type-body-small-bold text-text-bolder">상담 내용</h2>
         <dl className="mt-2 flex flex-col guide-gap-3 type-body-small">
-          {voiceMessages.map(({ sequence, speaker, content }) => (
+          {messages.map(({ sequence, speaker, content }) => (
             <div key={sequence}>
               <dt className={`type-body-small-bold ${speaker === "citizen" ? "text-text-subtle" : "text-text-primary"}`}>{speakerLabel[speaker]}</dt>
               <dd className="mt-1">{content}</dd>
@@ -59,13 +116,12 @@ export default function VoicePage() {
         </dl>
       </section>
 
-      <nav aria-label="음성 상담 조작" className="flex shrink-0 items-start justify-center py-4 [@media(max-height:720px)]:py-2">
-        <div className="flex flex-col items-center guide-gap-3">
-          <button type="button" disabled className="flex size-15 items-center justify-center rounded-full bg-element-gray-lighter text-icon-gray disabled:cursor-not-allowed">
-            <MuteIcon />
-          </button>
-          <span className="type-body-small">음소거</span>
-        </div>
+      <nav aria-label="음성 상담 조작" className="flex shrink-0 items-center justify-center py-4 [@media(max-height:720px)]:py-2">
+        <MicrophoneControl
+          state={speechState}
+          isSupported={isSupported}
+          onToggleListening={toggleListening}
+        />
       </nav>
 
       <Link href="/citizen/summary" onNavigate={() => {
