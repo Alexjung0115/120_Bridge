@@ -27,8 +27,9 @@ export function configuredSessionApi() {
     },
     load: (id) => rpc("bridge_load_session", { p_session: id }),
     loadSummary: (id, revision) => rpc("bridge_load_citizen_summary", { p_session: id, p_revision: revision }),
-    end: (id, command, base, hash) => rpc("bridge_end_session", {
+    end: (id, command, base, hash, decision) => rpc(decision ? "bridge_record_citizen_outcome" : "bridge_end_session", {
       p_session: id, p_command: command, p_base: base, p_token_hash: hash,
+      ...(decision ? { p_decision: decision } : {}),
     }),
   }, BRIDGE_SESSION_SIGNING_SECRET, BRIDGE_CORPUS_VERSION);
 }
