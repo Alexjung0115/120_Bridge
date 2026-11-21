@@ -1,7 +1,7 @@
 # AI 1 태스크별 작업 계획
 
-기준 문서: `specs/001-civic-consultation-handoff/tasks.md`  
-담당 범위: 자료 수집·검증, 검색, 정책 대체 관계, 개선 후보 검증  
+기준 문서: `specs/001-civic-consultation-handoff/tasks.md`
+담당 범위: 자료 수집·검증, 검색, 정책 대체 관계, 개선 후보 검증
 작성일: 2026-11-21
 
 ## 진행 원칙
