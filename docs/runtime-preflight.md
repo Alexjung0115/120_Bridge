@@ -1,5 +1,21 @@
 # AI2 모델 사전시험
 
+## T018 독립 안내 평가 준비
+
+`frontend/tests/fixtures/generalization.json`은 독립 15문항(새 문의 5·표현 변경 5·근거 없음 5)을 유지한다. SC-015 표본 6건에 분야·자치구를 명시하고 기대 상태·금지 표현 패턴·근거 카드 금지 조건을 추가했다. SC-025 다섯 경로의 목적별 지역·재질문·정정 조건도 검사한다. 기존 `forbidden` 설명은 수동 의미 검토 기준으로 유지하며 정규식 검사는 해당 설명의 일부 위반을 탐지한다.
+
+저장소의 현 브랜치에는 T014 검색과 T016 서비스 안내 API가 없어 실제 일반화 성능은 미검증이다. `sourceReview=pending`은 기대 문서의 공식 원문·답변 가능 청크에 대한 AI1 검토 대기 상태다. 검토 후 자료 버전과 함께 갱신하고 평가 결과를 검색 임계값 조정에 사용하지 않는다.
+
+frontend 디렉터리에서 평가기 자체 검사와 live 시험을 실행한다. live 시험은 전용 개발·시험 환경에 가상 상담 세션을 생성한다. `BRIDGE_US1_API_BASE`는 `/api`까지 포함한 서비스 API 주소다.
+
+```powershell
+node --experimental-strip-types --test tests/integration/us1-guidance.test.ts
+$env:BRIDGE_US1_API_BASE = 'http://localhost:3000/api'
+node --experimental-strip-types --test tests/integration/us1-guidance.test.ts
+```
+
+주소가 없으면 평가기 자체 검사 2건을 실행하고 live 15건은 skip으로 표시한다. 주소를 설정하면 세션 생성→명령 봉투를 이용한 턴 제출→202 polling→최종 상태·관할·출처 URL/인용문·필수/금지 표현을 검사한다. 근거 있는 답변 문항은 `sourceReview=verified`가 필요하다. 출력되는 fixture SHA-256으로 평가 자료를 식별한다. 사실 함의·개인 조회 주장·질문 의미에 대한 최종 검토와 T017 화면 연결 확인은 API 시험과 함께 수행해야 한다. T018의 완료 체크는 이 검증 후에 한다.
+
 2026-11-21 로컬 Windows Python 3.12에서 SSAFY GMS Responses API의 `gpt-4.1-mini`를 시험했다. 모델 ID는 호출에 사용한 별칭이다. 요청은 두 건 모두 가상 발화 또는 가상 근거만 사용했다.
 
 | 검증 | 결과 |

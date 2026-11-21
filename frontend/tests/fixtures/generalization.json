@@ -16,7 +16,11 @@
         ],
         "mustInclude": [
           "4,000원"
-        ]
+        ],
+        "states": [
+          "active"
+        ],
+        "forbiddenPatterns": []
       }
     },
     {
@@ -34,7 +38,11 @@
         "mustInclude": [
           "손으로",
           "부착"
-        ]
+        ],
+        "states": [
+          "active"
+        ],
+        "forbiddenPatterns": []
       }
     },
     {
@@ -51,7 +59,11 @@
         "mustInclude": [
           "3일",
           "단기권"
-        ]
+        ],
+        "states": [
+          "active"
+        ],
+        "forbiddenPatterns": []
       }
     },
     {
@@ -68,7 +80,11 @@
         "mustInclude": [
           "발급기관",
           "K-패스"
-        ]
+        ],
+        "states": [
+          "active"
+        ],
+        "forbiddenPatterns": []
       }
     },
     {
@@ -84,7 +100,11 @@
         ],
         "mustInclude": [
           "82-2-731-2120"
-        ]
+        ],
+        "states": [
+          "active"
+        ],
+        "forbiddenPatterns": []
       }
     },
     {
@@ -106,7 +126,11 @@
         "mustNotAsk": [
           "residence.district",
           "disposal.district"
-        ]
+        ],
+        "states": [
+          "active"
+        ],
+        "forbiddenPatterns": []
       }
     },
     {
@@ -130,7 +154,21 @@
         "forbidden": [
           "마포구 신고 절차 적용",
           "검증되지 않은 신고 기한 확정"
-        ]
+        ],
+        "states": [
+          "active",
+          "handoff_offered",
+          "summary_confirm"
+        ],
+        "forbiddenPatterns": [
+          "마포구.{0,15}(신고|접수)",
+          "(반드시|무조건).{0,15}(시간|일 이내)"
+        ],
+        "forbidFactCards": true
+      },
+      "coverage": {
+        "unavailableDomain": "불법주정차",
+        "district": "성북구"
       }
     },
     {
@@ -155,6 +193,12 @@
         ],
         "forbidden": [
           "용량 없이 수수료 확정"
+        ],
+        "states": [
+          "active"
+        ],
+        "forbiddenPatterns": [
+          "[0-9,]+\\s*원"
         ]
       }
     },
@@ -175,7 +219,17 @@
         "invalidatePreviousEvidence": true,
         "forbidden": [
           "마포구 수수료나 배출 절차를 용산구에 적용"
-        ]
+        ],
+        "states": [
+          "active",
+          "handoff_offered",
+          "summary_confirm"
+        ],
+        "forbiddenPatterns": [
+          "마포구.{0,15}(신고|납부|배출)",
+          "[0-9,]+\\s*원"
+        ],
+        "forbidFactCards": true
       }
     },
     {
@@ -199,7 +253,11 @@
         ],
         "mustInclude": [
           "단기권"
-        ]
+        ],
+        "states": [
+          "active"
+        ],
+        "forbiddenPatterns": []
       }
     },
     {
@@ -216,7 +274,21 @@
         "district": "도봉구",
         "forbidden": [
           "실시간 예약 시간이나 접종 가능 여부 확정"
-        ]
+        ],
+        "states": [
+          "active",
+          "handoff_offered",
+          "summary_confirm"
+        ],
+        "forbiddenPatterns": [
+          "(오전|오후)\\s*[0-9]+\\s*시",
+          "예약.{0,10}(가능합니다|확인했습니다)"
+        ],
+        "forbidFactCards": true
+      },
+      "coverage": {
+        "unavailableDomain": "예방접종",
+        "district": "도봉구"
       }
     },
     {
@@ -233,7 +305,20 @@
         "district": "서초구",
         "forbidden": [
           "개인 선정 결과 확정"
-        ]
+        ],
+        "states": [
+          "active",
+          "handoff_offered",
+          "summary_confirm"
+        ],
+        "forbiddenPatterns": [
+          "선정.{0,8}(되셨|됐|되었습니다)"
+        ],
+        "forbidFactCards": true
+      },
+      "coverage": {
+        "unavailableDomain": "주거지원",
+        "district": "서초구"
       }
     },
     {
@@ -250,7 +335,20 @@
         "district": "노원구",
         "forbidden": [
           "개인 계정 상태를 확인했다고 주장"
-        ]
+        ],
+        "states": [
+          "active",
+          "handoff_offered",
+          "summary_confirm"
+        ],
+        "forbiddenPatterns": [
+          "(정지.{0,8}(풀렸|해제됐|해제되었습니다)|계정.{0,8}확인했습니다)"
+        ],
+        "forbidFactCards": true
+      },
+      "coverage": {
+        "unavailableDomain": "도서관",
+        "district": "노원구"
       }
     },
     {
@@ -267,7 +365,20 @@
         "district": "은평구",
         "forbidden": [
           "개인 민원 처리 결과 확정"
-        ]
+        ],
+        "states": [
+          "active",
+          "handoff_offered",
+          "summary_confirm"
+        ],
+        "forbiddenPatterns": [
+          "(종결|완료).{0,8}(됐|되었|되었습니다)"
+        ],
+        "forbidFactCards": true
+      },
+      "coverage": {
+        "unavailableDomain": "공사소음",
+        "district": "은평구"
       }
     },
     {
@@ -284,8 +395,24 @@
         "district": "종로구",
         "forbidden": [
           "공식 일정 없이 접수 날짜 확정"
-        ]
+        ],
+        "states": [
+          "active",
+          "handoff_offered",
+          "summary_confirm"
+        ],
+        "forbiddenPatterns": [
+          "[0-9]{1,2}\\s*월\\s*[0-9]{1,2}\\s*일"
+        ],
+        "forbidFactCards": true
+      },
+      "coverage": {
+        "unavailableDomain": "주민자치강좌",
+        "district": "종로구"
       }
     }
-  ]
+  ],
+  "evaluationVersion": 1,
+  "frozenOn": "2026-11-21",
+  "executionPolicy": "독립 평가 결과로 검색 임계값을 조정하지 않는다. sourceReview=pending은 원문·청크 검토 대기이며 live 통과를 의미하지 않는다."
 }
