@@ -34,6 +34,30 @@ test("extracts a personal lookup without answering from memory", async () => {
   assert.deepEqual(result.answerUnits, []);
 });
 
+test("keeps two independent requests in order and defers the second question", async () => {
+  const second = {
+    ...personal.sampleCandidate.issues[0],
+    localId: "issue-2",
+    missingFields: ["residence.district"],
+  };
+  const candidate = {
+    ...grounded.sampleCandidate,
+    issues: [grounded.sampleCandidate.issues[0], second],
+    answerUnits: [],
+    proposedQuestion: null,
+  };
+  const context = { recentTurns: [], knownFields: grounded.request.knownFields };
+  const result = await interpret(clientWith(candidate), "냉장고와 수도요금 문의", context);
+  assert.deepEqual(result.issues.map((issue) => issue.localId), ["issue-1", "issue-2"]);
+  await assert.rejects(
+    interpret(clientWith({
+      ...candidate,
+      proposedQuestion: { fieldKey: "residence.district", text: "거주지를 알려주세요." },
+    }), "냉장고와 수도요금 문의", context),
+    InvalidModelOutput,
+  );
+});
+
 test("keeps known district and evidence in the model input", async () => {
   let supplied: Record<string, unknown> | undefined;
   const result = await answer(
