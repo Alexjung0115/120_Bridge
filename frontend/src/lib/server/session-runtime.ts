@@ -1,3 +1,4 @@
+import { createSupabaseRpc } from "../store/snapshot";
 import { createSessionApi } from "./session-api";
 
 export function configuredSessionApi() {
@@ -7,18 +8,7 @@ export function configuredSessionApi() {
   if (!SUPABASE_URL || !key || !BRIDGE_DEMO_OWNER_ID || !BRIDGE_SESSION_SIGNING_SECRET || !BRIDGE_CORPUS_VERSION) {
     throw new Error("Session API is not configured.");
   }
-  const endpoint = new URL("/rest/v1/rpc/", SUPABASE_URL);
-  const headers = new Headers({ apikey: key, "Content-Type": "application/json" });
-  if (!key.startsWith("sb_secret_")) headers.set("Authorization", `Bearer ${key}`);
-
-  async function rpc<T>(name: string, body: Record<string, unknown>): Promise<T> {
-    const response = await fetch(new URL(name, endpoint), {
-      method: "POST", headers, body: JSON.stringify(body), cache: "no-store",
-      redirect: "error", signal: AbortSignal.timeout(5_000),
-    });
-    if (!response.ok) throw new Error("Storage is unavailable.");
-    return await response.json() as T;
-  }
+  const rpc = createSupabaseRpc(SUPABASE_URL, key);
 
   return createSessionApi({
     open: (mode, session) => rpc("bridge_open_session", {

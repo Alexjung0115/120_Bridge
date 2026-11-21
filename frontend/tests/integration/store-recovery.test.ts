@@ -275,3 +275,94 @@ test("session admission checks retries ahead of the five-session ceiling", async
     await db.close();
   }
 });
+test("approved handoff delivery atomically publishes one protected queue entry", async () => {
+  const db = await PGlite.create();
+  try {
+    await seed(db);
+    await db.exec(await readFile(new URL("20261121030000_console_handoffs.sql", migrationDir), "utf8"));
+    await db.exec("set role service_role");
+    const storage = persistence(db);
+    await storage.initialize(sessionId, { ...initial, state: "sending" });
+    const payload = {
+      id: uid(201), idempotencyKey: uid(202), summaryId: uid(203), summaryRevision: 1,
+      summary: { id: uid(203), revision: 1, sessionRevision: 0, confirmation: "confirmed", confirmedAt: initial.updatedAt },
+      unresolvedIssueIds: [], resolvedContextIds: [], candidates: [],
+    };
+    async function deliver(input: object, revision = 0) {
+      const { rows } = await db.query<{ data: { status: string } }>(
+        "select public.bridge_deliver_handoff($1,$2,$3) as data", [sessionId, revision, input]);
+      return rows[0].data;
+    }
+    assert.equal((await deliver(payload, 1)).status, "conflict");
+    await assert.rejects(deliver({ ...payload, summary: { ...payload.summary, confirmation: "unconfirmed" } }), { code: "22023" });
+    assert.equal((await deliver(payload)).status, "conflict");
+    const approved = await db.query<{ approved: boolean }>(
+      "select public.bridge_record_handoff_approval($1,0,$2) as approved", [sessionId, payload.summary]);
+    assert.equal(approved.rows[0].approved, true);
+    assert.equal((await deliver({ ...payload, summary: { ...payload.summary, coreLines: ["변조"] } })).status, "conflict");
+    assert.equal((await deliver(payload)).status, "sending");
+    const unpublished = await db.query<{ data: { items: unknown[] } }>(
+      "select public.bridge_console_queue(null) as data");
+    assert.equal(unpublished.rows[0].data.items.length, 0);
+    const hidden = await db.query<{ data: unknown }>("select public.bridge_console_detail($1) as data", [sessionId]);
+    assert.equal(hidden.rows[0].data, null);
+    const ack = async () => (await db.query<{ data: { status: string } }>(
+      "select public.bridge_acknowledge_handoff($1,0,$2) as data", [sessionId, payload.idempotencyKey])).rows[0].data;
+    assert.equal((await ack()).status, "queued");
+    assert.equal((await ack()).status, "replayed");
+    assert.equal((await deliver(payload)).status, "replayed");
+    assert.equal((await deliver({ ...payload, idempotencyKey: uid(204) })).status, "conflict");
+    const snapshot = codec(await storage.load(sessionId));
+    assert.equal(snapshot.revision, 1);
+    const { rows: queue } = await db.query<{ data: { items: { sessionId: string; handoffId: string }[] } }>(
+      "select public.bridge_console_queue(null) as data");
+    assert.equal(queue[0].data.items.length, 1);
+    assert.equal(queue[0].data.items[0].handoffId, payload.id);
+    const { rows: detail } = await db.query<{ data: Record<string, unknown> }>(
+      "select public.bridge_console_detail($1) as data", [sessionId]);
+    assert.equal(detail[0].data.state, "queued");
+    assert.equal(detail[0].data.acknowledgedRevision, 1);
+    assert.equal("citizenTokenHash" in detail[0].data, false);
+    async function stage(id: string, text: string, base = 1) {
+      const { rows } = await db.query<{ data: { status: string } }>(
+        "select public.bridge_stage_handoff_correction($1,$2,$3,$4) as data",
+        [sessionId, base, id, text]);
+      return rows[0].data.status;
+    }
+    const premature = await db.query<{ data: { status: string } }>(
+      "select public.bridge_correct_handoff($1,1,$2,$3) as data",
+      [sessionId, uid(210), { ...payload.summary, revision: 2, sessionRevision: 1 }]);
+    assert.equal(premature.rows[0].data.status, "conflict");
+    assert.equal(await stage(uid(210), "정정 내용"), "pending_confirmation");
+    assert.equal(await stage(uid(210), "정정 내용"), "pending_confirmation");
+    const pending = (await db.query<{ data: Record<string, unknown> }>(
+      "select public.bridge_console_detail($1) as data", [sessionId])).rows[0].data;
+    assert.equal(pending.deliveryRevision, 2);
+    assert.equal(pending.acknowledgedRevision, 1);
+    assert.equal(await stage(uid(211), "다른 정정", 2), "conflict");
+    const amended = { ...payload.summary, revision: 2, sessionRevision: 2, coreLines: ["정정 내용"] };
+    const correction = async () => (await db.query<{ data: { status: string; handoffId: string } }>(
+      "select public.bridge_correct_handoff($1,2,$2,$3) as data", [sessionId, uid(210), amended])).rows[0].data;
+    const corrected = await correction();
+    assert.equal(corrected.status, "queued");
+    assert.equal(corrected.handoffId, payload.id);
+    assert.equal((await correction()).status, "replayed");
+    const correctedDetail = (await db.query<{ data: Record<string, unknown> }>(
+      "select public.bridge_console_detail($1) as data", [sessionId])).rows[0].data;
+    assert.equal(correctedDetail.acknowledgedRevision, 2);
+    assert.deepEqual(correctedDetail.summary, amended);
+    assert.deepEqual(correctedDetail.summaryHistory, [{ correctionId: uid(210), summary: payload.summary, deliveryRevision: 1 }]);
+    const latest = codec(await storage.load(sessionId));
+    await storage.commit(sessionId, uid(212), 3, { ...latest, state: "serving", revision: 4 }, null);
+    assert.equal(await stage(uid(213), "수락 이후 정정", 3), "conflict");
+    assert.equal(await stage(uid(213), "수락 이후 정정", 3), "conflict");
+    const afterClaim = (await db.query<{ data: Record<string, unknown> }>(
+      "select public.bridge_console_detail($1) as data", [sessionId])).rows[0].data;
+    assert.deepEqual(afterClaim.correctionConflicts, [{ id: uid(213), text: "수락 이후 정정" }]);
+    await db.exec("reset role");
+    await db.exec("set role authenticated");
+    await assert.rejects(db.query("select public.bridge_console_queue(null)"), { code: "42501" });
+  } finally {
+    await db.close();
+  }
+});
