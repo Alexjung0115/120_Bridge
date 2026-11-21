@@ -7,6 +7,7 @@ import { createDialogueApi, parseDialogueSnapshot } from "../../src/lib/dialogue
 import type { DialogueCandidate } from "../../src/lib/dialogue/candidate-schema";
 import { ResponsesClient } from "../../src/lib/dialogue/model-client";
 import { issueCitizenToken } from "../../src/lib/server/auth";
+import { createSessionStore } from "../../src/lib/store/session-store";
 import type { SavedCommand, SessionPersistence } from "../../src/lib/store/snapshot";
 
 const corpus = loadCorpus();
@@ -52,6 +53,7 @@ function setup({
     },
   };
 
+  const background: Promise<unknown>[] = [];
   let calls = 0;
   const model = new ResponsesClient("https://dialogue.invalid/responses", "fixture-key", "fixture", async (_url, init) => {
     calls += 1;
@@ -69,13 +71,13 @@ function setup({
       type: "output_text", text: JSON.stringify(candidate),
     }] }] });
   });
-  const api = createDialogueApi({ persistence, corpus, model, responseWaitMs });
+  const api = createDialogueApi({ persistence, corpus, model, responseWaitMs, retainWork: work => background.push(work) });
   const request = (path: string, body?: object, bearer = token) => new Request("https://bridge.invalid/api/sessions/" + id + path, {
     method: body ? "POST" : "GET", headers: { Authorization: "Bearer " + bearer },
     body: body ? JSON.stringify(body) : undefined,
   });
   const turnCommand = { commandId: randomUUID(), baseRevision: 0, text, inputMode: "text" };
-  return { api, id, request, turnCommand, calls: () => calls, stored: () => stored };
+  return { api, id, request, turnCommand, persistence, background, calls: () => calls, stored: () => stored };
 }
 
 test("T016 saves verified guidance, replays without model work, and requires explicit resolution", async () => {
@@ -188,4 +190,48 @@ test("T016 asks for the disposal district without borrowing the residence distri
   assert.equal(calls(), 1);
   assert.equal(stored().issues[0].jurisdiction, null);
   assert.equal(stored().issues[0].questionCounts["disposal.district"], 1);
+});
+
+test("T043 a delayed answer cannot overwrite the handoff transition", async () => {
+  const gate = Promise.withResolvers<void>();
+  const { api, id, request, turnCommand, stored, persistence, background } =
+    setup({ waitForAnswer: gate.promise, responseWaitMs: 0 });
+  try {
+    assert.equal((await api.turn(request("/turns", turnCommand), id)).status, 202);
+    const before = stored();
+    assert.ok(before.pendingRequestId);
+    // The handoff SQL writes these same fields under the snapshot revision lock.
+    const next = { ...before, state: "summary_confirm", pendingRequestId: null, revision: before.revision + 1 };
+    const delivery = await persistence.commit(id, randomUUID(), before.revision, next, {});
+    assert.equal(delivery.status, "committed");
+  } finally {
+    gate.resolve();
+  }
+  assert.equal(background.length, 1);
+  await Promise.all(background);
+  assert.equal(stored().state, "summary_confirm");
+  assert.equal(stored().revision, 2);
+  assert.equal(stored().pendingRequestId, null);
+  assert.deepEqual(stored().transcript.map(({ role }) => role), ["citizen"]);
+});
+
+test("T043 a fresh store can recover a persisted interrupted request", async () => {
+  const gate = Promise.withResolvers<void>();
+  const { api, id, request, turnCommand, stored, persistence, background } =
+    setup({ waitForAnswer: gate.promise, responseWaitMs: 0 });
+  try {
+    assert.equal((await api.turn(request("/turns", turnCommand), id)).status, 202);
+    const interrupted = stored().pendingRequestId;
+    assert.ok(interrupted);
+    const restartedStore = createSessionStore(persistence, parseDialogueSnapshot);
+    const recovered = await restartedStore.recoverInterrupted(
+      id, { commandId: randomUUID(), baseRevision: stored().revision }, interrupted);
+    assert.equal(recovered.status, "committed");
+    assert.equal((await restartedStore.load(id))?.pendingRequestId, null);
+  } finally {
+    gate.resolve();
+  }
+  await Promise.all(background);
+  assert.equal(stored().revision, 2);
+  assert.deepEqual(stored().transcript.map(({ role }) => role), ["citizen"]);
 });
