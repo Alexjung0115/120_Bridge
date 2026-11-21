@@ -141,4 +141,39 @@ test("text consultation reaches the console and persists the counselor claim", a
   const detail = await rpc<{ summary: { confirmation: string } }>(
     "select public.bridge_console_detail($1) as value", [confirmedSession]);
   assert.equal(detail.summary.confirmation, "confirmed");
+  const outcomeSession = "10000000-0000-4000-8000-000000000010";
+  await rpc("select public.bridge_open_session($1,$2,'text',$3) as value",
+    [owner, outcomeSession, { ...initial, id: outcomeSession }]);
+  const cmd = "10000000-0000-4000-8000-000000000011";
+  const early = await rpc<{ status: string }>(
+    "select public.bridge_record_citizen_outcome($1,$2,0,$3,'resolved') as value",
+    [outcomeSession, cmd, citizenTokenHash]);
+  assert.equal(early.status, "conflict");
+  const outcome = (key: string, rev: number, hash: string, decision: string) => rpc<{
+    status: string; data?: { state: string; revision: number; outcome: string };
+  }>("select public.bridge_record_citizen_outcome($1,$2,$3,$4,$5) as value",
+    [outcomeSession, key, rev, hash, decision]);
+  assert.equal((await outcome(cmd, 0, "wrong-token", "need_more")).status, "forbidden");
+  assert.deepEqual(await outcome(cmd, 0, citizenTokenHash, "need_more"), {
+    status: "committed", data: { state: "active", revision: 1, outcome: "unknown" },
+  });
+  assert.equal((await outcome(cmd, 0, citizenTokenHash, "resolved")).status, "conflict");
+  const issue = "10000000-0000-4000-8000-000000000012";
+  await rpc("select public.bridge_commit_session_command($1,$2,1,$3,'{}') as value", [
+    outcomeSession, issue, { ...initial, id: outcomeSession, revision: 2,
+      issueIds: [issue], issues: [{ id: issue, status: "advised" }],
+      transcript: [{ role: "assistant", factCitations: [{ chunkId: "test-citation" }] }],
+    },
+  ]);
+  const confirm = "10000000-0000-4000-8000-000000000013";
+  assert.equal((await outcome(confirm, 1, citizenTokenHash, "resolved")).status, "conflict");
+  assert.deepEqual(await outcome(confirm, 2, citizenTokenHash, "resolved"), {
+    status: "committed", data: { state: "ended", revision: 3, outcome: "ai_confirmed" },
+  });
+  assert.equal((await outcome(confirm, 2, citizenTokenHash, "resolved")).status, "replayed");
+  const metrics = await rpc<{ events: Array<{ sessionId: string; eventType: string }> }>(
+    "select public.bridge_console_metrics_input(clock_timestamp()) as value");
+  assert.equal(metrics.events.filter(({ sessionId, eventType }) =>
+    sessionId === outcomeSession && eventType === "session_ended").length, 1);
+
 });

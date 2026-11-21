@@ -14,7 +14,7 @@ export function createSessionApi(storage: {
   open(mode: "voice" | "text", session: Session, request: Request): Promise<OpenResult>;
   load(id: string): Promise<unknown>;
   loadSummary?(id: string, revision: number): Promise<unknown>;
-  end(id: string, commandId: string, base: number, hash: string): Promise<
+  end(id: string, commandId: string, base: number, hash: string, decision?: "resolved" | "need_more"): Promise<
     { status: "committed" | "replayed"; data: unknown } |
     { status: "conflict"; revision: number } | { status: "not_found" } | { status: "forbidden" }
   >;
@@ -58,14 +58,15 @@ export function createSessionApi(storage: {
         return sessionError(requestId, 503, "storage_unavailable");
       }
     },
-    async end(request: Request, id: string) {
+    async end(request: Request, id: string, confirmOutcome = false) {
       const { requestId } = createRequestContext("session_end");
       if (!z.uuid().safeParse(id).success) return sessionError(requestId, 400, "invalid_request");
       const token = readBearerToken(request.headers);
       if (!token) return sessionError(requestId, 401, "unauthorized");
       let input: unknown;
       try { input = await request.json(); } catch { return sessionError(requestId, 400, "invalid_request"); }
-      const parsed = commandEnvelopeSchema.safeParse(input);
+      const outcome = commandEnvelopeSchema.extend({ decision: z.enum(["resolved", "need_more"]) });
+      const parsed = (confirmOutcome ? outcome : commandEnvelopeSchema).safeParse(input);
       if (!parsed.success) return sessionError(requestId, 400, "invalid_request");
       try {
         const raw = await storage.load(id);
@@ -74,7 +75,8 @@ export function createSessionApi(storage: {
         if (session.id !== id || !canAccessCitizenSession(request.headers, session.citizenTokenHash)) {
           return sessionError(requestId, 403, "forbidden");
         }
-        const result = await storage.end(id, parsed.data.commandId, parsed.data.baseRevision, session.citizenTokenHash);
+        const result = await storage.end(id, parsed.data.commandId, parsed.data.baseRevision, session.citizenTokenHash,
+          "decision" in parsed.data ? parsed.data.decision as "resolved" | "need_more" : undefined);
         if (result.status === "conflict") {
           return noStoreJson({ schemaVersion, requestId, currentRevision: result.revision,
             error: { code: "session_conflict", message: "최신 상담 상태를 확인해 주세요.", retryable: false },
