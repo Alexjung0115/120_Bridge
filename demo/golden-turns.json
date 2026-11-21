@@ -1,0 +1,269 @@
+{
+  "meta": {
+    "written": "2026-11-10",
+    "demo_today": "2026-11",
+    "note": "demo-script.md 와 같은 내용. confidence 는 high/low 로만 판정한다. answer_must_include 의 모든 문자열이 AI 답변(자막)에 들어 있어야 통과. citizen_requests_agent 규칙은 다른 규칙보다 먼저 적용한다.",
+    "handoff_rules": [
+      "citizen_requests_agent",
+      "low_confidence_twice",
+      "sentiment_very_upset",
+      "complaint_with_fields_filled",
+      "no_evidence"
+    ]
+  },
+  "scenarios": [
+    {
+      "id": "s1-fridge",
+      "title": "단순 문의: 냉장고 버리기",
+      "expect_handoff": false,
+      "turns": [
+        {
+          "turn": 1,
+          "citizen": "냉장고 버리려면 어떻게 해요?",
+          "expected": {
+            "intent": "문의",
+            "category": "청소·폐기물",
+            "sources": [],
+            "counts_as_low_confidence": false,
+            "sentiment": "보통",
+            "handoff": false,
+            "missing_fields": [
+              "거주 자치구"
+            ],
+            "asks_for": "거주 자치구",
+            "answer_must_not_include": [
+              "1599-0903",
+              "수수료"
+            ]
+          }
+        },
+        {
+          "turn": 2,
+          "citizen": "마포구 사는데요.",
+          "expected": {
+            "intent": "문의",
+            "category": "청소·폐기물",
+            "jurisdiction_filter": "마포구",
+            "sources": [
+              "waste/mapo-large-waste-guide.md"
+            ],
+            "confidence": "high",
+            "sentiment": "보통",
+            "handoff": false,
+            "missing_fields": [],
+            "answer_must_include": [
+              "무료",
+              "1599-0903"
+            ]
+          }
+        },
+        {
+          "turn": 3,
+          "citizen": "오래돼서 안에 부품을 좀 떼어 냈는데, 그래도 돼요?",
+          "expected": {
+            "intent": "문의",
+            "category": "청소·폐기물",
+            "sources": [
+              "waste/mapo-large-waste-guide.md"
+            ],
+            "confidence": "high",
+            "sentiment": "보통",
+            "handoff": false,
+            "answer_must_include": [
+              "수수료"
+            ],
+            "answer_may_include": [
+              "8천 원",
+              "8,000",
+              "동주민센터",
+              "스마트클린"
+            ]
+          }
+        },
+        {
+          "turn": 4,
+          "citizen": "네, 알겠습니다.",
+          "expected": {
+            "intent": "기타",
+            "handoff": false,
+            "end": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "s2-climate-card",
+      "title": "복잡한 민원: 기후동행카드 전환과 페이백 미입금",
+      "expect_handoff": true,
+      "turns": [
+        {
+          "turn": 1,
+          "citizen": "기후동행카드 후불카드를 쓰는데요, 지난달부터 할인이 안 된 것 같아요. 그리고 3만 원 돌려준다던 것도 아직 안 들어왔어요.",
+          "expected": {
+            "intent": "민원접수",
+            "category": "교통·대중교통 요금",
+            "sources": [
+              "policy-change/case1-after-climate-pass-qa.md"
+            ],
+            "confidence": "high",
+            "sentiment": "보통",
+            "handoff": false,
+            "missing_fields": [
+              "페이백 신청 시기"
+            ],
+            "answer_must_include": [
+              "9월 30일",
+              "10월 1일",
+              "K-패스"
+            ],
+            "answer_must_not_include": [
+              "8월 말",
+              "9월 1일 종료"
+            ]
+          }
+        },
+        {
+          "turn": 2,
+          "citizen": "9월 중순쯤에 티머니 홈페이지에서 했어요.",
+          "expected": {
+            "intent": "민원접수",
+            "missing_fields": [],
+            "handoff": true,
+            "handoff_reason": "complaint_with_fields_filled",
+            "stage": "summary_confirm",
+            "summary_must_include": [
+              "후불",
+              "10월",
+              "페이백",
+              "9월 중순"
+            ]
+          }
+        },
+        {
+          "turn": 3,
+          "citizen": "네.",
+          "expected": {
+            "stage": "sent_to_console",
+            "citizen_confirmed": true
+          }
+        }
+      ],
+      "console": {
+        "sentiment": "보통",
+        "already_told": [
+          "후불카드 9월 30일 종료, 10월 1일 일반 교통카드 전환",
+          "모두의카드 전환과 K-패스 누리집 등록 필요",
+          "페이백 9월 말~11월 순차 입금"
+        ],
+        "department_candidates": [
+          {
+            "rank": 1,
+            "name": "㈜티머니 기후동행카드 페이백 담당",
+            "evidence_doc": "policy-change/case1-after-climate-pass-qa.md",
+            "evidence_date": "2026-09-17"
+          },
+          {
+            "rank": 2,
+            "name": "서울시 교통실 교통정책과",
+            "evidence_doc": "policy-change/case1-after-climate-card-plus.md",
+            "evidence_date": "2026-06-17"
+          }
+        ],
+        "superseded": [
+          {
+            "doc": "policy-change/case1-after-climate-card-plus.md",
+            "replaced_by": "policy-change/case1-after-climate-pass-qa.md",
+            "what": "기존 카드 종료 일정"
+          },
+          {
+            "doc": "policy-change/case1-before-climate-card-payback.md",
+            "replaced_by": "policy-change/case1-after-climate-pass-qa.md",
+            "what": "페이백 신청 기한과 입금 시기"
+          }
+        ]
+      }
+    },
+    {
+      "id": "s3-trapped-in-ai",
+      "title": "AI에 갇힌 시민: 보도된 실패 사례를 뒤집기",
+      "based_on": {
+        "source": "파이낸셜뉴스 2026-10-29 [fn광장] AI 상담원에 발 묶인 고객",
+        "url": "https://www.fnnews.com/news/202610291918467737",
+        "note": "실패 순서만 실제 사례(카드사). 수도 요금 문의 내용은 가상."
+      },
+      "expect_handoff": true,
+      "turns": [
+        {
+          "turn": 1,
+          "citizen": "이사하면서 수도 요금 정산을 다 했는데요, 예전 집 요금이 또 나왔어요.",
+          "expected": {
+            "intent": "문의",
+            "category": "수도",
+            "sources": [],
+            "confidence": "low",
+            "sentiment": "보통",
+            "handoff": false,
+            "answer_must_not_include": [
+              "이중 청구",
+              "누락"
+            ]
+          }
+        },
+        {
+          "turn": 2,
+          "citizen": "아니, 정산 다 끝냈다니까요. 그냥 상담사 바꿔 주세요.",
+          "expected": {
+            "intent": "상담사요청",
+            "category": "수도",
+            "sources": [],
+            "sentiment": "불만",
+            "handoff": true,
+            "handoff_reason": "citizen_requests_agent",
+            "stage": "summary_confirm",
+            "must_not_ask_another_question": true,
+            "summary_must_include": [
+              "수도 요금",
+              "정산",
+              "이전 집"
+            ],
+            "answer_must_not_include": [
+              "이중 청구",
+              "누락"
+            ]
+          }
+        },
+        {
+          "turn": 3,
+          "citizen": "네.",
+          "expected": {
+            "stage": "sent_to_console",
+            "citizen_confirmed": true
+          }
+        }
+      ],
+      "agent_request_phrases": [
+        "상담사",
+        "상담원",
+        "사람 바꿔",
+        "사람이랑 통화"
+      ],
+      "console": {
+        "sentiment": "불만",
+        "sentiment_note": "AI가 한 번 되물은 뒤 시민이 상담사를 요청함",
+        "handoff_reason": "citizen_requests_agent",
+        "already_told": [],
+        "transcript_turns": 3,
+        "department_candidates": [
+          {
+            "rank": 1,
+            "name": "수도 분야 상담 (120 ARS 2번)",
+            "evidence_doc": "departments/120dasan-phone-consultation.md",
+            "evidence_date": "미확인",
+            "confidence": "low"
+          }
+        ],
+        "superseded": []
+      }
+    }
+  ]
+}
