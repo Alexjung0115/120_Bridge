@@ -138,7 +138,7 @@
 
 ### Tests
 
-- [ ] T038 [P] [US3] AI1·10분·선행 T003,T009: frontend/tests/unit/replacement-routing.test.ts에 항목별 일정 대체·미변경 업무분장 유지·선불/후불 구분·미래 시행·근거 없는 부서명 금지 시험을 작성한다.
+- [X] T038 [P] [US3] AI1·10분·선행 T003,T009: frontend/tests/unit/replacement-routing.test.ts에 항목별 일정 대체·미변경 업무분장 유지·선불/후불 구분·미래 시행·근거 없는 부서명 금지 시험을 작성한다.
 
 ### Implementation
 
