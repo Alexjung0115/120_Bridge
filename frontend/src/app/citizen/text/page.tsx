@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { HandoffLink } from "../_components/handoff-entry";
-import { GovernmentIcon } from "@/app/citizen/_components/government-icon";
+import { BridgeBrand } from "@/components/bridge-brand";
 
 export default function TextPage() {
   const [message, setMessage] = useState("");
@@ -18,15 +18,15 @@ export default function TextPage() {
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background-white sm:max-w-xl text-text-basic">
       <header className="shrink-0 border-b border-border-gray-light px-6 pb-4 pt-6">
         <div aria-label="120Bridge" className="flex items-center guide-gap-3">
-          <GovernmentIcon />
-          <span className="type-heading-medium text-element-primary">120</span>
-          <span className="type-body-small tracking-wider">BRIDGE</span>
+          <BridgeBrand />
         </div>
         <div className="mt-4 flex items-center justify-between guide-gap-3">
           <div>
             <h1 className="type-heading-small text-text-bolder">텍스트 상담</h1>
           </div>
-          <HandoffLink channel="text" summary={summary} className="rounded-guide-medium-1 border border-border-primary px-3 py-2 type-body-small-bold text-text-primary">
+          <HandoffLink channel="text" summary={summary} messages={messages.map((content, index) => ({
+            sequence: index + 1, speaker: "citizen", content,
+          }))} className="rounded-guide-medium-1 border border-border-primary px-3 py-2 type-body-small-bold text-text-primary">
             상담사 연결
           </HandoffLink>
         </div>
@@ -52,8 +52,14 @@ export default function TextPage() {
             maxLength={2000}
             value={message}
             onChange={(event) => setMessage(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
+                event.preventDefault();
+                sendMessage();
+              }
+            }}
             placeholder="메시지를 입력해주세요"
-            className="max-h-32 min-h-12 min-w-0 flex-1 resize-y rounded-guide-medium-1 border border-border-gray px-4 py-3 type-body-small placeholder:text-text-disabled"
+            className="max-h-32 min-h-12 min-w-0 flex-1 resize-none rounded-guide-medium-1 border border-border-gray px-4 py-3 type-body-small placeholder:text-text-disabled"
           />
           <button
             type="button"

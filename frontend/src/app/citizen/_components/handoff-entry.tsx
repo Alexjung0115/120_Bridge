@@ -4,10 +4,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { startHandoff, useRecentConsultation, type Channel } from "../_lib/handoff";
+import type { ConsultationMessage } from "../_lib/messages";
 
-export function HandoffLink({ channel, summary, className, children }: {
+export function HandoffLink({ channel, summary, messages, historyId, className, children }: {
   channel: Channel;
   summary: string;
+  messages?: ConsultationMessage[];
+  historyId?: string;
   className: string;
   children: React.ReactNode;
 }) {
@@ -15,8 +18,8 @@ export function HandoffLink({ channel, summary, className, children }: {
   return (
     <>
     <Link
-      href={`/citizen/handoff?channel=${channel}`}
-      onClick={(event) => { if (!startHandoff({ channel, summary })) { event.preventDefault(); setError(true); } }}
+      href={`/citizen/handoff?channel=${channel}${historyId ? "&from=history" : ""}`}
+      onNavigate={(event) => { if (!startHandoff({ channel, summary, historyId }, messages)) { event.preventDefault(); setError(true); } }}
       className={className}
     >
       {children}

@@ -1,10 +1,16 @@
+"use client";
+
 import { buttonVariants } from "@/components/ui/button";
 import { HandoffLink } from "../_components/handoff-entry";
 import { Badge } from "@/components/ui/badge";
-import { GovernmentIcon } from "@/app/citizen/_components/government-icon";
+import { BridgeBrand } from "@/components/bridge-brand";
 import Link from "next/link";
-import Image from "next/image";
-import callIcon from "@/assets/icon/call.svg";
+import { ClipboardCheck, ChevronRight } from "lucide-react";
+import { CancelConsultation } from "../_components/cancel-consultation";
+import { resultHistoryIdKey } from "../_lib/history";
+import { summaryKey } from "../_lib/summary";
+import { removeStorage } from "../_lib/storage";
+import { speakerLabel, voiceMessages } from "../_lib/messages";
 
 const voiceSummary = "마포구 안심생활 키트 신청 후 처리 결과를 받지 못함";
 const bars = [8, 14, 23, 12, 31, 43, 25, 51, 34, 20, 42, 29, 14, 25, 10];
@@ -17,17 +23,11 @@ function MuteIcon() {
   );
 }
 
-function EndIcon() {
-  return <Image src={callIcon} alt="" aria-hidden="true" className="size-icon-24 rotate-135 brightness-0 invert" />;
-}
-
 export default function VoicePage() {
   return (
     <main className="mx-auto flex min-h-svh w-full max-w-md flex-col sm:max-w-xl sm:px-10 overflow-y-auto bg-background-white px-6 pb-4 pt-6 text-text-basic [@media(max-height:720px)]:pt-4">
       <header aria-label="120Bridge" className="flex items-center guide-gap-3">
-        <GovernmentIcon />
-        <span className="type-heading-medium text-element-primary">120</span>
-        <span className="type-body-small tracking-wider">BRIDGE</span>
+        <BridgeBrand />
       </header>
 
       <section aria-labelledby="voice-title" className="mt-4 shrink-0 text-center [@media(max-height:720px)]:mt-2">
@@ -50,35 +50,36 @@ export default function VoicePage() {
       <section aria-labelledby="caption-title" className="shrink-0 rounded-2xl bg-element-secondary-lighter guide-p-6">
         <h2 id="caption-title" className="type-body-small-bold text-text-bolder">상담 내용</h2>
         <dl className="mt-2 flex flex-col guide-gap-3 type-body-small">
-          <div>
-            <dt className="type-body-small-bold text-text-subtle">시민</dt>
-            <dd className="mt-1">마포구 안심생활 키트를 신청했는데 아직 처리 결과를 못 받았어요.</dd>
-          </div>
-          <div>
-            <dt className="type-body-small-bold text-text-primary">AI 상담봇</dt>
-            <dd className="mt-1">10월 15일 신청이시군요. 변경된 정책을 기준으로 확인해보겠습니다.</dd>
-          </div>
+          {voiceMessages.map(({ sequence, speaker, content }) => (
+            <div key={sequence}>
+              <dt className={`type-body-small-bold ${speaker === "citizen" ? "text-text-subtle" : "text-text-primary"}`}>{speakerLabel[speaker]}</dt>
+              <dd className="mt-1">{content}</dd>
+            </div>
+          ))}
         </dl>
       </section>
 
-      <nav aria-label="음성 상담 조작" className="flex shrink-0 items-start justify-around py-4 [@media(max-height:720px)]:py-2">
+      <nav aria-label="음성 상담 조작" className="flex shrink-0 items-start justify-center py-4 [@media(max-height:720px)]:py-2">
         <div className="flex flex-col items-center guide-gap-3">
           <button type="button" disabled className="flex size-15 items-center justify-center rounded-full bg-element-gray-lighter text-icon-gray disabled:cursor-not-allowed">
             <MuteIcon />
           </button>
           <span className="type-body-small">음소거</span>
         </div>
-        <div className="flex flex-col items-center guide-gap-3">
-          <Link href="/citizen" aria-label="처음으로 돌아가기" className="flex size-15 items-center justify-center rounded-full bg-element-danger text-icon-inverse">
-            <EndIcon />
-          </Link>
-          <span className="type-body-small">화면 종료</span>
-        </div>
       </nav>
 
-      <HandoffLink channel="voice" summary={voiceSummary} className={buttonVariants({ className: "w-full" })}>
+      <Link href="/citizen/summary" onNavigate={() => {
+        removeStorage("session", summaryKey);
+        removeStorage("session", resultHistoryIdKey);
+      }} className="mb-3 flex min-h-16 w-full items-center gap-3 rounded-guide-xlarge border border-border-primary bg-background-white px-4 text-left text-text-primary">
+        <ClipboardCheck aria-hidden="true" className="size-6 shrink-0" />
+        <span className="flex-1"><span className="block type-body-medium-bold">AI 상담 마치기</span><span className="block type-body-xsmall text-text-subtle">상담 내용을 확인하고 마무리합니다</span></span>
+        <ChevronRight aria-hidden="true" className="size-5 shrink-0" />
+      </Link>
+      <HandoffLink channel="voice" summary={voiceSummary} messages={voiceMessages} className={buttonVariants({ className: "w-full" })}>
         사람 상담사 연결
       </HandoffLink>
+      <CancelConsultation />
     </main>
   );
 }

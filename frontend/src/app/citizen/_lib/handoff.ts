@@ -2,6 +2,8 @@
 
 import { useSyncExternalStore } from "react";
 import { readStorage, removeStorage, writeStorage } from "./storage";
+import { saveHistoryEntry } from "./history";
+import type { ConsultationMessage } from "./messages";
 
 const requestKey = "120bridge:demo-handoff";
 const requestEvent = "120bridge:handoff-changed";
@@ -11,8 +13,8 @@ const recentKey = "120bridge:failed-consultation";
 const timeoutMs = 15_000;
 
 export type Channel = "voice" | "text";
-type Consultation = { channel: Channel; summary: string };
-type Request = { id: string; channel: Channel; deadline: number; status: "waiting" | "connected" | "failed" };
+type Consultation = { channel: Channel; summary: string; historyId?: string };
+type Request = { id: string; channel: Channel; deadline: number; status: "waiting" | "connected" | "failed" | "ended" };
 
 function subscribe(callback: () => void) {
   window.addEventListener("storage", callback);
@@ -36,7 +38,13 @@ function writeRequest(request: Request): boolean {
 export function useHandoff() {
   const raw = useSyncExternalStore(subscribe, () => readStorage("local", requestKey), () => null);
   const request = read<Request>(raw);
-  return request && typeof request.id === "string" && (request.channel === "voice" || request.channel === "text") && Number.isFinite(request.deadline) && ["waiting", "connected", "failed"].includes(request.status) ? request : null;
+  return request && typeof request.id === "string" && (request.channel === "voice" || request.channel === "text") && Number.isFinite(request.deadline) && ["waiting", "connected", "failed", "ended"].includes(request.status) ? request : null;
+}
+
+export function endHandoff(id: string): boolean {
+  const request = read<Request>(readStorage("local", requestKey));
+  if (!request || request.id !== id || request.status !== "connected") return false;
+  return writeRequest({ ...request, status: "ended" });
 }
 
 export function useRecentConsultation() {
@@ -54,15 +62,24 @@ export function startPreparedHandoff(channel: Channel): boolean {
   return startHandoff({ channel, summary: readStorage("session", draftKey) ?? "" });
 }
 
-export function startHandoff(consultation: Consultation): boolean {
+export function startHandoff(consultation: Consultation, messages?: ConsultationMessage[]): boolean {
   let id: string;
   try { id = crypto.randomUUID(); } catch { return false; }
-  if (!writeStorage("session", activeKey, JSON.stringify({ id, ...consultation }))) return false;
+  const historyId = consultation.historyId ?? id;
+  if (!writeStorage("session", activeKey, JSON.stringify({ id, ...consultation, historyId }))) return false;
   if (!writeRequest({ id, channel: consultation.channel, deadline: Date.now() + timeoutMs, status: "waiting" })) {
     removeStorage("session", activeKey);
     return false;
   }
   removeStorage("session", draftKey);
+  if (!consultation.historyId) {
+    saveHistoryEntry({
+      id: historyId, channel: consultation.channel, status: "unresolved",
+      title: consultation.channel === "voice" ? "음성 상담" : "텍스트 상담",
+      summary: consultation.summary,
+      messages,
+    });
+  }
   return true;
 }
 
@@ -81,7 +98,7 @@ export function settleHandoff(id: string, status: "connected" | "failed"): boole
   const active = getActiveConsultation();
   if (active?.id === id) {
     if (status === "failed") {
-      if (!writeStorage("session", recentKey, JSON.stringify({ channel: active.channel, summary: active.summary }))) return false;
+      if (!writeStorage("session", recentKey, JSON.stringify({ channel: active.channel, summary: active.summary, historyId: active.historyId }))) return false;
     } else {
       removeStorage("session", recentKey);
     }

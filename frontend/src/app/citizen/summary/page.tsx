@@ -1,9 +1,11 @@
 "use client";
 
+import { Card } from "@/components/ui/card";
 import { useState, useSyncExternalStore } from "react";
-import { GovernmentIcon } from "@/app/citizen/_components/government-icon";
+import { BridgeBrand } from "@/components/bridge-brand";
 import Link from "next/link";
 import { Textarea } from "@/components/ui/textarea";
+import { SummaryRow } from "../_components/summary-row";
 import { parseSummary, summaryFields, summaryKey, type ConsultationSummary } from "../_lib/summary";
 import { readStorage, writeStorage } from "../_lib/storage";
 
@@ -17,9 +19,7 @@ export default function SummaryPage() {
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col sm:max-w-xl sm:px-10 overflow-y-auto bg-background-white px-6 pb-4 pt-6 text-text-basic [@media(max-height:720px)]:pt-4 [@media(max-height:650px)]:px-4 [@media(max-height:650px)]:pb-2 [@media(max-height:650px)]:pt-2">
       <header aria-label="120Bridge" className="flex shrink-0 items-center guide-gap-3">
-        <GovernmentIcon />
-        <span className="type-heading-medium text-element-primary">120</span>
-        <span className="type-body-small tracking-wider">BRIDGE</span>
+        <BridgeBrand />
       </header>
 
       <section aria-labelledby="summary-title" className="flex flex-1 flex-col items-center justify-center py-4 text-center [@media(max-height:720px)]:py-1">
@@ -35,19 +35,18 @@ export default function SummaryPage() {
         </h1>
       </section>
 
-      <section aria-labelledby="summary-card-title" className="shrink-0 rounded-guide-xlarge border border-border-gray-light guide-p-6 [@media(max-height:720px)]:p-3">
+      <Card as="section" aria-labelledby="summary-card-title" className="shrink-0 guide-p-6 [@media(max-height:720px)]:p-3">
         <h2 id="summary-card-title" className="type-body-medium-bold text-text-bolder">
           민원 요약
         </h2>
         <dl className="mt-3 flex flex-col guide-gap-3 type-body-small [@media(max-height:720px)]:mt-2 [@media(max-height:720px)]:gap-1">
           {summaryFields.map(([key, label]) => (
-            <div key={key} className="grid grid-cols-[4rem_1fr] items-start gap-3">
-              <dt className="text-text-subtle"><label htmlFor={editing ? `summary-${key}` : undefined}>{label}</label></dt>
-              <dd>{editing ? <Textarea id={`summary-${key}`} value={content[key]} onChange={(event) => setDraft({ ...content, [key]: event.target.value })} rows={key === "summary" ? 3 : 1} maxLength={key === "summary" ? 2000 : 200} /> : <span className="whitespace-pre-wrap break-words">{content[key]}</span>}</dd>
-            </div>
+            <SummaryRow key={key} label={label} inputId={editing ? `summary-${key}` : undefined} compact>
+              {editing ? <Textarea id={`summary-${key}`} value={content[key]} onChange={(event) => setDraft({ ...content, [key]: event.target.value })} rows={key === "summary" ? 3 : 1} maxLength={key === "summary" ? 2000 : 200} /> : <span className="whitespace-pre-wrap break-words">{content[key]}</span>}
+            </SummaryRow>
           ))}
         </dl>
-      </section>
+      </Card>
 
       <div aria-hidden="true" className="min-h-4 flex-1 [@media(max-height:720px)]:min-h-2 [@media(max-height:650px)]:min-h-1" />
 
