@@ -17,7 +17,7 @@ export const commandEnvelopeSchema = z.strictObject({
 });
 
 export const createSessionRequestSchema = z.strictObject({
-  clientSessionKey: z.string().refine((value) => value.trim().length > 0),
+  clientSessionKey: z.uuidv4(),
   inputMode: consultationInputModeSchema,
 });
 
