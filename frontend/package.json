@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "tsx --test tests/unit/*.test.ts",
+    "data:validate": "tsx scripts/validate-data.ts",
+    "data:build": "tsx scripts/build-corpus.ts"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.108.2",
@@ -23,6 +26,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
     "tailwindcss": "4.3.3",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   }
 }
