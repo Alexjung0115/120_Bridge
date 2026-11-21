@@ -18,12 +18,12 @@ uv run --with-requirements requirements.txt python -B -m unittest discover -s te
 ## Next.js에 전달할 답변 계약
 
 - `GET /health`는 HTTP 200과 `{"ok":true}`를 반환한다. Vercel 경로는 `/api/ai/health`다.
-- Next.js 서버의 `POST /answer`는 `Authorization: Bearer <AI_INTERNAL_TOKEN>`을 요구한다. 요청 JSON은 `text`, `businessDate`(YYYY-MM-DD), `corpusVersion`, 선택 필드 `district`다. `district`는 현재 문의에 적용되는 구다. 배출지나 신고 발생지를 거주지로 덮어쓰지 않는다.
+- Next.js 서버의 `POST /answer`는 `Authorization: Bearer <AI_INTERNAL_TOKEN>`을 요구한다. 요청 JSON은 `text`, `recentTurns`, `knownFields`다. 자치구는 `residence.district`, `disposal.district`, `incident.district`처럼 목적별 `fieldKey`로 전달한다.
 
 | 응답 | Next.js의 처리 |
 | --- | --- |
-| HTTP 200 · `outcome: "answer"` | `answerUnits`에서 본문과 출처를 읽는다. 각 인용에는 청크 ID, 검증 항목 키, 인용문, URL, 기준일이 포함된다. |
-| HTTP 200 · `outcome: "no_evidence"` | `answerUnits`는 빈 배열이다. 저장된 시민 발화를 바탕으로 근거 부족 규칙을 적용한다. |
+| HTTP 200 · `DialogueCandidate` | `intent`, `issues`, `proposedQuestion`, `answerUnits`, `summaryProposal`, `routingEvidence`를 반환한다. 인용은 청크 ID·검증 항목 키·인용문을 포함한다. |
+| HTTP 200 · 빈 `answerUnits` | Next.js가 근거 부족 규칙과 `needsPersonalLookup`을 적용한다. |
 | HTTP 504 · `detail.code: "ai_timeout"` | 실패 사유를 기록하고 상담사 연결 경로를 제공한다. |
 | HTTP 503 · `detail.code: "ai_unavailable"` | AI 사용 불가를 기록한다. 현재 선작업 버전의 정상적인 결과다. |
 | HTTP 401 · `detail.code: "unauthorized"` | 서버 간 인증 설정을 확인한다. |
