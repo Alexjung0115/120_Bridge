@@ -12,6 +12,7 @@ type CitizenSession = {
 
 type CitizenRead = Pick<Session, "revision" | "state" | "transcript"> & {
   processing: boolean;
+  summary?: { revision: number; coreLines: string[] } | null;
 };
 
 type Queue = {
@@ -225,13 +226,15 @@ function Citizen() {
     });
   }
 
-  function send(kind: "turns" | "handoff-request") {
-    if (!session || !snapshot) return;
+  function send(kind: "turns" | "handoff-request" | "summary", skipConfirmation = false) {
+    if (!session || !snapshot || (kind === "summary" && !snapshot.summary)) return;
     return request.run(async () => {
       setNotice("");
       const body = kind === "turns"
         ? { text: draft.trim(), inputMode: "text" }
-        : { trigger: "button", skipConfirmation: true };
+        : kind === "summary"
+          ? { action: "confirm", summaryRevision: snapshot.summary?.revision }
+          : skipConfirmation ? { trigger: "button", skipConfirmation: true } : { trigger: "button" };
       await sendCommand(`/api/sessions/${session.sessionId}/${kind}`, session.citizenToken, snapshot.revision, body);
       if (kind === "turns") setDraft("");
       setNotice(kind === "turns" ? "메시지를 보냈습니다." : "상담사 연결을 요청했습니다.");
@@ -273,6 +276,12 @@ function Citizen() {
               ))}
             </ol>
           )}
+          {snapshot?.state === "summary_confirm" && snapshot.summary && (
+            <section aria-label="전달 요약" className="space-y-3">
+              <ul>{snapshot.summary.coreLines.map((line, index) => <li key={index}>{line}</li>)}</ul>
+              <Button disabled={request.busy} onClick={() => send("summary")}>요약 승인하고 연결</Button>
+            </section>
+          )}
           <form className="space-y-3" onSubmit={(event) => {
             event.preventDefault();
             if (canSend && validDraft) void send("turns");
@@ -286,7 +295,11 @@ function Citizen() {
               <Button type="submit" disabled={!canSend || !validDraft}>메시지 보내기</Button>
               <Button type="button" variant="outline" disabled={!canSend}
                 onClick={() => send("handoff-request")}>
-                상담사 연결 요청
+                요약 확인 후 연결
+              </Button>
+              <Button type="button" variant="outline" disabled={!canSend}
+                onClick={() => send("handoff-request", true)}>
+                확인 없이 연결
               </Button>
             </div>
           </form>
