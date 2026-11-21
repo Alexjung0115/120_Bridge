@@ -19,7 +19,8 @@
     "pretendard-gov": "^1.3.9",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "tailwind-merge": "^3.7.1"
+    "tailwind-merge": "^3.7.1",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.17",
