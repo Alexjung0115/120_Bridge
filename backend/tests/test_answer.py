@@ -4,16 +4,26 @@ from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
-from main import AnswerResult, answer_provider, app
+from dialogue import DialogueCandidate
+from main import answer_provider, app
 
 
 PAYLOAD = {
     "text": "마포구 냉장고는 어디에 신청해요?",
-    "district": "마포구",
-    "businessDate": "2026-11-21",
-    "corpusVersion": "test",
+    "recentTurns": [],
+    "knownFields": [{"fieldKey": "disposal.district", "value": "마포구"}],
 }
 AUTH = {"Authorization": "Bearer only-for-tests"}
+SAMPLE = {
+    "intent": "문의", "category": "대형폐기물", "sentiment": "보통",
+    "issues": [{
+        "localId": "issue-1", "request": PAYLOAD["text"],
+        "knownFields": PAYLOAD["knownFields"], "missingFields": [],
+        "needsPersonalLookup": False,
+    }],
+    "proposedQuestion": None, "confidence": "high",
+    "answerUnits": [], "summaryProposal": None, "routingEvidence": [],
+}
 
 
 class AnswerTests(unittest.TestCase):
@@ -34,30 +44,32 @@ class AnswerTests(unittest.TestCase):
         with patch.dict(os.environ, {"AI_INTERNAL_TOKEN": ""}):
             self.assertEqual(self.client.post("/answer", json=PAYLOAD, headers=AUTH).status_code, 401)
 
-    def test_normal_answer_returns_citation(self):
-        result = {
-            "outcome": "answer",
-            "answerUnits": [{
-                "text": "공식 자료 확인 결과입니다.",
-                "citations": [{
-                    "chunkId": "test/section-1",
-                    "claimKey": "test.checked-fact",
-                    "quote": "인용문 예시",
-                    "sourceUrl": "https://example.com/source",
-                    "basisDate": "2026-11-21",
-                }],
+    def test_candidate_response(self):
+        result = dict(SAMPLE)
+        result["answerUnits"] = [{
+            "issueLocalId": "issue-1", "text": "공식 자료 확인 결과입니다.",
+            "citations": [{
+                "chunkId": "test/section-1",
+                "claimKey": "test.checked-fact",
+                "quote": "인용문 예시",
             }],
-        }
-        app.dependency_overrides[answer_provider] = lambda: lambda _: AnswerResult(**result)
+        }]
+        app.dependency_overrides[answer_provider] = lambda: lambda _: DialogueCandidate(**result)
         response = self.client.post("/answer", json=PAYLOAD, headers=AUTH)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), result)
 
     def test_no_evidence_has_no_answer_units(self):
-        app.dependency_overrides[answer_provider] = lambda: lambda _: AnswerResult(outcome="no_evidence")
+        app.dependency_overrides[answer_provider] = lambda: lambda _: DialogueCandidate(**SAMPLE)
         response = self.client.post("/answer", json=PAYLOAD, headers=AUTH)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {"outcome": "no_evidence", "answerUnits": []})
+        self.assertEqual(response.json(), SAMPLE)
+
+    def test_old_request_shape_is_rejected(self):
+        app.dependency_overrides[answer_provider] = lambda: lambda _: DialogueCandidate(**SAMPLE)
+        old = {"text": PAYLOAD["text"], "district": "마포구",
+               "businessDate": "2026-11-21", "corpusVersion": "test"}
+        self.assertEqual(self.client.post("/answer", json=old, headers=AUTH).status_code, 422)
 
     def test_timeout_has_distinct_error(self):
         def timeout(_):
