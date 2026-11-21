@@ -1,3 +1,5 @@
+import { createClient } from "@supabase/supabase-js";
+
 export type JsonValue =
   | null | boolean | number | string
   | JsonValue[] | { [key: string]: JsonValue };
@@ -24,26 +26,28 @@ export function createSupabaseRpc(
   serviceUrl: string,
   serviceRoleKey: string,
 ) {
-  const rpcUrl = new URL("/rest/v1/rpc/", serviceUrl);
-  const headers = new Headers({ apikey: serviceRoleKey, "Content-Type": "application/json" });
-  // New Supabase secret keys are not JWTs. The gateway authenticates them via apikey.
-  if (!serviceRoleKey.startsWith("sb_secret_")) {
-    headers.set("Authorization", `Bearer ${serviceRoleKey}`);
-  }
+  if (typeof window !== "undefined") throw new Error("Supabase RPC requires a server context.");
+
+  const client = createClient(serviceUrl, serviceRoleKey, {
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+    global: {
+      fetch(input, init) {
+        const headers = new Headers(init?.headers ?? (input instanceof Request ? input.headers : undefined));
+        // Opaque secret keys authenticate via apikey; the SDK also supplies a fallback Bearer header.
+        if (serviceRoleKey.startsWith("sb_secret_") &&
+          headers.get("Authorization") === `Bearer ${serviceRoleKey}`) {
+          headers.delete("Authorization");
+        }
+        return fetch(input, { ...init, headers, cache: "no-store", redirect: "error" });
+      },
+    },
+  });
 
   async function rpc<Result>(name: string, input: Record<string, unknown>): Promise<Result> {
-    const response = await fetch(new URL(name, rpcUrl), {
-      method: "POST",
-      headers,
-      body: JSON.stringify(input),
-      cache: "no-store",
-      redirect: "error",
-      signal: AbortSignal.timeout(5_000),
-    });
-    if (!response.ok) {
-      throw new Error(`Session persistence request failed (${response.status}).`);
-    }
-    return await response.json() as Result;
+    const { data, error, status } = await client.rpc(name, input)
+      .retry(false).abortSignal(AbortSignal.timeout(5_000));
+    if (error) throw new Error(`Session persistence request failed (${status}).`);
+    return data as Result;
   }
 
   return rpc;
