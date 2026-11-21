@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 120 Bridge 프론트엔드
 
-## Getting Started
+120 Bridge는 시민의 민원 상담을 AI가 돕고, 필요한 경우 상담사가 대화 맥락을 이어받도록 하는 서비스입니다. 시민이 상담사에게 같은 내용을 다시 설명하는 부담을 줄이고, 근거를 바탕으로 적절한 담당 창구를 찾는 것을 목표로 합니다.
 
-First, run the development server:
+## 서비스 원칙
+
+- **언제든 사람에게 연결:** 시민이 상담사를 요청하면 다른 조건보다 우선해 연결 단계로 이동합니다.
+- **한 번만 말하기:** 상담 내용을 요약하고 시민의 확인을 받은 뒤 상담사에게 전달합니다.
+- **근거 있는 창구 안내:** 관련 자료와 기준일을 함께 보여 주고, 변경된 정책은 이전 자료와 구분합니다.
+
+## 계획된 화면
+
+### 시민 상담 화면
+
+- 음성 또는 글자로 민원을 입력하고 답변과 자막을 확인합니다.
+- 답변의 출처와 기준일을 확인합니다.
+- 상담사 연결을 요청하고, 전달할 요약 내용을 확인합니다.
+
+### 상담사 업무 화면
+
+- 전달된 상담 요약과 대화 기록, 이관 사유 및 감정 상태를 확인합니다.
+- 담당 창구 후보와 판단 근거를 확인합니다.
+
+## 현재 개발 상태
+
+현재는 Next.js 기본 화면과 프론트엔드 개발 환경을 구성한 초기 단계입니다. 위 상담 기능과 화면은 기획된 내용으로, 아직 구현되지 않았습니다. TanStack Query는 설치되어 있으며 서비스 연동은 진행 전입니다.
+
+## 기술 스택
+
+| 구분 | 기술 |
+| --- | --- |
+| 프레임워크 | Next.js 16, React 19, App Router |
+| 언어 | TypeScript |
+| 스타일 | Tailwind CSS 4 |
+| 서버 상태 관리 | TanStack Query 5 |
+| 코드 검사 | ESLint |
+| 패키지 관리자 | npm |
+
+## 시작하기
+
+`frontend` 디렉터리에서 실행합니다.
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+브라우저에서 [http://localhost:3000](http://localhost:3000)을 엽니다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run lint   # 코드 검사
+npm run build  # 프로덕션 빌드
+npm run start  # 빌드 후 프로덕션 서버 실행
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 디렉터리 구조
 
-## Learn More
+```text
+frontend/
+├── public/          정적 파일
+├── src/app/         App Router 페이지, 레이아웃, 전역 스타일
+├── package.json     의존성과 실행 명령어
+└── next.config.ts   Next.js 설정
+```
 
-To learn more about Next.js, take a look at the following resources:
+## 프로젝트 자료
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [기획서 보강안](../기획서-보강안.md)
+- [시연 대본](../demo/demo-script.md)
+- [시연 시나리오별 기준](../demo/golden-turns.json)
+- [상담 근거 자료](../rag-data/)
