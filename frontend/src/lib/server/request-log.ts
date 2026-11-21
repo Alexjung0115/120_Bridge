@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-type Endpoint = "session_create" | "session_read" | "session_turn" | "handoff" | "console";
+type Endpoint = "session_create" | "session_read" | "session_end" | "session_turn" | "handoff" | "console";
 
 export function createRequestContext(endpoint: Endpoint) {
   const requestId = randomUUID();
