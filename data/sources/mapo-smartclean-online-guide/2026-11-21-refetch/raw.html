@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    
+    <title>스마트클린 마포</title>
+
+    
+		<link rel="shortcut icon" href="/favicon/favicon.ico">
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="96x96" href="/favicon/favicon-96x96.png">
+
+		<link rel="apple-touch-icon" sizes="57x57" href="/favicon/apple-icon-57x57.png">
+		<link rel="apple-touch-icon" sizes="60x60" href="/favicon/apple-icon-60x60.png">
+		<link rel="apple-touch-icon" sizes="72x72" href="/favicon/apple-icon-72x72.png">
+		<link rel="apple-touch-icon" sizes="76x76" href="/favicon/apple-icon-76x76.png">
+		<link rel="apple-touch-icon" sizes="114x114" href="/favicon/apple-icon-114x114.png">
+		<link rel="apple-touch-icon" sizes="120x120" href="/favicon/apple-icon-120x120.png">
+		<link rel="apple-touch-icon" sizes="144x144" href="/favicon/apple-icon-144x144.png">
+		<link rel="apple-touch-icon" sizes="152x152" href="/favicon/apple-icon-152x152.png">
+		<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-icon-180x180.png">
+
+		<meta name="msapplication-TileColor" content="#ffffff">
+		<meta name="msapplication-TileImage" content="/favicon/ms-icon-144x144.png">
+	
+    
+    
+    <!-- 비활성화된 환경에서도 기존 워커의 정리를 확인한다. -->
+    <script defer src="/online/js/pwa.js?v=103" data-online-pwa-enabled="false" data-online-pwa-mobile="false"></script>
+
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no">
+    
+
+    
+        
+            <link rel="stylesheet"
+                  type="text/css"
+                  href="/client/mapo/css/online.css?ver=103">
+        
+    
+    <link rel="stylesheet" type="text/css" href="/common/css/common.css?103">
+
+    
+		<meta name="_csrf" 			content="2aa48523-dfc2-45d3-b1cb-1bd6aa75670f"/>
+		<meta name="_csrf_header"	content="X-CSRF-TOKEN"/>
+
+		<script>
+			// getter
+			function getCsrfHeader(){
+				return $("meta[name='_csrf_header']").attr("content");
+			}
+			// getter
+			function getCsrfToken(){
+				return $("meta[name='_csrf']").attr("content");
+			}
+			// csrf config
+			function configCsrfAjax(xhr) {
+				xhr.setRequestHeader(getCsrfHeader(), getCsrfToken());
+			}
+		</script>
+	
+    
+		<!-- css -->
+		<link rel="stylesheet" type="text/css" href="/vendor/jquery-ui/jquery-ui.min.css?103" />
+		<!-- js -->
+		<script	src="/vendor/jquery/jquery-3.5.1.js?103"></script>
+		<script src="/vendor/jquery-ui/jquery-ui.min.js?103"></script>
+
+		<style>
+			.datepicker-holiday,
+			.datepicker-holiday a,
+			.datepicker-holiday span {
+				background-color: #ff403e !important;
+				color: #000 !important;
+			}
+		</style>
+
+		<script type="text/javascript">
+			;let JqueryUtil = (function() {
+				'use strict';
+				let _returnUtils = {};
+
+				/**
+				 * <input>에 "jquery-ui 의 datePicker"를 등록한다
+				 * @param {id, class, selector} id
+				 */
+				_returnUtils.setDatePicker = function(id) {
+					$(id).datepicker({
+						dateFormat 			: 'yy.mm.dd',
+						prevText			: '이전 달',
+						nextText			: '다음 달',
+						monthNames			: [ '1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월' ],
+						monthNamesShort		: [ '1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월' ],
+						dayNames			: [ '일', '월', '화', '수', '목', '금', '토' ],
+						dayNamesShort		: [ '일', '월', '화', '수', '목', '금', '토' ],
+						dayNamesMin			: [ '일', '월', '화', '수', '목', '금', '토' ],
+						yearSuffix			: '년',
+						showMonthAfterYear	: true,
+					});
+				}
+
+				_returnUtils.setLimitWeeks = function(options) {
+					const {
+						$datepicker,
+						limitWeeks = 3,
+						startDate = new Date(),
+					} = options;
+					$datepicker.datepicker("option", "minDate", startDate);
+					const limitDate = moment(startDate).add(limitWeeks * 7, 'days').endOf('day').toDate();
+					$datepicker.datepicker("option", "maxDate", limitDate);
+				}
+
+				_returnUtils.setHolidays = function(options) {
+					const {
+						$datepicker,
+						holidays = [],
+						block = true,
+					} = options;
+					$datepicker.datepicker("option", "beforeShowDay", function(date) {
+						const dateString = moment(date).format('YYYYMMDD');
+						if (holidays.includes(dateString)) {
+							return [!block, 'datepicker-holiday', ''];
+						}
+						return [true, '', ''];
+					});
+				}
+
+				return init();
+				function init() {
+					return _returnUtils;
+				}
+			})();
+		</script>
+	
+    
+	<!-- js -->
+	<script src="/vendor/vue/vue-3.2.45.js?103"></script>
+
+	<script>
+		const { createApp } = Vue
+
+		const VueMomentMixin = function() {
+			return {
+				data() {
+					return {
+						xMoment: moment,
+					}
+				},
+				methods: {
+					mix$momentFormat(date, format) {
+						try {
+							return !date || !format ? '' : moment(date).format(format);
+						} catch (e) {
+							console.error(e)
+							return '';
+						}
+					},
+				},
+			}
+		}
+
+		const VueLshUtilMixin = function() {
+			return {
+				data() {
+					return {
+						xLshUtil: LshUtil,
+					}
+				},
+			}
+		}
+
+		const VueBulkyMixin = function() {
+			return {
+				mounted() {},
+				computed: {},
+				methods: {
+					/**
+					 * @Deprecated
+					 * lsh-util.js에 있는 formatByPatternWithJoiner 사용할 것
+					 */
+					mix$formatOrderNo(text, joinChar = '-') {
+						let formattedString;
+						try {
+							const parts = text.match(/^(\d{6})(\d{4})$/);
+							if (parts)
+								formattedString = parts.slice(1).join(joinChar);
+							else
+								formattedString = text;
+						} catch (e) {
+							formattedString = text;
+						}
+						return formattedString;
+					},
+					/**
+					 * @Deprecated
+					 * lsh-util.js에 있는 formatByPatternWithJoiner 사용할 것
+					 */
+					mix$formatDetailNo(detailNo, joinChar = '-') {
+						let formattedString;
+						try {
+							const parts = detailNo.match(/^(\d{6})(\d{4})(\d{3})$/);
+							if (parts)
+								formattedString = parts.slice(1).join(joinChar);
+							else
+								formattedString = detailNo;
+						} catch (e) {
+							formattedString = detailNo;
+						}
+						return formattedString;
+					},
+				},
+			}
+		}
+	</script>
+
+    
+	<script type="text/javascript">
+		const isMobile = false;
+	</script>
+
+
+    <script src="/common/js/common.js?103"></script>
+    <script src="/common/js/lsh-util.js?103"></script>
+    <script src="/common/js/loading-spinner.js?103"></script>
+</head>
+<body>
+<div class="clientBody">
+    <div class="headerBox">
+        
+        
+        <div class="headerInner">
+            <div class="headerLogo" style="position: relative">
+                <a class="headerLogoHref" href="/" style="position: absolute">
+                    <img class="comImgH" src="/client/mapo/img/logo_full.png">
+                </a>
+            </div>
+
+            <div class="moIcon">
+                <div class="moLine"></div>
+                <div class="moLine"></div>
+                <div class="moLine"></div>
+            </div>
+
+
+            <div class="headerMenuList">
+               <div class="headerMenuInner">
+                    <div class="headerMenuUnit">
+                         <a class="headerMenu">이용 안내</a>
+                         <div class="headerSubList">
+                             <a class="headerSub a-tag-care" href="/online/bulky/guide">이용 방법</a>
+                             <a class="headerSub a-tag-care" href="/online/bulky/item">수수료 안내</a>
+                         </div>
+                    </div>
+                    <div class="headerMenuUnit">
+                         <a class="headerMenu headerPoint">온라인 신청</a>
+                         <div class="headerSubList">
+                             <a class="headerSub a-tag-care" href="/online/bulky/request">배출신청</a>
+                             <a class="headerSub a-tag-care" href="/online/bulky/list">결과조회 / 배출취소</a>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            $(function() {
+                controlDropdown();
+
+                if (window.innerWidth <= 839) {
+                    $('.headerLogo').on('click',function(){
+                        $('.headerInner').toggleClass('moAct');
+                        $('.headerMenuList').css('display','none');
+                        $('.headerMenuListToHome').css('display','flex');
+                    })
+                } else {
+                    const _headerLogo = document.getElementsByClassName('headerLogo')[0];
+
+                    _headerLogo.addEventListener('click', function() {
+                        const goHomePC = document.getElementsByClassName('goHomePC')[0];
+                        if (!goHomePC.classList.contains('is-hide')) goHomePC.classList.add('is-hide');
+                        else goHomePC.classList.remove('is-hide');
+                    })
+                }
+
+                $('.moIcon').on('click',function(){
+                    $('.headerInner').toggleClass('moAct');
+                    $('.headerMenuListToHome').css('display','none');
+                    $('.headerMenuList').css('display','flex');
+                });
+
+            });
+
+
+            // 드랍다운 메뉴
+            function controlDropdown() {
+                const _headerSubList = document.getElementsByClassName('headerSubList');
+                const _headerMenu = document.getElementsByClassName('headerMenu');
+
+                for (let i = 0; i < _headerMenu.length; i++) {
+                    _headerMenu[i].addEventListener('click', function() {
+                        for (let j = 0; j < _headerMenu.length; j++) {
+                            if (_headerSubList[j].classList.contains('toggleOn')) {
+                                _headerSubList[j].classList.remove('toggleOn');
+                            }
+                        }
+                        _headerSubList[i].classList.add('toggleOn');
+                    });
+                }
+
+                // 마우스가 헤더를 떠나면 드랍다운 메뉴가 사라짐
+                $('.headerInner').on('mouseleave', function() {
+                    for (let j = 0; j < _headerMenu.length; j++) {
+                        if (_headerSubList[j].classList.contains('toggleOn')) {
+                            _headerSubList[j].classList.remove('toggleOn');
+                        }
+                    }
+                })
+            }
+
+
+        </script>
+    
+    
+    </div>
+    <div class="clientContent">
+        <div class="contentInner">
+            <div class="max1200">
+                <div class="nav-container client-color-border">
+                    
+        
+        <style>
+            .nav-header {
+                display: flex;
+                margin: 0;
+                height: 55px;
+                font-size: 22px;
+                text-align: center; justify-content: center; align-items: center;
+                border-bottom: 1px solid #e0e0e0;
+                color: white;
+            }
+            .nav-item {
+                display: flex;
+                height: 45px;
+                text-align: center; justify-content: center; align-items: center;
+                border-bottom: 1px solid #e0e0e0;
+            }
+        </style>
+        <div>
+            <h1 class="nav-header client-color-bg">이용 안내</h1>
+            <a class="a-tag-care" href="/online/bulky/guide"><p class="nav-item">이용 방법</p></a>
+            <a class="a-tag-care" href="/online/bulky/item"><p class="nav-item">수수료 안내</p></a>
+        </div>
+        <div>
+            <h1 class="nav-header client-color-bg">온라인 신청</h1>
+            <a class="a-tag-care" href="/online/bulky/request"><p class="nav-item">배출신청</p></a>
+            <a class="a-tag-care" href="/online/bulky/list"><p class="nav-item">결과조회 / 배출취소</p></a>
+        </div>
+    
+    
+                </div>
+                <main class="max850">
+
+                    <!-- maintenance notice -->
+                    
+
+    <style>
+        .maintenance-notice {
+            width: 100%;
+            box-sizing: border-box;
+            margin: 24px 0;
+            padding: 18px 22px;
+            border: 1px solid;
+            border-left-width: 5px;
+            border-radius: 6px;
+            max-width: 1200px;
+            justify-self: center;
+        }
+
+        /* 점검 예정 */
+        .maintenance-notice--scheduled {
+            background-color: #fff8e1;
+            border-color: #e6c766;
+            border-left-color: #d39e00;
+            color: #4f421f;
+        }
+
+        .maintenance-notice--scheduled .maintenance-notice__title {
+            color: #795f00;
+        }
+
+        .maintenance-notice--scheduled .maintenance-notice__period {
+            color: #6c5400;
+        }
+
+        /* 점검 중 */
+        .maintenance-notice--in-progress {
+            background-color: #fff0f0;
+            border-color: #e3a3a3;
+            border-left-color: #c83e3e;
+            color: #542828;
+        }
+
+        .maintenance-notice--in-progress .maintenance-notice__title {
+            color: #a32626;
+        }
+
+        .maintenance-notice--in-progress .maintenance-notice__period {
+            color: #a32626;
+        }
+
+        .maintenance-notice__title {
+            display: block;
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        .maintenance-notice__message {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.7;
+            word-break: keep-all;
+        }
+
+        .maintenance-notice__period {
+            display: inline-block;
+            margin-right: 4px;
+            font-weight: 700;
+        }
+
+        @media (max-width: 600px) {
+            .maintenance-notice {
+                margin: 16px 0;
+                padding: 15px 16px;
+            }
+
+            .maintenance-notice__title {
+                margin-bottom: 6px;
+                font-size: 15px;
+            }
+
+            .maintenance-notice__message {
+                font-size: 13px;
+                line-height: 1.6;
+            }
+        }
+    </style>
+
+    
+
+    
+
+
+
+
+                    <!-- BULKY -->
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                        
+    
+        <!-- css -->
+        <link rel="stylesheet" type="text/css" href="/vendor/toast-ui/tui-pagination.css?103" />
+        <link rel="stylesheet" type="text/css" href="/vendor/toast-ui/tui-grid.css?103" />
+        <link rel="stylesheet" type="text/css" href="/common/css/apsol-tui-grid.css?103" />
+        <!-- js -->
+        <script src="/vendor/toast-ui/tui-code-snippet.js?103"></script>
+        <script src="/vendor/toast-ui/tui-pagination.js?103"></script>
+        <script src="/vendor/toast-ui/tui-grid.js?103"></script>
+            <!-- custom js -->
+        <script src="/common/js/tui-custom-renderer.js?103"></script>
+        <script src="/common/js/tui-custom-editor.js?103"></script>
+    
+    <script src="/common/js/common.js?103"></script>
+
+    <style>
+        span.redfont { color: #f00; }
+        span.blufont { color: #0B4C5F; }
+        table { border-collapse: collapse; }
+        td { border: 1px solid grey; text-align: center; }
+
+        .bulky-guide { padding: 10px; margin-bottom: 40px; font-size: 0.9rem; line-height: 1.2rem; border-bottom: 1px solid grey; }
+        .bulky-guide:last-child { border-bottom: none; }
+        .bulky-guide > .guide-title { font-size: 20px; font-weight: 700; color: var(--client-color); margin-bottom: 20px; padding: 5px 0; }
+        .bulky-guide .company-title { font-size: 15px; font-weight: 600; }
+        .bulky-guide > ul > li,
+        .bulky-guide > ol > li { margin-bottom: 8px; line-height: 1.6; }
+        .bulky-guide > ul,
+        .bulky-guide > ol { padding-bottom: 10px; padding-left: 20px; }
+    </style>
+
+    <div>
+        <div class="big-header-box client-color-bg">
+            <p class="big-header-text">대형생활폐기물</p><br>
+            <p class="big-header-text">이용 방법</p>
+        </div>
+
+        <!-- guide-contents client branch -->
+        
+        
+        <div class="bulky-guide">
+            <div class="guide-title">대형 생활 폐기물이란?</div>
+            <ul>
+                <li>생활폐기물 중 종량제봉투에 담기 어려운 폐기물</li>
+                <li>가전제품류 : 텔레비전, 냉장고, 세탁기 등</li>
+                <li>가구류 : 장롱, 침대, 책상 등</li>
+                <li>생활용품류 : 거울, 항아리, 세면대 등</li>
+            </ul>
+        </div>
+
+        <div class="bulky-guide">
+            <div class="guide-title">대형폐기물 배출 신고 절차</div>
+            <ol>
+                <li><a href="/online/bulky/request">배출신청 페이지</a>로 이동</li>
+                <li>신고자 정보 입력 및 휴대폰 인증</li>
+                <li>배출 장소 및 배출 일시 입력</li>
+                <li>배출 품목 선택</li>
+                <li>수수료 결제</li>
+                <li>배출 물품에 <span class="red-point">배출증(출력 또는 수기작성) 부착하시고(필수)</span> 후 사진 업로드(선택)</li>
+                <li>배출 장소에 배출</li>
+            </ol>
+        </div>
+
+        <div class="bulky-guide">
+            <div class="guide-title">대형폐기물 배출 취소 절차</div>
+            <ol>
+                <li><a href="/online/bulky/list">배출신청 결과조회 페이지</a>로 이동</li>
+                <li>신고자 정보 입력 후 휴대폰 인증</li>
+                <li>신고한 주문번호 클릭</li>
+                <li>취소할 품목 선택 후 취소</li>
+            </ol>
+        </div>
+
+        <div class="bulky-guide" id="areas">
+            <div class="guide-title">수거 대행업체 관할구역</div>
+            
+    <style>
+        #companyCardsApp { display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); gap: 12px; margin-bottom: 40px; }
+        /* 카드 */
+        #companyCardsApp .company-card { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; min-width: 0; padding: 14px; background: #fff; border: 1px solid #e2e2e2; border-radius: 12px; box-shadow: 0 2px 7px rgba(0, 0, 0, 0.05); }
+        #companyCardsApp .company-title { width: 100%; color: #222; font-size: 25px; font-weight: 700; line-height: 1.3; }
+        /* 전화번호 */
+        #companyCardsApp .company-phone-list { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; width: 100%; }
+        #companyCardsApp .company-phone { display: inline-flex; align-items: center; gap: 4px; min-height: 30px; box-sizing: border-box; padding: 4px 8px; color: var(--client-color); font-size: 12px; font-weight: 600; line-height: 1; text-decoration: none; white-space: nowrap; background: #eef6ff; border: 1px solid #cfe3fb; border-radius: 999px; -webkit-tap-highlight-color: transparent; }
+        #companyCardsApp .company-phone:active { transform: scale(0.97); opacity: 0.8; }
+        #companyCardsApp .company-phone-icon { width: 13px; height: 13px; object-fit: contain; opacity: 0.75; }
+        /* 행정동 */
+        #companyCardsApp .company-area-list { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 9px; width: 100%; }
+        #companyCardsApp .company-area-badge { display: inline-flex; align-items: center; max-width: 100%; box-sizing: border-box; padding: 4px 7px; color: #4d4d4d; font-size: 15px; font-weight: 500; line-height: 1.4; word-break: keep-all; background: #f3f4f5; border: 1px solid #e1e3e5; border-radius: 6px; }
+        /* 제외 지역 */
+        #companyCardsApp .company-exclude { display: flex; align-items: flex-start; gap: 6px; box-sizing: border-box; padding: 8px; color: #c62828; font-size: 12px; line-height: 1.45; background: #fff4f4; border: 1px solid #f2cdcd; border-radius: 7px; }
+        #companyCardsApp .company-exclude-label { flex-shrink: 0; padding: 1px 5px; color: #fff; font-size: 10px; font-weight: 700; line-height: 1.5; background: #d32f2f; border-radius: 4px; }
+        #companyCardsApp .company-exclude-content { min-width: 0; word-break: keep-all; overflow-wrap: break-word; }
+        /* 모바일 */
+        @media (max-width: 480px) {
+            /*.bulky-guide { padding-right: 8px; padding-left: 8px; }*/
+            #companyCardsApp { gap: 16px; }
+            #companyCardsApp .company-card { gap: 13px; padding: 13px; border-radius: 10px; }
+            #companyCardsApp .company-title { font-size: 23px; }
+            #companyCardsApp .company-phone-list { gap: 5px; }
+            #companyCardsApp .company-phone { min-height: 27px; padding: 4px 6px; font-size: 13px; }
+            #companyCardsApp .company-phone-icon { width: 12px; height: 12px; }
+            #companyCardsApp .company-area-list { gap: 8px; }
+            #companyCardsApp .company-area-badge { padding: 3px 6px; font-size: 15px; }
+            #companyCardsApp .company-exclude { flex-direction: column; gap: 4px; padding: 7px; font-size: 13px; }
+        }
+    </style>
+
+    <div id="companyCardsApp">
+        <div v-for="company in model.companies" :key="company.name"
+             class="company-card">
+            <div class="company-title">
+                {{ company.name }}
+            </div>
+            <div class="company-phone-list">
+                <a v-for="phone in company.phone"
+                   :key="phone"
+                   class="company-phone"
+                   :href="`tel:${phone}`">
+                    <img src="/vendor/material-icon/call_24dp_000000.png"
+                         alt=""
+                         class="company-phone-icon">
+                    <span>{{ phone }}</span>
+                </a>
+            </div>
+
+            <div class="company-area-list">
+            <span v-for="area in company.area"
+                  :key="area"
+                  class="company-area-badge">
+                {{ area }}
+            </span>
+            </div>
+            <div v-if="company?.exclude?.length > 0"
+                 class="company-exclude">
+                <span class="company-exclude-label">
+                    제외
+                </span>
+                <span class="company-exclude-content">
+                    {{ company.exclude.join(", ") }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+
+    <script type="text/javascript" charset='UTF-8' >
+        const companyCardsApp = createApp({
+            mixins: [VueLshUtilMixin()],
+            data() {
+                return {
+                    flag: { },
+                    model: {
+                        companies: [],
+                    },
+                }
+            },
+            mounted() {
+
+            },
+            updated() {},
+            watch: {},
+            computed: {},
+            methods: {
+                setCompanies(companies) {
+                    this.model.companies = companies;
+                }
+            },
+        }).mount("#companyCardsApp");
+    </script>
+
+
+        </div>
+
+        <script>
+
+            $(document).ready(function () {
+                const interval = setInterval(() => {
+                    if (companyCardsApp) {
+                        companyCardsApp.setCompanies(bulky_guide_areas);
+                        clearInterval(interval);
+                    }
+                }, 100);
+            });
+
+            const bulky_guide_areas = [
+                {
+                    name: "평화환경",
+                    phone: ["02-3142-6412"],
+                    area: ["아현동", "공덕동", "도화동", "서교동(舊서교동)",],
+                    exclude: [],
+                },
+                {
+                    name: "효성환경",
+                    phone: ["02-322-3780"],
+                    area: ["서강동", "합정동", "성산2동", "상암동",],
+                    exclude: [],
+                },
+                {
+                    name: "태응그린",
+                    phone: ["02-3141-5055"],
+                    area: ["대흥동", "신수동", "舊동교동", "연남동",],
+                    exclude: [],
+                },
+                {
+                    name: "대경환경",
+                    phone: ["02-336-1351"],
+                    area: ["용강동", "염리동", "망원1동", "망원2동", "성산1동",],
+                    exclude: [],
+                },
+                {
+                    name: "신수환경",
+                    phone: ["02-336-8108"],
+                    area: ["舊서교동", "舊동교동", "서강동 일부", "합정동 일부",],
+                    exclude: [],
+                },
+            ];
+
+        </script>
+
+    
+    
+    </div>
+
+    <script type="text/javascript" charset='UTF-8' >
+
+        $(document).ready(() => {
+            controlHash();
+        });
+        function controlHash() {
+            const hash = window.location.hash;
+            const hashValue = hash.substring(1);
+            if (LshUtil.isBlank(hashValue)) {
+                return;
+            }
+            const target = $(`#${CSS.escape(hashValue)}`);
+            if (!target || target.length === 0) {
+                return;
+            }
+            // scroll to target (offset - 80)
+            $('html, body').animate({
+                scrollTop: target.offset().top - 80
+            }, 500);
+            // highlight target
+            target.css({
+                transition: 'background-color 1s ease',
+                backgroundColor: '#fff8b6'
+            });
+            setTimeout(() => {
+                target.css('backgroundColor', '');
+            }, 1500);
+        }
+
+    </script>
+
+
+                    
+                    
+                    
+                    <!-- MARKET -->
+                    
+                    <!-- MINWON -->
+                    
+                    
+                    
+                </main>
+            </div>
+        </div>
+    </div>
+    <div class="clearBoth"></div>
+    <div class="footerBox">
+        
+        
+        <div class="footerSiteBox">
+            <div class="footerSiteInner">
+                <a class="footerSite"
+                   href="https://www.mapo.go.kr/site/main/content/mapo0601"
+                   style="font-size: 1.2rem"
+                   target="_blank">
+                    개인정보처리방침
+                </a>
+                <a class="footerSite"
+                   href="/">
+                    홈
+                </a>
+                <a class="footerSite"
+                   href="https://www.mapo.go.kr"
+                   target="_blank">
+                    마포구청
+                </a>
+            </div>
+        </div>
+        <div class="footerInner">
+            <div class="footerInfoBox">
+                <p class="footerInfo">사업장명 : 마포구청 | 대표자명 : 유동균</p>
+                <p class="footerInfo">주소: 서울특별시 마포구 월드컵로 212(성산동)</p>
+                <p class="footerInfo">대표전화 : 02-3153-9200</p>
+                <p class="footerInfo">사업자등록번호 : 105-83-00138</p>
+            </div>
+            <p class="footerCopy">Copyright© 2025 MAPO-GU OFFICE. All rights reserved</p>
+        </div>
+    
+    
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        // console.log("serverVersion", "103");
+        setTimeout(function() {
+            let windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+            let windowHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+            console.log("Window Width: " + windowWidth);
+            console.log("Window Height: " + windowHeight);
+        }, 1000);
+    });
+</script>
+</body>
+</html>
