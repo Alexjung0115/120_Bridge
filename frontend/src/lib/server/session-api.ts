@@ -13,6 +13,7 @@ type OpenResult = { status: "created" | "existing"; snapshot: unknown } |
 export function createSessionApi(storage: {
   open(mode: "voice" | "text", session: Session, request: Request): Promise<OpenResult>;
   load(id: string): Promise<unknown>;
+  loadSummary?(id: string, revision: number): Promise<unknown>;
   end(id: string, commandId: string, base: number, hash: string): Promise<
     { status: "committed" | "replayed"; data: unknown } |
     { status: "conflict"; revision: number } | { status: "not_found" } | { status: "forbidden" }
@@ -102,6 +103,8 @@ export function createSessionApi(storage: {
           session.transcript.filter((turn) => turn.outputStatus === "committed");
         return noStoreJson({ schemaVersion, requestId, data: {
           ...metadata, transcript, issues: [], utterances: [], cards: [],
+          ...(session.state === "summary_confirm" && storage.loadSummary
+            ? { summary: await storage.loadSummary(id, session.revision) } : {}),
         } });
       } catch {
         return sessionError(requestId, 503, "storage_unavailable");

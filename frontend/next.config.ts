@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async rewrites() {
+    return [{
+      source: "/api/ai/:path*",
+      destination: "https://bridge-api-demo-129844172635.asia-northeast3.run.app/:path*",
+    }];
+  },
   ...(process.env.BRIDGE_LOCAL_DEMO === "1" && {
     webpack(config) {
       config.resolve.alias = {

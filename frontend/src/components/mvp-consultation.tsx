@@ -13,6 +13,7 @@ type CitizenSession = {
 
 type CitizenRead = Pick<Session, "revision" | "state" | "transcript"> & {
   processing: boolean;
+  summary?: { revision: number; coreLines: string[] } | null;
 };
 
 type Queue = {
@@ -233,13 +234,15 @@ export function CitizenConsultation({ storageScope = "mvp" }: { storageScope?: s
     });
   }
 
-  function send(kind: "turns" | "handoff-request") {
-    if (!session || !snapshot) return;
+  function send(kind: "turns" | "handoff-request" | "summary", skipConfirmation = false) {
+    if (!session || !snapshot || (kind === "summary" && !snapshot.summary)) return;
     return request.run(async () => {
       setNotice("");
       const body = kind === "turns"
         ? { text: draft.trim(), inputMode: "text" }
-        : { trigger: "button", skipConfirmation: true };
+        : kind === "summary"
+          ? { action: "confirm", summaryRevision: snapshot.summary?.revision }
+          : skipConfirmation ? { trigger: "button", skipConfirmation: true } : { trigger: "button" };
       await sendCommand(`/api/sessions/${session.sessionId}/${kind}`, session.citizenToken, snapshot.revision, body);
       if (kind === "turns") setDraft("");
       setNotice(kind === "turns" ? "메시지를 보냈습니다." : "상담사 연결을 요청했습니다.");
@@ -261,7 +264,7 @@ export function CitizenConsultation({ storageScope = "mvp" }: { storageScope?: s
         <BridgeBrand />
         <div className="mt-4 flex items-center justify-between gap-3">
           <h2 id="citizen-title" className="type-heading-small text-text-bolder">텍스트 상담</h2>
-          {session && <Button type="button" variant="outline" size="compact" disabled={!canSend} onClick={() => send("handoff-request")}>상담사 연결</Button>}
+          {session && <Button type="button" variant="outline" size="compact" disabled={!canSend} onClick={() => send("handoff-request", true)}>상담사 연결</Button>}
         </div>
       </header>
       {!ready ? <p role="status">이전 상담을 확인하고 있습니다.</p> : !session ? (
@@ -287,6 +290,12 @@ export function CitizenConsultation({ storageScope = "mvp" }: { storageScope?: s
                 </li>
               ))}
             </ol>}
+            {snapshot?.state === "summary_confirm" && snapshot.summary && (
+              <section aria-label="전달 요약" className="space-y-3 pt-4">
+                <ul>{snapshot.summary.coreLines.map((line, index) => <li key={index}>{line}</li>)}</ul>
+                <Button type="button" disabled={request.busy} onClick={() => send("summary")}>요약 승인하고 연결</Button>
+              </section>
+            )}
           </div>
           <form className="shrink-0 border-t border-border-gray-light px-6 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4" onSubmit={(event) => {
             event.preventDefault();
@@ -298,6 +307,7 @@ export function CitizenConsultation({ storageScope = "mvp" }: { storageScope?: s
               onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); if (canSend && validDraft) void send("turns"); } }}
               disabled={!canSend} aria-describedby="mvp-message-limit" />
               <Button type="submit" disabled={!canSend || !validDraft}>전송</Button></div>
+            <Button type="button" variant="outline" className="mt-3" disabled={!canSend} onClick={() => send("handoff-request")}>요약 확인 후 연결</Button>
             <p id="mvp-message-limit" className="text-sm">최대 {consultationLimits.turnCharacters.toLocaleString("ko-KR")}자</p>
           </form>
         </>

@@ -1,0 +1,102 @@
+{
+  "_comment": "TEMPORARY (#4/#5). All requests, model output, and evidence are synthetic. Remove after the team contract and verified RAG excerpts are connected.",
+  "cases": [
+    {
+      "name": "grounded",
+      "request": {
+        "text": "가상의 대형폐기물 안내에서 마포구 냉장고는 어디에 신청해요?",
+        "recentTurns": [
+            {
+              "role": "citizen",
+              "text": "냉장고는 마포구에 있어요."
+            }
+        ],
+        "knownFields": [
+            {
+              "fieldKey": "disposal.district",
+              "value": "마포구"
+            }
+        ]
+      },
+      "expectedOutcome": "answer",
+      "evidence": [
+        {
+          "excerpt": {
+            "chunkId": "temporary/disposal-guide",
+            "claimKey": "temporary.fridge-application",
+            "quote": "가상 시연에서 냉장고는 예시 접수창구에 신청합니다.",
+            "answerEligible": true,
+            "routingEligible": false
+          },
+          "sourceUrl": "https://example.invalid/temporary-ai2-guide",
+          "basisDate": "2026-11-21"
+        }
+      ],
+      "sampleCandidate": {
+        "intent": "문의",
+        "category": "대형폐기물",
+        "sentiment": "보통",
+        "issues": [
+          {
+            "localId": "issue-1",
+            "request": "가상의 대형폐기물 안내에서 마포구 냉장고는 어디에 신청해요?",
+            "knownFields": [
+              {
+                "fieldKey": "disposal.district",
+                "value": "마포구"
+              }
+            ],
+            "missingFields": [],
+            "needsPersonalLookup": false
+          }
+        ],
+        "proposedQuestion": null,
+        "confidence": "high",
+        "answerUnits": [
+          {
+            "issueLocalId": "issue-1",
+            "text": "예시 접수창구에 신청하시면 됩니다.",
+            "citations": [
+              {
+                "chunkId": "temporary/disposal-guide",
+                "claimKey": "temporary.fridge-application",
+                "quote": "가상 시연에서 냉장고는 예시 접수창구에 신청합니다."
+              }
+            ]
+          }
+        ],
+        "summaryProposal": null,
+        "routingEvidence": []
+      }
+    },
+    {
+      "name": "no-evidence",
+      "request": {
+        "text": "가상의 복지 지원에 제가 선정됐는지 확인해 주세요.",
+        "recentTurns": [],
+        "knownFields": []
+      },
+      "expectedOutcome": "no_evidence",
+      "evidence": [],
+      "sampleCandidate": {
+        "intent": "문의",
+        "category": "복지 선정 결과",
+        "sentiment": "보통",
+        "issues": [
+          {
+            "localId": "issue-1",
+            "request": "가상의 복지 지원에 제가 선정됐는지 확인해 주세요.",
+            "knownFields": [],
+            "missingFields": [],
+            "needsPersonalLookup": true
+          }
+        ],
+        "proposedQuestion": null,
+        "confidence": "low",
+        "answerUnits": [],
+        "summaryProposal": null,
+        "routingEvidence": []
+      }
+    }
+  ]
+}

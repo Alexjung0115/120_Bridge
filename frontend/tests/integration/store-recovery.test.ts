@@ -428,6 +428,15 @@ test("approved handoff delivery atomically publishes one protected queue entry",
     assert.deepEqual(events.map((event) => event.event_type),
       ["agent_claimed", "case_completed", "repeat_explanation_recorded", "session_ended"]);
     assert.equal(events[2].repeat_explanation_count, 0);
+    await db.exec(await readFile(new URL("20261121032500_console_metrics.sql", migrationDir), "utf8"));
+    await db.exec("set role service_role");
+    const { rows: metricsRows } = await db.query<{ input: unknown }>(
+      "select public.bridge_console_metrics_input(now() + interval '1 minute') as input");
+    const metricInput = JSON.stringify(metricsRows[0].input);
+    assert.ok(metricInput.includes("queue_received"));
+    assert.ok(metricInput.includes("session_ended"));
+    assert.equal(metricInput.includes(outcome.resolutionNote), false);
+    await db.exec("reset role");
     await db.exec("reset role");
     await db.exec("set role authenticated");
     await assert.rejects(db.query("select public.bridge_console_queue(null)"), { code: "42501" });

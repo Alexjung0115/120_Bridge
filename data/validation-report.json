@@ -1,0 +1,70 @@
+{
+  "corpusVersion": "corpus-a6452f316f1f",
+  "corpusHash": "a6452f316f1fbcb34f9c77e6064f9eab0f64a9da7037c11e07b1ea2c8d50de87",
+  "ok": true,
+  "counts": {
+    "records": 36,
+    "uniqueSourceUrls": 32,
+    "chunks": 122,
+    "answerEligibleChunks": 10,
+    "routingEligibleChunks": 3,
+    "citations": 22,
+    "replacements": 5,
+    "byVerificationStatus": {
+      "verified": 6,
+      "historical": 0,
+      "unverified": 26,
+      "conflict": 1,
+      "blocked": 3
+    },
+    "externalWelfareRecords": 396
+  },
+  "errors": [],
+  "warnings": [],
+  "excluded": [
+    {
+      "target": "parking/law-road-traffic-act-article-160.md",
+      "message": "2027-04-14 미래 시행일 표기. 2026-11 시연의 현행 근거로 사용 금지."
+    },
+    {
+      "target": "policy-change/case2-after-2026-h2-changes.md",
+      "message": "동일 URL이 case3 문서에도 연결되어 claim별 대체 관계를 분리하기 전 답변 근거로 사용 금지."
+    },
+    {
+      "target": "policy-change/case3-after-2026-h2-changes.md",
+      "message": "동일 URL이 case2 문서에도 연결되어 claim별 대체 관계를 분리하기 전 답변 근거로 사용 금지."
+    },
+    {
+      "target": "waste/gangnam-large-waste-disposal.md",
+      "message": "페이지 내 담당 전화번호가 상충해 원문 재검증 전 연락처·수수료 근거로 사용 금지."
+    },
+    {
+      "target": "contact.mapo.collector.pyeonghwa @ waste/mapo-large-waste-guide.md/section-6",
+      "message": "상충 claim"
+    },
+    {
+      "target": "policy.climate-card.payback.application-period @ policy-change/case1-before-climate-card-payback.md/section-4",
+      "message": "대체된 claim. 대체 관계(data/replacements.json)로만 참조한다."
+    },
+    {
+      "target": "policy.climate-card.payback.deposit-period @ policy-change/case1-before-climate-card-payback.md/section-4",
+      "message": "대체된 claim. 대체 관계(data/replacements.json)로만 참조한다."
+    },
+    {
+      "target": "policy.climate-card.payback.fee-table @ policy-change/case1-before-climate-card-payback.md/section-3",
+      "message": "상충 claim"
+    },
+    {
+      "target": "policy.climate-card.prepaid-30day.end @ policy-change/case1-after-climate-card-plus.md/section-1",
+      "message": "대체된 claim. 대체 관계(data/replacements.json)로만 참조한다."
+    },
+    {
+      "target": "policy.climate-card.postpaid.end @ policy-change/case1-after-climate-card-plus.md/section-1",
+      "message": "대체된 claim. 대체 관계(data/replacements.json)로만 참조한다."
+    },
+    {
+      "target": "policy.climate-card.payback.deposit-period @ policy-change/case1-after-climate-card-plus.md/section-2",
+      "message": "대체된 claim. 대체 관계(data/replacements.json)로만 참조한다."
+    }
+  ]
+}

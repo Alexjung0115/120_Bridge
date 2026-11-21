@@ -1,0 +1,26 @@
+{
+  "task": "T003",
+  "generatedAt": "2026-11-21",
+  "sourceIndex": "rag-data/index.json",
+  "summary": {
+    "records": 36,
+    "uniqueSourceUrls": 32,
+    "verifiedRecords": 6,
+    "unverifiedRecords": 30,
+    "duplicateUrlGroups": 4
+  },
+  "priorityCoreDocuments": [
+    {"docId":"waste/mapo-large-waste-guide.md","purpose":"마포구 냉장고·대형폐기물 안내","verificationStatus":"historical_verified","sourceUrl":"https://www.mapo.go.kr/site/main/content/mapo05060502"},
+    {"docId":"waste/mapo-smartclean-online-guide.md","purpose":"마포구 온라인 배출 신청 경로","verificationStatus":"historical_verified","sourceUrl":"https://smartclean.mapo.go.kr/online/bulky/guide"},
+    {"docId":"policy-change/case1-before-climate-card-payback.md","purpose":"기후동행카드 페이백 신청·입금 시기","verificationStatus":"historical_verified","sourceUrl":"https://www.seoul.go.kr/news/news_report.do?nttNo=459223"},
+    {"docId":"policy-change/case1-after-climate-pass-qa.md","purpose":"기후동행패스 시행·전환 조건","verificationStatus":"historical_verified","sourceUrl":"https://mediahub.seoul.go.kr/archives/2019060"},
+    {"docId":"policy-change/case1-after-climate-card-plus.md","purpose":"기후동행카드 플러스 변경 안내","verificationStatus":"historical_verified","sourceUrl":"https://www.seoul.go.kr/news/news_report.do?bbsNo=158&nttNo=459855&cntPerPage=10&curPage=1"},
+    {"docId":"departments/120dasan-phone-consultation.md","purpose":"120다산콜 상담 경로","verificationStatus":"historical_verified","sourceUrl":"https://www.120dasan.or.kr/dsnc/main/contents.do?menuNo=200016"}
+  ],
+  "blockedCandidates": [
+    {"docId":"parking/law-road-traffic-act-article-160.md","reason":"2027-04-14 미래 시행일 표기. 2026-11 시연의 현행 근거로 사용 금지."},
+    {"docId":"waste/gangnam-large-waste-disposal.md","reason":"페이지 내 담당 전화번호가 상충해 원문 재검증 전 연락처·수수료 근거로 사용 금지."},
+    {"docId":"policy-change/case2-after-2026-h2-changes.md","reason":"동일 URL이 case3 문서에도 연결되어 claim별 대체 관계를 분리하기 전 답변 근거로 사용 금지."},
+    {"docId":"policy-change/case3-after-2026-h2-changes.md","reason":"동일 URL이 case2 문서에도 연결되어 claim별 대체 관계를 분리하기 전 답변 근거로 사용 금지."}
+  ]
+}

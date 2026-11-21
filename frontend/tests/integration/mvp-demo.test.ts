@@ -122,4 +122,23 @@ test("text consultation reaches the console and persists the counselor claim", a
     { id, text, inputMode, outputStatus }
   )), [{ id: turnId, text: citizenText, inputMode: "text", outputStatus: "committed" }]);
   assert.deepEqual(await rpc<Queue>(queueSql), { items: [], nextCursor: null });
+  const confirmedSession = "10000000-0000-4000-8000-000000000006";
+  const draftId = "10000000-0000-4000-8000-000000000007";
+  const approveId = "10000000-0000-4000-8000-000000000008";
+  await rpc("select public.bridge_open_session($1,$2,'text',$3) as value",
+    [owner, confirmedSession, { ...initial, id: confirmedSession }]);
+  const summaryCommand = (id: string, base: number, summaryRevision: number | null) => rpc<Receipt>(
+    "select public.bridge_citizen_summary_command($1,$2,$3,$4,$5) as value",
+    [confirmedSession, id, base, citizenTokenHash, summaryRevision]);
+  const draft = await summaryCommand(draftId, 0, null);
+  assert.equal(draft.data.state, "summary_confirm");
+  assert.equal((await rpc<Queue>(queueSql)).items.length, 0);
+  assert.equal((await summaryCommand(approveId, 1, 2)).status, "conflict");
+  const approved = await summaryCommand(approveId, 1, 1);
+  assert.equal(approved.data.state, "queued");
+  assert.equal((await summaryCommand(approveId, 1, 1)).status, "replayed");
+  assert.equal((await rpc<Queue>(queueSql)).items.length, 1);
+  const detail = await rpc<{ summary: { confirmation: string } }>(
+    "select public.bridge_console_detail($1) as value", [confirmedSession]);
+  assert.equal(detail.summary.confirmation, "confirmed");
 });
