@@ -6,30 +6,13 @@ from typing import Literal
 
 import httpx
 from fastapi import Depends, FastAPI, HTTPException
-from pydantic import Field
-
-from dialogue import CandidateModel, DialogueCandidate, EvidenceExcerpt, KnownField, propose
-from main import AnswerRequest, AnswerResult, AnswerUnit, Citation, require_internal_token
+from dialogue import DialogueCandidate, EvidenceExcerpt, propose
+from main import AnswerRequest, require_internal_token
 from model_client import InvalidModelOutput, ModelUnavailable, ResponsesClient
 
 
-class TemporaryTurn(CandidateModel):
-    role: Literal["citizen", "assistant"]
-    text: str = Field(min_length=1, max_length=2000)
-
-
-class TemporaryContext(CandidateModel):
-    recentTurns: list[TemporaryTurn] = Field(max_length=10)
-    knownFields: list[KnownField] = Field(max_length=20)
-
-
-class TemporaryAnswerRequest(AnswerRequest):
-    context: TemporaryContext
-
-
-class TemporaryAnswerResult(AnswerResult):
+class TemporaryAnswerResult(DialogueCandidate):
     temporary: Literal[True] = True
-    candidate: DialogueCandidate
 
 
 fixture_path = Path(__file__).resolve().parents[2] / "frontend/tests/fixtures/temporary-ai-contract.json"
@@ -50,19 +33,13 @@ def fixture_transport(candidate: dict) -> httpx.MockTransport:
 
 
 @app.post("/answer", dependencies=[Depends(require_internal_token)])
-async def answer(request: TemporaryAnswerRequest) -> TemporaryAnswerResult:
+async def answer(request: AnswerRequest) -> TemporaryAnswerResult:
     payload = request.model_dump(mode="json")
     case = next((row for row in cases if row["request"] == payload), None)
     if case is None:
         raise HTTPException(status_code=422, detail={"code": "temporary_fixture_only"})
 
     evidence = [EvidenceExcerpt.model_validate(row["excerpt"]) for row in case["evidence"]]
-    sources = {
-        (row["excerpt"]["chunkId"], row["excerpt"]["claimKey"]): {
-            "sourceUrl": row["sourceUrl"], "basisDate": row["basisDate"],
-        }
-        for row in case["evidence"]
-    }
     live = os.environ.get("BRIDGE_TEMPORARY_LIVE_MODEL") == "1"
     transport = None if live else fixture_transport(case["sampleCandidate"])
     try:
@@ -73,20 +50,14 @@ async def answer(request: TemporaryAnswerRequest) -> TemporaryAnswerResult:
                                 api_key="temporary", model="temporary")
             )
             candidate = await propose(
-                model, text=request.text, context=request.context.model_dump(), evidence=evidence,
+                model, text=request.text, context={
+                    "recentTurns": [turn.model_dump() for turn in request.recentTurns],
+                    "knownFields": [field.model_dump() for field in request.knownFields],
+                }, evidence=evidence,
             )
     except TimeoutError:
         raise HTTPException(status_code=504, detail={"code": "ai_timeout"}) from None
     except (ModelUnavailable, InvalidModelOutput):
         raise HTTPException(status_code=503, detail={"code": "ai_unavailable"}) from None
 
-    units = [
-        AnswerUnit(text=unit.text, citations=[
-            Citation(**ref.model_dump(), **sources[(ref.chunkId, ref.claimKey)])
-            for ref in unit.citations
-        ])
-        for unit in candidate.answerUnits
-    ]
-    return TemporaryAnswerResult(
-        outcome="answer" if units else "no_evidence", answerUnits=units, candidate=candidate,
-    )
+    return TemporaryAnswerResult(**candidate.model_dump())
