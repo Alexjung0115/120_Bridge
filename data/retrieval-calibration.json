@@ -1,0 +1,254 @@
+{
+  "task": "T014",
+  "purpose": "개발 보정 표본이다. 독립 평가 fixture(frontend/tests/fixtures/generalization.json)와 문항을 공유하지 않으며 그 결과로 임계값을 바꾸지 않는다.",
+  "corpusVersion": "corpus-a6452f316f1f",
+  "thresholds": {
+    "ngram": 2,
+    "minScore": 0.3,
+    "maxPerDoc": 2,
+    "topK": 4
+  },
+  "devSamples": [
+    {
+      "id": "D01",
+      "text": "마포구에서 냉장고 버릴 때 수수료가 얼마예요?",
+      "district": "마포구",
+      "businessDate": "2026-11-21",
+      "expect": {
+        "chunkIds": [
+          "waste/mapo-large-waste-guide.md/section-5"
+        ],
+        "use": "answer"
+      }
+    },
+    {
+      "id": "D02",
+      "text": "세탁기도 무료 방문수거 되나요?",
+      "district": "마포구",
+      "businessDate": "2026-11-21",
+      "expect": {
+        "chunkIds": [
+          "waste/mapo-large-waste-guide.md/section-4"
+        ],
+        "use": "answer"
+      }
+    },
+    {
+      "id": "D03",
+      "text": "대형폐기물 신고를 취소하면 환불 받을 수 있나요?",
+      "district": "마포구",
+      "businessDate": "2026-11-21",
+      "expect": {
+        "chunkIds": [
+          "waste/mapo-large-waste-guide.md/section-3"
+        ],
+        "use": "answer"
+      }
+    },
+    {
+      "id": "D04",
+      "text": "기후동행카드 후불카드는 언제까지 쓸 수 있어요?",
+      "district": null,
+      "businessDate": "2026-11-21",
+      "expect": {
+        "chunkIds": [
+          "policy-change/case1-after-climate-pass-qa.md/section-5"
+        ],
+        "use": "answer"
+      }
+    },
+    {
+      "id": "D05",
+      "text": "기후동행패스 청년 할인 나이 기준",
+      "district": null,
+      "businessDate": "2026-11-21",
+      "expect": {
+        "chunkIds": [
+          "policy-change/case1-after-climate-pass-qa.md/section-2"
+        ],
+        "use": "answer"
+      }
+    },
+    {
+      "id": "D06",
+      "text": "기후동행카드 페이백은 누가 받을 수 있나요?",
+      "district": "관악구",
+      "businessDate": "2026-11-21",
+      "expect": {
+        "chunkIds": [
+          "policy-change/case1-before-climate-card-payback.md/section-2"
+        ],
+        "use": "answer"
+      }
+    },
+    {
+      "id": "D07",
+      "text": "마포구 대형폐기물 담당 문의 전화번호",
+      "district": "마포구",
+      "businessDate": "2026-11-21",
+      "expect": {
+        "chunkIds": [
+          "waste/mapo-large-waste-guide.md/section-7"
+        ],
+        "use": "routing"
+      }
+    },
+    {
+      "id": "D08",
+      "text": "강남구에서 냉장고 버리는 수수료가 얼마예요?",
+      "district": "강남구",
+      "businessDate": "2026-11-21",
+      "expect": {
+        "unknownReason": "no_eligible_evidence"
+      }
+    },
+    {
+      "id": "D09",
+      "text": "냉장고 버리는 수수료가 얼마예요?",
+      "district": null,
+      "businessDate": "2026-11-21",
+      "expect": {
+        "unknownReason": "jurisdiction_unconfirmed"
+      }
+    },
+    {
+      "id": "D10",
+      "text": "도로교통법 주정차 과태료 금액",
+      "district": null,
+      "businessDate": "2026-11-21",
+      "expect": {
+        "unknownReason": "no_eligible_evidence"
+      }
+    },
+    {
+      "id": "D11",
+      "text": "오늘 서울 날씨 어때요?",
+      "district": null,
+      "businessDate": "2026-11-21",
+      "expect": {
+        "none": true
+      }
+    }
+  ],
+  "results": [
+    {
+      "id": "D01",
+      "pass": true,
+      "top": [
+        "waste/mapo-large-waste-guide.md/section-5",
+        "waste/mapo-large-waste-guide.md/section-4"
+      ],
+      "scores": [
+        0.625,
+        0.415
+      ],
+      "unknownReason": null
+    },
+    {
+      "id": "D02",
+      "pass": true,
+      "top": [
+        "waste/mapo-large-waste-guide.md/section-4"
+      ],
+      "scores": [
+        0.57
+      ],
+      "unknownReason": null
+    },
+    {
+      "id": "D03",
+      "pass": true,
+      "top": [
+        "waste/mapo-large-waste-guide.md/section-3"
+      ],
+      "scores": [
+        0.383
+      ],
+      "unknownReason": null
+    },
+    {
+      "id": "D04",
+      "pass": true,
+      "top": [
+        "policy-change/case1-after-climate-pass-qa.md/section-5",
+        "policy-change/case1-before-climate-card-payback.md/section-2",
+        "policy-change/case1-after-climate-pass-qa.md/section-2"
+      ],
+      "scores": [
+        0.547,
+        0.474,
+        0.351
+      ],
+      "unknownReason": null
+    },
+    {
+      "id": "D05",
+      "pass": true,
+      "top": [
+        "policy-change/case1-after-climate-pass-qa.md/section-2",
+        "policy-change/case1-after-climate-pass-qa.md/section-4"
+      ],
+      "scores": [
+        0.665,
+        0.551
+      ],
+      "unknownReason": null
+    },
+    {
+      "id": "D06",
+      "pass": true,
+      "top": [
+        "policy-change/case1-after-climate-pass-qa.md/section-5",
+        "policy-change/case1-before-climate-card-payback.md/section-2",
+        "policy-change/case1-after-climate-pass-qa.md/section-2"
+      ],
+      "scores": [
+        0.571,
+        0.486,
+        0.365
+      ],
+      "unknownReason": null
+    },
+    {
+      "id": "D07",
+      "pass": true,
+      "top": [
+        "waste/mapo-large-waste-guide.md/section-2",
+        "waste/mapo-large-waste-guide.md/section-7"
+      ],
+      "scores": [
+        0.548,
+        0.468
+      ],
+      "unknownReason": null
+    },
+    {
+      "id": "D08",
+      "pass": true,
+      "top": [],
+      "scores": [],
+      "unknownReason": "no_eligible_evidence"
+    },
+    {
+      "id": "D09",
+      "pass": true,
+      "top": [],
+      "scores": [],
+      "unknownReason": "jurisdiction_unconfirmed"
+    },
+    {
+      "id": "D10",
+      "pass": true,
+      "top": [],
+      "scores": [],
+      "unknownReason": "no_eligible_evidence"
+    },
+    {
+      "id": "D11",
+      "pass": true,
+      "top": [],
+      "scores": [],
+      "unknownReason": "no_eligible_evidence"
+    }
+  ]
+}
