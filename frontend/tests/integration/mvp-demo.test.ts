@@ -104,6 +104,13 @@ test("text consultation reaches the console and persists the counselor claim", a
   assert.equal(claim.data.agentId, agentId);
   assert.equal(claim.data.state, "serving");
   assert.equal(claim.data.revision, 4);
+  const cases = await rpc<{ session_id: string; payload: { status: string } }[]>(
+    "select public.bridge_console_cases($1, null) as value", ["serving"],
+  );
+  assert.deepEqual(cases.map(({ session_id, payload }) => ({ id: session_id, status: payload.status })), [
+    { id: sessionId, status: "serving" },
+  ]);
+  assert.deepEqual(await rpc("select public.bridge_console_cases($1, null) as value", ["completed"]), []);
 
   const loaded = await rpc<{
     id: string;

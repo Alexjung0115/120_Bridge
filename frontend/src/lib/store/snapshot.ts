@@ -22,13 +22,13 @@ export type SessionPersistence = {
   ): Promise<SavedCommand>;
 };
 
-export function createSupabaseRpc(
+export function createSupabaseClient(
   serviceUrl: string,
   serviceRoleKey: string,
 ) {
   if (typeof window !== "undefined") throw new Error("Supabase RPC requires a server context.");
 
-  const client = createClient(serviceUrl, serviceRoleKey, {
+  return createClient(serviceUrl, serviceRoleKey, {
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
     global: {
       fetch(input, init) {
@@ -43,6 +43,10 @@ export function createSupabaseRpc(
     },
   });
 
+}
+
+export function createSupabaseRpc(serviceUrl: string, serviceRoleKey: string) {
+  const client = createSupabaseClient(serviceUrl, serviceRoleKey);
   async function rpc<Result>(name: string, input: Record<string, unknown>): Promise<Result> {
     const { data, error, status } = await client.rpc(name, input)
       .retry(false).abortSignal(AbortSignal.timeout(5_000));

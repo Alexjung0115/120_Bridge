@@ -1,9 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { MicrophoneControl, type VoicePhase } from "@/components/speech/MicrophoneControl";
+import { useSpeechController } from "@/components/speech/useSpeechController";
 import { BridgeBrand } from "@/components/bridge-brand";
 import { consultationLimits } from "@/lib/contracts";
+import { rememberSession } from "@/app/citizen/_lib/remote-history";
 import type { Session, Turn } from "@/lib/schema/session";
 
 type CitizenSession = {
@@ -151,15 +155,21 @@ function readCitizenSession(current: CitizenSession, signal?: AbortSignal) {
 const sectionClass = "min-w-0 space-y-4 border-t border-border-gray pt-5";
 const inputClass = "w-full rounded-guide-small border border-border-gray bg-background-white p-3";
 
-export function CitizenConsultation({ storageScope = "mvp" }: { storageScope?: string }) {
+const speakingStates: Session["state"][] = ["active", "handoff_offered", "summary_confirm"];
+
+export function CitizenConsultation({ storageScope = "mvp", mode = "text" }: { storageScope?: string; mode?: "text" | "voice" }) {
   const storageKey = storageScope === "mvp" ? citizenStorageKey : `${citizenStorageKey}:${storageScope}`;
   const request = useRequest();
   const sendCommand = useCommand();
+  const speech = useSpeechController();
+  const voice = mode === "voice";
+  const primedFor = useRef<string | null>(null);
   const startKey = useRef<string | null>(null);
   const [ready, setReady] = useState(false);
   const [session, setSession] = useState<CitizenSession | null>(null);
   const [snapshot, setSnapshot] = useState<CitizenRead | null>(null);
   const [readError, setReadError] = useState("");
+  const [storageError, setStorageError] = useState("");
   const [draft, setDraft] = useState("");
   const [notice, setNotice] = useState("");
 
@@ -167,7 +177,9 @@ export function CitizenConsultation({ storageScope = "mvp" }: { storageScope?: s
     let mounted = true;
     queueMicrotask(() => {
       if (!mounted) return;
-      setSession(savedCitizenSession(storageKey));
+      const saved = savedCitizenSession(storageKey);
+      if (saved && !rememberSession(saved)) setStorageError("상담을 다시 찾기 위한 정보를 브라우저에 저장하지 못했습니다.");
+      setSession(saved);
       setReady(true);
     });
     return () => { mounted = false; };
@@ -223,9 +235,10 @@ export function CitizenConsultation({ storageScope = "mvp" }: { storageScope?: s
       try { sessionStorage.setItem(retryStorageKey, startKey.current); } catch { /* In-memory retries remain available. */ }
       const { sessionId, citizenToken } = await api<CitizenSession>("/api/sessions", undefined, {
         clientSessionKey: startKey.current,
-        inputMode: "text",
+        inputMode: mode,
       });
       const created = { sessionId, citizenToken };
+      setStorageError(rememberSession(created) ? "" : "상담을 다시 찾기 위한 정보를 브라우저에 저장하지 못했습니다.");
       if (saveCitizenSession(created, storageKey)) {
         try { sessionStorage.removeItem(retryStorageKey); } catch { /* Session is kept in memory. */ }
       }
@@ -234,17 +247,39 @@ export function CitizenConsultation({ storageScope = "mvp" }: { storageScope?: s
     });
   }
 
-  function send(kind: "turns" | "handoff-request" | "summary", skipConfirmation = false) {
+  function endSession() {
+    if (!session || !snapshot) return;
+    return request.run(async () => {
+      await sendCommand(`/api/sessions/${session.sessionId}/end`, session.citizenToken, snapshot.revision, {});
+      setSnapshot(null);
+      await refresh(session);
+    });
+  }
+
+  function newSession() {
+    saveCitizenSession(null, storageKey);
+    startKey.current = null;
+    setSession(null);
+    setSnapshot(null);
+    setNotice("");
+  }
+
+  function send(
+    kind: "turns" | "handoff-request" | "summary",
+    skipConfirmation = false,
+    extra: { text?: string; trigger?: "key" } = {},
+  ) {
     if (!session || !snapshot || (kind === "summary" && !snapshot.summary)) return;
+    if (kind === "handoff-request") speech.cancel(); // Stop reading and listening the moment a person is requested.
     return request.run(async () => {
       setNotice("");
       const body = kind === "turns"
-        ? { text: draft.trim(), inputMode: "text" }
+        ? { text: (extra.text ?? draft).trim(), inputMode: extra.text === undefined ? "text" : "voice" }
         : kind === "summary"
           ? { action: "confirm", summaryRevision: snapshot.summary?.revision }
-          : skipConfirmation ? { trigger: "button", skipConfirmation: true } : { trigger: "button" };
+          : skipConfirmation ? { trigger: "button", skipConfirmation: true } : { trigger: extra.trigger ?? "button" };
       await sendCommand(`/api/sessions/${session.sessionId}/${kind}`, session.citizenToken, snapshot.revision, body);
-      if (kind === "turns") setDraft("");
+      if (kind === "turns" && extra.text === undefined) setDraft("");
       setNotice(kind === "turns" ? "메시지를 보냈습니다." : "상담사 연결을 요청했습니다.");
       // Require a fresh revision before enabling another write.
       setSnapshot(null);
@@ -253,22 +288,72 @@ export function CitizenConsultation({ storageScope = "mvp" }: { storageScope?: s
   }
 
   const state = snapshot?.state;
-  const canSend = !request.busy && !snapshot?.processing &&
-    (snapshot?.state === "active" || snapshot?.state === "handoff_offered");
+  const consulting = snapshot?.state === "active" || snapshot?.state === "handoff_offered";
+  const canSend = !request.busy && !snapshot?.processing && consulting;
+  // A person can be requested even while the model is still answering.
+  const canHandoff = !request.busy && !!snapshot && consulting;
   const validDraft = draft.trim().length > 0 &&
     Array.from(draft.trim()).length <= consultationLimits.turnCharacters;
+
+  function submitVoice(text: string) {
+    if (canSend && Array.from(text).length <= consultationLimits.turnCharacters) void send("turns", false, { text });
+    else setDraft(text); // Keep what was heard so it can be edited and sent as text.
+  }
+  const latest = useRef({ send, submitVoice });
+  useEffect(() => { latest.current = { send, submitVoice }; });
+
+  const { speak, markSpoken, cancel: cancelSpeech } = speech;
+  useEffect(() => {
+    if (!voice || !session || !snapshot) return;
+    if (!speakingStates.includes(snapshot.state)) {
+      cancelSpeech(); // Final screens never read aloud.
+      return;
+    }
+    const prime = primedFor.current !== session.sessionId;
+    primedFor.current = session.sessionId;
+    for (const turn of snapshot.transcript) {
+      if (turn.role !== "assistant" || turn.outputStatus !== "committed") continue;
+      if (prime) markSpoken(turn.id); // Resumed history is captioned, not replayed.
+      else speak(turn.id, turn.text);
+    }
+  }, [voice, session, snapshot, speak, markSpoken, cancelSpeech]);
+
+  // Key "1" asks for a counselor unless the citizen is typing.
+  useEffect(() => {
+    if (!canHandoff) return;
+    function onKey(event: KeyboardEvent) {
+      if (event.key !== "1" || event.repeat || event.ctrlKey || event.metaKey || event.altKey) return;
+      if ((event.target as HTMLElement | null)?.closest?.("input, textarea, select, [contenteditable]")) return;
+      event.preventDefault();
+      void latest.current.send("handoff-request", false, { trigger: "key" });
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [canHandoff]);
+
+  const phase: VoicePhase = speech.status === "listening" ? "listening"
+    : request.busy || snapshot?.processing ? "thinking"
+      : speech.status === "speaking" ? "speaking" : "idle";
+
+  function toggleMic() {
+    if (speech.status === "listening") speech.finishListening();
+    else speech.listen((text) => latest.current.submitVoice(text));
+  }
 
   return (
     <section id="citizen" aria-labelledby="citizen-title" className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background-white text-text-basic sm:max-w-xl">
       <header className="shrink-0 border-b border-border-gray-light px-6 pb-4 pt-6">
         <BridgeBrand />
         <div className="mt-4 flex items-center justify-between gap-3">
-          <h2 id="citizen-title" className="type-heading-small text-text-bolder">텍스트 상담</h2>
-          {session && <Button type="button" variant="outline" size="compact" disabled={!canSend} onClick={() => send("handoff-request", true)}>상담사 연결</Button>}
+          <h2 id="citizen-title" className="type-heading-small text-text-bolder">{voice ? "음성 상담" : "텍스트 상담"}</h2>
+          {session && <Button type="button" variant="outline" size="compact" disabled={!canHandoff} onClick={() => send("handoff-request", true)}>상담사 연결 (1번 키)</Button>}
         </div>
+        <Link href={voice ? "/citizen/text" : "/citizen/voice"} className="mt-2 inline-block type-body-small text-text-primary underline underline-offset-4">
+          {voice ? "글자로 상담하기" : "음성으로 상담하기"}
+        </Link>
       </header>
       {!ready ? <p role="status">이전 상담을 확인하고 있습니다.</p> : !session ? (
-        <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6"><p>상담을 시작해 문의 내용을 입력해주세요.</p><Button onClick={start} disabled={request.busy}>텍스트 상담 시작</Button></div>
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6"><p>상담을 시작해 문의 내용을 입력해주세요.</p><Button onClick={start} disabled={request.busy}>{voice ? "음성 상담 시작" : "텍스트 상담 시작"}</Button></div>
       ) : (
         <>
           <div className="flex flex-wrap items-center gap-3 px-6 pt-4">
@@ -279,6 +364,9 @@ export function CitizenConsultation({ storageScope = "mvp" }: { storageScope?: s
               onClick={() => request.run(() => refresh(session))}>
               상태 새로고침
             </Button>
+            {(state === "active" || state === "handoff_offered" || state === "summary_confirm") &&
+              <Button variant="outline" size="compact" disabled={request.busy} onClick={endSession}>상담 종료</Button>}
+            {(state === "ended" || state === "serving") && <Button variant="outline" size="compact" onClick={newSession}>새 상담 시작</Button>}
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto px-6 py-6">
             <p className="max-w-[85%] rounded-guide-xlarge rounded-bl-none bg-element-gray-lighter px-4 py-3 type-body-small">문의 내용을 입력해주세요.</p>
@@ -301,13 +389,15 @@ export function CitizenConsultation({ storageScope = "mvp" }: { storageScope?: s
             event.preventDefault();
             if (canSend && validDraft) void send("turns");
           }}>
+            {voice && <MicrophoneControl phase={phase} supported={speech.support.recognition} disabled={!canSend && speech.status !== "listening"}
+              interim={speech.interim} problem={speech.problem} onToggle={toggleMic} />}
             <label htmlFor="mvp-message" className="sr-only">상담 메시지</label>
             <div className="flex items-end gap-3"><textarea id="mvp-message" rows={1} className="max-h-32 min-h-12 min-w-0 flex-1 resize-none rounded-guide-medium-1 border border-border-gray px-4 py-3 type-body-small" placeholder="메시지를 입력해주세요"
               value={draft} onChange={(event) => setDraft(event.target.value)}
               onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); if (canSend && validDraft) void send("turns"); } }}
               disabled={!canSend} aria-describedby="mvp-message-limit" />
               <Button type="submit" disabled={!canSend || !validDraft}>전송</Button></div>
-            <Button type="button" variant="outline" className="mt-3" disabled={!canSend} onClick={() => send("handoff-request")}>요약 확인 후 연결</Button>
+            <Button type="button" variant="outline" className="mt-3" disabled={!canHandoff} onClick={() => send("handoff-request")}>요약 확인 후 연결</Button>
             <p id="mvp-message-limit" className="text-sm">최대 {consultationLimits.turnCharacters.toLocaleString("ko-KR")}자</p>
           </form>
         </>
@@ -315,6 +405,7 @@ export function CitizenConsultation({ storageScope = "mvp" }: { storageScope?: s
       <p role="status">{request.busy ? "요청 중입니다." : notice}</p>
       {request.error && <p role="alert">{request.error}</p>}
       {readError && <p role="status">{readError}</p>}
+      {storageError && <p role="alert">{storageError}</p>}
     </section>
   );
 }

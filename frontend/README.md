@@ -43,7 +43,8 @@
 - `NEXT_PUBLIC_SUPABASE_URL`과 `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`를 설정합니다.
 - Supabase 이메일 인증을 활성화하고 기본 가입 확인 및 로그인 링크 템플릿을 사용합니다. URL Configuration의 Redirect URLs에 배포 환경과 로컬의 `/auth/callback` 주소를 등록합니다.
 - 인증 요청과 메일 링크는 같은 브라우저에서 열어야 합니다. Supabase 기본 SMTP는 팀원 주소로만 발송할 수 있어 일반 시민 대상 발송에는 별도 SMTP가 필요합니다.
-- 상담사는 미리 생성한 계정의 서버 관리 `app_metadata.bridge_role`을 `counselor`로 설정해야 합니다. 사용자 편집이 가능한 `user_metadata`는 권한에 사용하지 않습니다.
+- 시민과 상담사는 각각 이메일로 가입·로그인합니다. 이메일 인증을 마친 첫 로그인에서 선택한 역할이 서버 관리 `app_metadata.bridge_role`에 저장되며, 같은 계정은 다른 역할로 로그인할 수 없습니다. 이를 위해 `supabase/migrations/20261121033000_login_roles.sql`을 적용하고 서버에 Supabase 비밀 키를 설정해야 합니다.
+- 상담사 가입을 이메일 인증만으로 허용하므로 이메일을 인증할 수 있는 누구나 상담사로 가입할 수 있습니다. 실제 상담 데이터 사용 전에는 별도 상담사 승인 절차가 필요합니다.
 - 현재 로그인은 화면 접근을 보호합니다. 상담 API의 인증과 데이터 접근 권한은 AI3의 API 계약에 맞춰 별도로 연결해야 합니다.
 
 `frontend` 디렉터리에서 실행합니다.

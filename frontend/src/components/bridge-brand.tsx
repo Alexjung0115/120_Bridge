@@ -2,13 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import governmentIcon from "@/assets/icon/government.svg";
 
-export function BridgeBrand({ variant = "citizen" }: { variant?: "citizen" | "counselor" }) {
+export function BridgeBrand({ variant = "citizen", href }: { variant?: "citizen" | "counselor"; href?: string }) {
   const counselor = variant === "counselor";
 
   return (
     <Link
-      href={counselor ? "/" : "/citizen"}
-      aria-label={counselor ? "120 Bridge 홈" : "120Bridge 시민 홈"}
+      href={href ?? (counselor ? "/" : "/citizen")}
+      aria-label={href === "/" || counselor ? "120 Bridge 홈" : "120Bridge 시민 홈"}
       className={counselor ? "flex items-center gap-2 whitespace-nowrap" : "inline-flex items-center guide-gap-3"}
     >
       <Image src={governmentIcon} alt="" aria-hidden="true" className="size-6" />

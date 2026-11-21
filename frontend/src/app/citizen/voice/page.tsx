@@ -1,5 +1,5 @@
-import { ConsultationPreview } from "../_components/consultation-preview";
+import { CitizenConsultation } from "@/components/mvp-consultation";
 
 export default function VoicePage() {
-  return <ConsultationPreview mode="voice" />;
+  return <CitizenConsultation mode="voice" />;
 }
