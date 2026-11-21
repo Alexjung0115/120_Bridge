@@ -2,15 +2,21 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   async rewrites() {
-    return [
-      {
-        source: "/api/ai/:path*",
-        destination:
-          "https://bridge-api-demo-129844172635.asia-northeast3.run.app/:path*",
-      },
-    ];
+    return [{
+      source: "/api/ai/:path*",
+      destination: "https://bridge-api-demo-129844172635.asia-northeast3.run.app/:path*",
+    }];
   },
-  /* config options here */
+  ...(process.env.BRIDGE_LOCAL_DEMO === "1" && {
+    webpack(config) {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        "pretendard-gov/dist/web/static/PretendardGOV-Regular.css": false,
+        "pretendard-gov/dist/web/static/PretendardGOV-Bold.css": false,
+      };
+      return config;
+    },
+  }),
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {

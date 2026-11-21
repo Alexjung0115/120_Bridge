@@ -57,10 +57,10 @@ test("commands require a UUID and an integer revision without coercion", () => {
 
 test("session creation accepts both input channels and rejects a blank key", () => {
   for (const inputMode of ["text", "voice"]) {
-    assert.ok(createSessionRequestSchema.safeParse({ clientSessionKey: "retry-key", inputMode }).success);
+    assert.ok(createSessionRequestSchema.safeParse({ clientSessionKey: commandId, inputMode }).success);
   }
   assert.equal(createSessionRequestSchema.safeParse({ clientSessionKey: " ", inputMode: "text" }).success, false);
-  assert.equal(createSessionRequestSchema.safeParse({ clientSessionKey: "key", inputMode: "button" }).success, false);
+  assert.equal(createSessionRequestSchema.safeParse({ clientSessionKey: commandId, inputMode: "button" }).success, false);
 });
 
 test("turn input preserves original text and enforces code point boundaries", () => {
