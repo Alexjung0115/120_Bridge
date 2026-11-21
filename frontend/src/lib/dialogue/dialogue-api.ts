@@ -17,7 +17,7 @@ const receiptData = z.looseObject({ completionId: z.uuid().optional() });
 const outcomeRequest = commandEnvelopeSchema.extend({ decision: z.enum(["resolved", "need_more"]) });
 
 export function parseDialogueSnapshot(input: unknown): DialogueSnapshot {
-  const { issues, ...session } = z.looseObject({ issues: issueCollectionSchema }).parse(input);
+  const { issues, ...session } = z.looseObject({ issues: issueCollectionSchema.default([]) }).parse(input);
   const snapshot = sessionSchema.parse(session);
   if (issues.length !== snapshot.issueIds.length ||
       issues.some(({ id, sessionId }) => sessionId !== snapshot.id || !snapshot.issueIds.includes(id)) ||
@@ -27,11 +27,12 @@ export function parseDialogueSnapshot(input: unknown): DialogueSnapshot {
   return { ...snapshot, issues };
 }
 
-export function createDialogueApi({ persistence, corpus, model, responseWaitMs = 10_000 }: {
+export function createDialogueApi({ persistence, corpus, model, responseWaitMs = 10_000, retainWork }: {
   persistence: SessionPersistence;
   corpus: Corpus;
   model: ResponsesClient;
   responseWaitMs?: number;
+  retainWork?: (work: Promise<unknown>) => void;
 }) {
   const store = createSessionStore(persistence, parseDialogueSnapshot);
 
@@ -165,6 +166,7 @@ export function createDialogueApi({ persistence, corpus, model, responseWaitMs =
       // Observe failures even after the response deadline; only the worker that won the receipt runs.
       const finished = work.then((result) => receipt(requestId, result),
         () => sessionError(requestId, 503, "storage_unavailable"));
+      retainWork?.(finished);
       let timer: ReturnType<typeof setTimeout> | undefined;
       try {
         return await Promise.race([finished, new Promise<Response>((resolve) => {

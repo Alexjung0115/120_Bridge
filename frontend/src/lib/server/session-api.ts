@@ -102,7 +102,11 @@ export function createSessionApi(storage: {
         const transcript = metadata.presentationState === "connection_complete" ? [] :
           session.transcript.filter((turn) => turn.outputStatus === "committed");
         return noStoreJson({ schemaVersion, requestId, data: {
-          ...metadata, transcript, issues: [], utterances: [], cards: [],
+          ...metadata, transcript, cards: [],
+          issues: metadata.presentationState === "connection_complete" ? [] :
+            (session.issues ?? []).map(({ id, citizenRequest, status }) => ({ id, request: citizenRequest, status })),
+          utterances: transcript.filter(({ role }) => role === "assistant")
+            .map(({ id, text }) => ({ id, text, maxSentences: 2 })),
           ...(session.state === "summary_confirm" && storage.loadSummary
             ? { summary: await storage.loadSummary(id, session.revision) } : {}),
         } });
