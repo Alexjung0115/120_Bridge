@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    
+    <title>스마트클린 금천</title>
+
+    
+		<link rel="shortcut icon" href="/favicon/favicon.ico">
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="96x96" href="/favicon/favicon-96x96.png">
+
+		<link rel="apple-touch-icon" sizes="57x57" href="/favicon/apple-icon-57x57.png">
+		<link rel="apple-touch-icon" sizes="60x60" href="/favicon/apple-icon-60x60.png">
+		<link rel="apple-touch-icon" sizes="72x72" href="/favicon/apple-icon-72x72.png">
+		<link rel="apple-touch-icon" sizes="76x76" href="/favicon/apple-icon-76x76.png">
+		<link rel="apple-touch-icon" sizes="114x114" href="/favicon/apple-icon-114x114.png">
+		<link rel="apple-touch-icon" sizes="120x120" href="/favicon/apple-icon-120x120.png">
+		<link rel="apple-touch-icon" sizes="144x144" href="/favicon/apple-icon-144x144.png">
+		<link rel="apple-touch-icon" sizes="152x152" href="/favicon/apple-icon-152x152.png">
+		<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-icon-180x180.png">
+
+		<meta name="msapplication-TileColor" content="#ffffff">
+		<meta name="msapplication-TileImage" content="/favicon/ms-icon-144x144.png">
+	
+    
+    
+    <!-- 비활성화된 환경에서도 기존 워커의 정리를 확인한다. -->
+    <script defer src="/online/js/pwa.js?v=103" data-online-pwa-enabled="false" data-online-pwa-mobile="false"></script>
+
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no">
+    
+
+    
+        
+            <link rel="stylesheet"
+                  type="text/css"
+                  href="/client/geumcheon/css/online.css?ver=103">
+        
+    
+    <link rel="stylesheet" type="text/css" href="/common/css/common.css?103">
+
+    
+		<meta name="_csrf" 			content="0ad31d0e-fb4e-4b50-8692-f2ae6acf8b3e"/>
+		<meta name="_csrf_header"	content="X-CSRF-TOKEN"/>
+
+		<script>
+			// getter
+			function getCsrfHeader(){
+				return $("meta[name='_csrf_header']").attr("content");
+			}
+			// getter
+			function getCsrfToken(){
+				return $("meta[name='_csrf']").attr("content");
+			}
+			// csrf config
+			function configCsrfAjax(xhr) {
+				xhr.setRequestHeader(getCsrfHeader(), getCsrfToken());
+			}
+		</script>
+	
+    
+		<!-- css -->
+		<link rel="stylesheet" type="text/css" href="/vendor/jquery-ui/jquery-ui.min.css?103" />
+		<!-- js -->
+		<script	src="/vendor/jquery/jquery-3.5.1.js?103"></script>
+		<script src="/vendor/jquery-ui/jquery-ui.min.js?103"></script>
+
+		<style>
+			.datepicker-holiday,
+			.datepicker-holiday a,
+			.datepicker-holiday span {
+				background-color: #ff403e !important;
+				color: #000 !important;
+			}
+		</style>
+
+		<script type="text/javascript">
+			;let JqueryUtil = (function() {
+				'use strict';
+				let _returnUtils = {};
+
+				/**
+				 * <input>에 "jquery-ui 의 datePicker"를 등록한다
+				 * @param {id, class, selector} id
+				 */
+				_returnUtils.setDatePicker = function(id) {
+					$(id).datepicker({
+						dateFormat 			: 'yy.mm.dd',
+						prevText			: '이전 달',
+						nextText			: '다음 달',
+						monthNames			: [ '1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월' ],
+						monthNamesShort		: [ '1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월' ],
+						dayNames			: [ '일', '월', '화', '수', '목', '금', '토' ],
+						dayNamesShort		: [ '일', '월', '화', '수', '목', '금', '토' ],
+						dayNamesMin			: [ '일', '월', '화', '수', '목', '금', '토' ],
+						yearSuffix			: '년',
+						showMonthAfterYear	: true,
+					});
+				}
+
+				_returnUtils.setLimitWeeks = function(options) {
+					const {
+						$datepicker,
+						limitWeeks = 3,
+						startDate = new Date(),
+					} = options;
+					$datepicker.datepicker("option", "minDate", startDate);
+					const limitDate = moment(startDate).add(limitWeeks * 7, 'days').endOf('day').toDate();
+					$datepicker.datepicker("option", "maxDate", limitDate);
+				}
+
+				_returnUtils.setHolidays = function(options) {
+					const {
+						$datepicker,
+						holidays = [],
+						block = true,
+					} = options;
+					$datepicker.datepicker("option", "beforeShowDay", function(date) {
+						const dateString = moment(date).format('YYYYMMDD');
+						if (holidays.includes(dateString)) {
+							return [!block, 'datepicker-holiday', ''];
+						}
+						return [true, '', ''];
+					});
+				}
+
+				return init();
+				function init() {
+					return _returnUtils;
+				}
+			})();
+		</script>
+	
+    
+	<!-- js -->
+	<script src="/vendor/vue/vue-3.2.45.js?103"></script>
+
+	<script>
+		const { createApp } = Vue
+
+		const VueMomentMixin = function() {
+			return {
+				data() {
+					return {
+						xMoment: moment,
+					}
+				},
+				methods: {
+					mix$momentFormat(date, format) {
+						try {
+							return !date || !format ? '' : moment(date).format(format);
+						} catch (e) {
+							console.error(e)
+							return '';
+						}
+					},
+				},
+			}
+		}
+
+		const VueLshUtilMixin = function() {
+			return {
+				data() {
+					return {
+						xLshUtil: LshUtil,
+					}
+				},
+			}
+		}
+
+		const VueBulkyMixin = function() {
+			return {
+				mounted() {},
+				computed: {},
+				methods: {
+					/**
+					 * @Deprecated
+					 * lsh-util.js에 있는 formatByPatternWithJoiner 사용할 것
+					 */
+					mix$formatOrderNo(text, joinChar = '-') {
+						let formattedString;
+						try {
+							const parts = text.match(/^(\d{6})(\d{4})$/);
+							if (parts)
+								formattedString = parts.slice(1).join(joinChar);
+							else
+								formattedString = text;
+						} catch (e) {
+							formattedString = text;
+						}
+						return formattedString;
+					},
+					/**
+					 * @Deprecated
+					 * lsh-util.js에 있는 formatByPatternWithJoiner 사용할 것
+					 */
+					mix$formatDetailNo(detailNo, joinChar = '-') {
+						let formattedString;
+						try {
+							const parts = detailNo.match(/^(\d{6})(\d{4})(\d{3})$/);
+							if (parts)
+								formattedString = parts.slice(1).join(joinChar);
+							else
+								formattedString = detailNo;
+						} catch (e) {
+							formattedString = detailNo;
+						}
+						return formattedString;
+					},
+				},
+			}
+		}
+	</script>
+
+    
+	<script type="text/javascript">
+		const isMobile = false;
+	</script>
+
+
+    <script src="/common/js/common.js?103"></script>
+    <script src="/common/js/lsh-util.js?103"></script>
+    <script src="/common/js/loading-spinner.js?103"></script>
+</head>
+<body>
+<div class="clientBody">
+    <div class="headerBox">
+        
+        
+        <div class="headerInner">
+            <div class="headerLogo" style="position: relative">
+                <a class="headerLogoHref" href="/" style="position: absolute">
+                    <img class="comImgH" src="/client/geumcheon/img/logo-h.png">
+                </a>
+            </div>
+
+            <div class="moIcon">
+                <div class="moLine"></div>
+                <div class="moLine"></div>
+                <div class="moLine"></div>
+            </div>
+
+            <div class="headerMenuList">
+               <div class="headerMenuInner">
+                    <div class="headerMenuUnit">
+                         <a class="headerMenu">이용 안내</a>
+                         <div class="headerSubList">
+                             <a class="headerSub a-tag-care" href="/online/bulky/guide">이용 방법</a>
+                             <a class="headerSub a-tag-care" href="/online/bulky/item">수수료 안내</a>
+                         </div>
+                    </div>
+                    <div class="headerMenuUnit">
+                         <a class="headerMenu headerPoint">대형폐기물</a>
+                         <div class="headerSubList">
+                             <a class="headerSub a-tag-care" href="/online/bulky/request">배출신청</a>
+                             <a class="headerSub a-tag-care" href="/online/bulky/list">결과조회 / 배출취소</a>
+                             <a class="headerSub a-tag-care" href="/online/minwon/request?minwonType=BULKY_CARRY_DOWN_V">내려드림 서비스 신청</a>
+                             <a class="headerSub a-tag-care" href="/online/minwon/list">내려드림 서비스 조회</a>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            $(function() {
+                controlDropdown();
+
+                if (window.innerWidth <= 839) {
+                    $('.headerLogo').on('click',function(){
+                        $('.headerInner').toggleClass('moAct');
+                        $('.headerMenuList').css('display','none');
+                        $('.headerMenuListToHome').css('display','flex');
+                    })
+                } else {
+                    const _headerLogo = document.getElementsByClassName('headerLogo')[0];
+
+                    _headerLogo.addEventListener('click', function() {
+                        const goHomePC = document.getElementsByClassName('goHomePC')[0];
+                        if (!goHomePC.classList.contains('is-hide')) goHomePC.classList.add('is-hide');
+                        else goHomePC.classList.remove('is-hide');
+                    })
+                }
+
+                $('.moIcon').on('click',function(){
+                    $('.headerInner').toggleClass('moAct');
+                    $('.headerMenuListToHome').css('display','none');
+                    $('.headerMenuList').css('display','flex');
+                });
+
+            });
+
+
+            // 드랍다운 메뉴
+            function controlDropdown() {
+                const _headerSubList = document.getElementsByClassName('headerSubList');
+                const _headerMenu = document.getElementsByClassName('headerMenu');
+
+                for (let i = 0; i < _headerMenu.length; i++) {
+                    _headerMenu[i].addEventListener('click', function() {
+                        for (let j = 0; j < _headerMenu.length; j++) {
+                            if (_headerSubList[j].classList.contains('toggleOn')) {
+                                _headerSubList[j].classList.remove('toggleOn');
+                            }
+                        }
+                        _headerSubList[i].classList.add('toggleOn');
+                    });
+                }
+
+                // 마우스가 헤더를 떠나면 드랍다운 메뉴가 사라짐
+                $('.headerInner').on('mouseleave', function() {
+                    for (let j = 0; j < _headerMenu.length; j++) {
+                        if (_headerSubList[j].classList.contains('toggleOn')) {
+                            _headerSubList[j].classList.remove('toggleOn');
+                        }
+                    }
+                })
+            }
+
+
+        </script>
+    
+    
+    </div>
+    <div class="clientContent">
+        <div class="contentInner">
+            <div class="max1200">
+                <div class="nav-container client-color-border">
+                    
+        
+        <style>
+            .nav-header {
+                display: flex;
+                margin: 0;
+                height: 55px;
+                font-size: 22px;
+                text-align: center; justify-content: center; align-items: center;
+                border-bottom: 1px solid #e0e0e0;
+                color: white;
+            }
+            .nav-item {
+                display: flex;
+                height: 45px;
+                text-align: center; justify-content: center; align-items: center;
+                border-bottom: 1px solid #e0e0e0;
+            }
+        </style>
+        <div>
+            <h1 class="nav-header client-color-bg">이용 안내</h1>
+            <a class="a-tag-care" href="/online/bulky/guide"><p class="nav-item">이용 방법</p></a>
+            <a class="a-tag-care" href="/online/bulky/item"><p class="nav-item">수수료 안내</p></a>
+        </div>
+        <div>
+            <h1 class="nav-header client-color-bg">온라인 신청</h1>
+            <a class="a-tag-care" href="/online/bulky/request"><p class="nav-item">배출신청</p></a>
+            <a class="a-tag-care" href="/online/bulky/list"><p class="nav-item">결과조회 / 배출취소</p></a>
+            <a class="a-tag-care" href="/online/minwon/request?minwonType=BULKY_CARRY_DOWN_V"><p class="nav-item">내려드림 서비스 신청</p></a>
+            <a class="a-tag-care" href="/online/minwon/list"><p class="nav-item">내려드림 서비스 조회</p></a>
+        </div>
+    
+    
+                </div>
+                <main class="max850">
+
+                    <!-- maintenance notice -->
+                    
+
+    <style>
+        .maintenance-notice {
+            width: 100%;
+            box-sizing: border-box;
+            margin: 24px 0;
+            padding: 18px 22px;
+            border: 1px solid;
+            border-left-width: 5px;
+            border-radius: 6px;
+            max-width: 1200px;
+            justify-self: center;
+        }
+
+        /* 점검 예정 */
+        .maintenance-notice--scheduled {
+            background-color: #fff8e1;
+            border-color: #e6c766;
+            border-left-color: #d39e00;
+            color: #4f421f;
+        }
+
+        .maintenance-notice--scheduled .maintenance-notice__title {
+            color: #795f00;
+        }
+
+        .maintenance-notice--scheduled .maintenance-notice__period {
+            color: #6c5400;
+        }
+
+        /* 점검 중 */
+        .maintenance-notice--in-progress {
+            background-color: #fff0f0;
+            border-color: #e3a3a3;
+            border-left-color: #c83e3e;
+            color: #542828;
+        }
+
+        .maintenance-notice--in-progress .maintenance-notice__title {
+            color: #a32626;
+        }
+
+        .maintenance-notice--in-progress .maintenance-notice__period {
+            color: #a32626;
+        }
+
+        .maintenance-notice__title {
+            display: block;
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        .maintenance-notice__message {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.7;
+            word-break: keep-all;
+        }
+
+        .maintenance-notice__period {
+            display: inline-block;
+            margin-right: 4px;
+            font-weight: 700;
+        }
+
+        @media (max-width: 600px) {
+            .maintenance-notice {
+                margin: 16px 0;
+                padding: 15px 16px;
+            }
+
+            .maintenance-notice__title {
+                margin-bottom: 6px;
+                font-size: 15px;
+            }
+
+            .maintenance-notice__message {
+                font-size: 13px;
+                line-height: 1.6;
+            }
+        }
+    </style>
+
+    
+
+    
+
+
+
+
+                    <!-- BULKY -->
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                        
+    <link rel="stylesheet" type="text/css" href="/common/css/grid-border-lighten-2.css?103">
+    
+        <!-- css -->
+        <link rel="stylesheet" type="text/css" href="/vendor/toast-ui/tui-pagination.css?103" />
+        <link rel="stylesheet" type="text/css" href="/vendor/toast-ui/tui-grid.css?103" />
+        <link rel="stylesheet" type="text/css" href="/common/css/apsol-tui-grid.css?103" />
+        <!-- js -->
+        <script src="/vendor/toast-ui/tui-code-snippet.js?103"></script>
+        <script src="/vendor/toast-ui/tui-pagination.js?103"></script>
+        <script src="/vendor/toast-ui/tui-grid.js?103"></script>
+            <!-- custom js -->
+        <script src="/common/js/tui-custom-renderer.js?103"></script>
+        <script src="/common/js/tui-custom-editor.js?103"></script>
+    
+
+    <script src="/vendor/lodash/lodash.min.js?103"></script>
+
+    <style>
+        .price-grid table * { box-sizing: border-box; }
+        .price-grid table { width: 100%; border-collapse: collapse; }
+        .price-grid th, .price-grid td { border: 1px solid #ddd; font-size: 0.9rem; padding: 8px; text-align: left; }
+        .price-grid th { background-color: #f2f2f2; height: 40px; text-align: center; }
+        .price-grid td { font-weight: 300; }
+        .price-grid td:nth-child(4) { text-align: right; }
+
+        @media (max-width: 839px) {
+            .price-grid th, .price-grid td { font-size: 0.8rem; padding: 4px; }
+            .price-grid td:first-child { min-width: 80px; }
+        }
+    </style>
+
+    <div id="bulkyItemApp">
+        <div class="big-header-box client-color-bg">
+            <p class="big-header-text">대형생활폐기물</p><br>
+            <p class="big-header-text">수수료 안내</p>
+        </div>
+
+        
+
+        <div>
+            <div class="inputUnit" style="border: none">
+                <b class="inputTitle">품목명 검색</b>
+                <div class="inputCon">
+                    <input @input="form.keyword = $event.target.value;"
+                           class="comInput shortInput"
+                           placeholder="검색어" />
+                </div>
+                <div class="inputRefBox">
+                    <p class="inputRef"></p>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 30px;">
+            <div class="feeKindList">
+                <div class="feeKindUnit">
+                    <div class="feeKindCon"
+                         @click="form.categoryCode = 0;"
+                         :style="[form.categoryCode === 0 ? 'background: var(--client-warn-color)' : '']">
+                        전체
+                    </div>
+                </div>
+                <div class="feeKindUnit" v-for="category in categories" :key="category.code">
+                    <div class="feeKindCon"
+                         @click="form.categoryCode = category.code"
+                         :style="[form.categoryCode === category.code ? 'background: var(--client-warn-color)' : '']">
+                        {{ category.name }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="price-grid">
+            <table>
+                <thead>
+                    <tr>
+                        <th>분류</th>
+                        <th>품목</th>
+                        <th>규격</th>
+                        <th>가격</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="item in items" :key="item.code">
+                        <td>{{ item.categoryName }}</td>
+                        <td style="white-space: normal;">{{ item.name }}</td>
+                        <td style="white-space: normal;">{{ item.standard }}</td>
+                        <td>{{ xLshUtil.addComma(item.price) }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="text/javascript" charset='UTF-8'>
+
+        $(document).ready(function() {
+
+        });
+
+        const bulkyItemApp = createApp({
+            mixins: [VueBulkyMixin(), VueLshUtilMixin()],
+            data() {
+                return {
+                    model: {
+                        items: [{"code":60,"name":"2\uCE35\uCE68\uB300","standard":"\uBAA8\uB4E0\uADDC\uACA9 (\uB9E4\uD2B8\uB9AC\uC2A4\uBCC4\uB3C4)","price":15000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":1,"name":"TV\uB300","standard":"\uAC00\uB85C\uAE38\uC7741m\uB2F9","price":3000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":2,"name":"\uAC00\uC2A4\uB300","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":2000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":4,"name":"\uB3CC\uCE68\uB300","standard":"1\uC778\uC6A9 \uB3CC,\uC625,\uD669\uD1A0","price":25000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":5,"name":"\uB3CC\uCE68\uB300","standard":"2\uC778\uC6A9 \uB3CC,\uC625,\uD669\uD1A0","price":35000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":6,"name":"\uB514\uC9C0\uD138\uD53C\uC544\uB178","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":5000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":7,"name":"\uB9E4\uD2B8\uB9AC\uC2A4","standard":"1\uC778\uC6A9","price":7000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":8,"name":"\uB9E4\uD2B8\uB9AC\uC2A4","standard":"2\uC778\uC6A9","price":11000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":9,"name":"\uBB38\uAC11","standard":"\uD3ED1m\uB2F9","price":3000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":10,"name":"\uBB38\uC9DD","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":2000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":11,"name":"\uBC25\uC0C1(\uAD50\uC790\uC0C1)","standard":"2\uC778 \uC774\uD558","price":1000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":12,"name":"\uBC25\uC0C1(\uAD50\uC790\uC0C1)","standard":"4\uC778 \uC774\uD558","price":3000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":13,"name":"\uBC25\uC0C1(\uAD50\uC790\uC0C1)","standard":"5\uC778 \uC774\uC0C1","price":4000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":14,"name":"\uBC25\uC0C1(\uAD50\uC790\uC0C1)","standard":"\uB2E4\uACFC\uC0C1","price":1000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":15,"name":"\uBE44\uD0A4\uB2C8\uC637\uC7A5(\uC544\uAE30\uC637\uC7A5)","standard":"1\uCE78\uB2F9","price":3000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":16,"name":"\uC11C\uB78D\uC7A5","standard":"4\uB2E8\uC774\uD558","price":3000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":17,"name":"\uC11C\uB78D\uC7A5","standard":"5\uB2E8\uC774\uC0C1","price":5000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":18,"name":"\uC138\uBA74\uB300","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":3000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":19,"name":"\uC18C\uD30C","standard":"1\uC778\uC6A9","price":3000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":20,"name":"\uC18C\uD30C","standard":"2\uC778\uC6A9","price":5000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":21,"name":"\uC18C\uD30C","standard":"3\uC778\uC6A9","price":7000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":22,"name":"\uC18C\uD30C","standard":"4\uC778\uC6A9","price":9000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":23,"name":"\uC18C\uD30C","standard":"5\uC778\uC6A9","price":11000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":24,"name":"\uC218\uAC74\uD568","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":1000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":25,"name":"\uC2DD\uD0C1(\uB098\uBB34)","standard":"4\uC778\uC6A9","price":4000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":26,"name":"\uC2DD\uD0C1(\uB098\uBB34)","standard":"6\uC778\uC6A9","price":5000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":27,"name":"\uC2DD\uD0C1(\uB300\uB9AC\uC11D)","standard":"4\uC778\uC6A9","price":7000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":28,"name":"\uC2DD\uD0C1(\uB300\uB9AC\uC11D)","standard":"6\uC778\uC6A9","price":9000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":29,"name":"\uC2E0\uBC1C\uC7A5","standard":"\uB192\uC774120cm\uBBF8\uB9CC","price":2000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":30,"name":"\uC2E0\uBC1C\uC7A5","standard":"\uB192\uC774120cm\uC774\uC0C1","price":4000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":31,"name":"\uC2F1\uD06C\uB300","standard":"\uD3ED 30cm\uB2F9","price":1000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":32,"name":"\uC300\uD1B5","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":3000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":34,"name":"\uC637\uAC78\uC774(\uD589\uAC70)","standard":"1\uB2E8 \uD589\uAC70","price":2000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":35,"name":"\uC637\uAC78\uC774(\uD589\uAC70)","standard":"2\uB2E8 \uD589\uAC70","price":3000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":33,"name":"\uC637\uAC78\uC774(\uD589\uAC70)","standard":"\uC2A4\uD0E0\uB4DC\uC637\uAC78\uC774","price":2000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":36,"name":"\uC720\uC544\uC6A9\uCE68\uB300","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":3000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":37,"name":"\uC758\uC790","standard":"1\uC778\uC6A9","price":2000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":38,"name":"\uC758\uC790","standard":"2\uC778\uC6A9","price":3000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":41,"name":"\uC758\uC790","standard":"\uBC14\uD034\uB300\uD615","price":3000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":40,"name":"\uC758\uC790","standard":"\uBC14\uD034\uC18C\uD615","price":2000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":39,"name":"\uC758\uC790","standard":"\uD754\uB4E4\uC758\uC790","price":3000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":43,"name":"\uC7A5\uB871","standard":"120cm(4\uC790) 1\uC9DD\uB2F9","price":16000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":42,"name":"\uC7A5\uB871","standard":"90cm(3\uC790) 1\uC9DD\uB2F9","price":11000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":3,"name":"\uC804\uC790\uB808\uC778\uC9C0\uB300","standard":"\uBAA8\uB4E0 \uADDC\uACA9","price":4000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":44,"name":"\uC811\uC774\uC2DD\uCE68\uB300","standard":"1\uC778\uC6A9","price":7000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":45,"name":"\uC811\uC774\uC2DD\uCE68\uB300","standard":"2\uC778\uC6A9","price":9000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":46,"name":"\uC9C4\uC5F4\uB300(\uC575\uAE00)","standard":"\uB108\uBE441m 1\uB2E8\uB2F9","price":1000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":47,"name":"\uCC2C\uC7A5","standard":"\uC2F1\uD06C\uB300\uCC2C\uC7A5 (\uD3ED30cm\uB2F9)","price":1000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":48,"name":"\uCC3D\uBB38\uC9DD","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":2000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":49,"name":"\uCC45\uAF42\uC774","standard":"1\uB2E8\uB2F9","price":1000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":53,"name":"\uCC45\uC0C1","standard":"H\uD615(\uCC45\uAF42\uC774+\uC0C1\uD310+\uC11C\uB78D)","price":9000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":50,"name":"\uCC45\uC0C1","standard":"\uC11C\uB78D\uC5C6\uC74C","price":4000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":52,"name":"\uCC45\uC0C1","standard":"\uC591\uCABD\uC11C\uB78D","price":9000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":51,"name":"\uCC45\uC0C1","standard":"\uD55C\uCABD\uC11C\uB78D","price":7000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":54,"name":"\uCC45\uC7A5","standard":"90x180cm\uBBF8\uB9CC","price":5000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":55,"name":"\uCC45\uC7A5","standard":"90x180cm\uC774\uC0C1","price":9000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":56,"name":"\uCE68\uB300\uD2C0","standard":"1\uC778\uC6A9","price":7000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":57,"name":"\uCE68\uB300\uD2C0","standard":"2\uC778\uC6A9","price":9000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":58,"name":"\uCE68\uB300\uD5E4\uB4DC","standard":"1\uC778\uC6A9","price":2000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":59,"name":"\uCE68\uB300\uD5E4\uB4DC","standard":"2\uC778\uC6A9","price":3000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":61,"name":"\uCE90\uBE44\uB2DB","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":4000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":63,"name":"\uD0C1\uC790","standard":"4\uC778\uC774\uD558","price":3000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":64,"name":"\uD0C1\uC790","standard":"5\uC778\uC774\uC0C1","price":5000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":62,"name":"\uD0C1\uC790","standard":"\uD611\uD0C1","price":2000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":65,"name":"\uD30C\uC77C\uCE90\uBE44\uB2DB","standard":"3\uB2E8\uC774\uD558","price":2000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":66,"name":"\uD30C\uC77C\uCE90\uBE44\uB2DB","standard":"4\uB2E8\uC774\uC0C1","price":3000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":67,"name":"\uD53C\uC544\uB178","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":16000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":68,"name":"\uD654\uC7A5\uB300","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":4000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":69,"name":"\uD68C\uC758\uC6A9\uD0C1\uC790","standard":"8\uC778\uC6A9\uBBF8\uB9CC","price":5000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":70,"name":"\uD68C\uC758\uC6A9\uD0C1\uC790","standard":"8\uC778\uC6A9\uC774\uC0C1","price":7000.00,"deleted":false,"ordained":true,"categoryCode":1,"categoryName":"\uAC00\uAD6C\uB958","categoryDeleted":false,"active":true},{"code":73,"name":"\uAC00\uBC29","standard":"\uACE8\uD504\uAC00\uBC29","price":3000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":71,"name":"\uAC00\uBC29","standard":"\uAE34\uBA7450cm\uBBF8\uB9CC","price":1000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":72,"name":"\uAC00\uBC29","standard":"\uAE34\uBA7450cm\uC774\uC0C1","price":2000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":74,"name":"\uAC15\uC544\uC9C0\uC9D1","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":2000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":76,"name":"\uAC70\uC6B8","standard":"1\u33A1\uB2F9","price":2000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":75,"name":"\uAC70\uC6B8","standard":"1\u33A1\uBBF8\uB9CC","price":1000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":79,"name":"\uACE0\uBB34\uD1B5","standard":"\uC9C0\uB9841m\uC774\uC0C1","price":5000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":77,"name":"\uACE0\uBB34\uD1B5","standard":"\uC9C0\uB98450cm\uBBF8\uB9CC","price":2000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":78,"name":"\uACE0\uBB34\uD1B5","standard":"\uC9C0\uB98450cm\uC774\uC0C1","price":3000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":80,"name":"\uAE30\uB984\uD0F1\uD06C","standard":"200\u2113\uB2F9","price":4000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":81,"name":"\uB098\uBB34\uB3C4\uB9C8","standard":"\uAC00\uC815\uC6A9","price":1000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":82,"name":"\uB098\uBB34\uB3C4\uB9C8","standard":"\uC5C5\uC18C\uC6A9","price":2000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":83,"name":"\uB09C\uB85C","standard":"\uC11D\uC720\uB09C\uB85C","price":4000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":84,"name":"\uB2E4\uB9AC\uBBF8\uD310","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":1000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":85,"name":"\uB3D7\uC790\uB9AC","standard":"3.3\u33A1\uB2F9","price":1000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":86,"name":"\uBB3C\uD0F1\uD06C(\uC800\uC218\uC870)","standard":"FRP1\uD1A4(5\uB4DC\uB7FC)\uB2F9","price":7000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":88,"name":"\uBCA0\uAC1C","standard":"\uBAA8\uB4E0 \uADDC\uACA9","price":1000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":90,"name":"\uBCC0\uAE30\uD1B5","standard":"\uC591\uBCC0\uAE30","price":5000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":89,"name":"\uBCC0\uAE30\uD1B5","standard":"\uC88C\uBCC0\uAE30","price":3000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":91,"name":"\uBCD1\uD48D","standard":"2\uD3ED\uB2F9","price":1000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":92,"name":"\uBCF4\uD589\uAE30","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":2000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":93,"name":"\uBE14\uB77C\uC778\uB4DC","standard":"\uD3ED1m\uB2F9","price":1000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":94,"name":"\uBE68\uB798\uAC74\uC870\uB300","standard":"\uB192\uC7741m\uBBF8\uB9CC","price":1000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":95,"name":"\uBE68\uB798\uAC74\uC870\uB300","standard":"\uB192\uC7741m\uC774\uC0C1","price":2000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":97,"name":"\uC544\uC774\uC2A4\uBC15\uC2A4","standard":"\uB300\uD615(50\u2113\uC774\uC0C1)","price":3000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":96,"name":"\uC544\uC774\uC2A4\uBC15\uC2A4","standard":"\uC18C\uD615(50\u2113\uBBF8\uB9CC)","price":2000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":98,"name":"\uC548\uB9C8\uC758\uC790","standard":"\uC804\uC2E0\uC548\uB9C8\uC758\uC790(1599-0903 \uC6B0\uC120 \uC548\uB0B4)","price":16000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":100,"name":"\uC561\uC790","standard":"\uB300\uD615(1\u33A1\uC774\uC0C1)","price":2000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":99,"name":"\uC561\uC790","standard":"\uC18C\uD615(1\u33A1\uBBF8\uB9CC)","price":1000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":101,"name":"\uC625\uB9E4\uD2B8","standard":"1\uC778\uC6A9","price":4000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":102,"name":"\uC625\uB9E4\uD2B8","standard":"2\uC778\uC6A9","price":7000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":103,"name":"\uC695\uC870","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":5000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":105,"name":"\uC720\uB9AC","standard":"1\u33A1\uB2F9","price":2000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":104,"name":"\uC720\uB9AC","standard":"1\u33A1\uBBF8\uB9CC","price":1000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":106,"name":"\uC720\uBAA8\uCC28","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":2000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":107,"name":"\uC720\uC544\uB180\uC774\uB9E4\uD2B8","standard":"1\u33A1\uB2F9","price":1000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":108,"name":"\uC720\uC544\uC6A9\uADF8\uB124","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":1000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":109,"name":"\uC720\uC544\uC6A9\uBAA9\uB9C8","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":1000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":110,"name":"\uC720\uC544\uC6A9\uC790\uB3D9\uCC28","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":2000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":112,"name":"\uC774\uBD88","standard":"\uACA8\uC6B8\uC6A9","price":2000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":111,"name":"\uC774\uBD88","standard":"\uC5EC\uB984\uC6A9","price":1000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":115,"name":"\uC790\uC804\uAC70","standard":"\uC131\uC778\uC6A9","price":4000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":114,"name":"\uC790\uC804\uAC70","standard":"\uC544\uB3D9\uC6A92\uB95C","price":3000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":113,"name":"\uC790\uC804\uAC70","standard":"\uC544\uB3D9\uC6A93\uB95C","price":2000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":116,"name":"\uC7A5\uD310","standard":"3.3\u33A1\uB2F9","price":1000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":117,"name":"\uC7AC\uBD09\uD2C0","standard":"\uB300\uD615","price":3000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":118,"name":"\uC804\uAE30\uC7A5\uD310","standard":"1\uC778\uC6A9","price":2000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":119,"name":"\uC804\uAE30\uC7A5\uD310","standard":"2\uC778\uC6A9","price":3000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":120,"name":"\uCE74\uD398\uD2B8","standard":"3.3\u33A1\uB2F9","price":1000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":121,"name":"\uCEE4\uD2BC","standard":"\uD3ED2m\uBBF8\uB9CC","price":1000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":122,"name":"\uCEE4\uD2BC","standard":"\uD3ED2m\uC774\uC0C1","price":2000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":123,"name":"\uCEE4\uD2BC\uBD09","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":1000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":124,"name":"\uD0A5\uBCF4\uB4DC","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":2000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":125,"name":"\uD0C1\uAD6C\uB300","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":16000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":126,"name":"\uD56D\uC544\uB9AC","standard":"\uB192\uC77430cm\uBBF8\uB9CC","price":1000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":127,"name":"\uD56D\uC544\uB9AC","standard":"\uB192\uC77430cm\uC774\uC0C1","price":2000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":128,"name":"\uD56D\uC544\uB9AC","standard":"\uB192\uC77450cm\uC774\uC0C1","price":3000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":129,"name":"\uD654\uBD84(\uD759,\uB098\uBB34 \uBCC4\uB3C4 \uBC30\uCD9C)","standard":"\uB192\uC77450cm\uBBF8\uB9CC","price":1000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":130,"name":"\uD654\uBD84(\uD759,\uB098\uBB34 \uBCC4\uB3C4 \uBC30\uCD9C)","standard":"\uB192\uC77450cm\uC774\uC0C1","price":2000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":131,"name":"\uD654\uD658","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":3000.00,"deleted":false,"ordained":true,"categoryCode":2,"categoryName":"\uC0DD\uD65C\uC6A9\uD488","categoryDeleted":false,"active":true},{"code":178,"name":"\uAC00\uC2A4 \uC624\uBE10\uB808\uC778\uC9C0","standard":"\uB192\uC7741m\uC774\uC0C1","price":5000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":133,"name":"\uAC04\uD310","standard":"40*100cm\uB2F9","price":4000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":134,"name":"\uAC04\uD310","standard":"\uC5D0\uC5B4\uAC04\uD310","price":5000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":132,"name":"\uAC04\uD310","standard":"\uC785\uAC04\uD310","price":1000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":309,"name":"\uAC74\uC124\uB9C8\uB30010L(1,020\uC6D0)","standard":"20Kg\uCD08\uACFC\uAE08\uC9C0","price":0.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":310,"name":"\uAC74\uC124\uB9C8\uB30020L(2,040\uC6D0)","standard":"20Kg\uCD08\uACFC\uAE08\uC9C0","price":0.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":135,"name":"\uAE08\uACE0","standard":"20kg\uC774\uD558","price":4000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":136,"name":"\uAE08\uACE0","standard":"40kg\uC774\uD558(40kg\uCD08\uACFC\uC2DC \uC218\uAC70 \uBD88\uAC00)","price":7000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":314,"name":"\uAE30\uD0C0","standard":"\uD488\uBAA9\uC744 \uBA54\uBAA8\uB780\uC5D0 \uAE30\uC7AC","price":1000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":315,"name":"\uAE30\uD0C0","standard":"\uD488\uBAA9\uC744 \uBA54\uBAA8\uB780\uC5D0 \uAE30\uC7AC","price":2000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":316,"name":"\uAE30\uD0C0","standard":"\uD488\uBAA9\uC744 \uBA54\uBAA8\uB780\uC5D0 \uAE30\uC7AC","price":3000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":317,"name":"\uAE30\uD0C0","standard":"\uD488\uBAA9\uC744 \uBA54\uBAA8\uB780\uC5D0 \uAE30\uC7AC","price":4000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":318,"name":"\uAE30\uD0C0","standard":"\uD488\uBAA9\uC744 \uBA54\uBAA8\uB780\uC5D0 \uAE30\uC7AC","price":5000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":320,"name":"\uAE30\uD0C0","standard":"\uD488\uBAA9\uC744 \uBA54\uBAA8\uB780\uC5D0 \uAE30\uC7AC","price":7000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":322,"name":"\uAE30\uD0C0","standard":"\uD488\uBAA9\uC744 \uBA54\uBAA8\uB780\uC5D0 \uAE30\uC7AC","price":9000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":324,"name":"\uAE30\uD0C0","standard":"\uD488\uBAA9\uC744 \uBA54\uBAA8\uB780\uC5D0 \uAE30\uC7AC","price":11000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":327,"name":"\uAE30\uD0C0","standard":"\uD488\uBAA9\uC744 \uBA54\uBAA8\uB780\uC5D0 \uAE30\uC7AC","price":16000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":137,"name":"\uAE30\uD0C0 \uD3D0\uBAA9\uC7AC","standard":"5kg\uB2F9","price":1000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":138,"name":"\uAE30\uD0C0 \uD3D0\uD50C\uB77C\uC2A4\uD2F1\uB958","standard":"5kg\uB2F9","price":1000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":139,"name":"\uAE30\uD0C0 \uD5EC\uC2A4\uAE30\uAD6C","standard":"\uB7EC\uB2DD\uBA38\uC2E0(\uC218\uB3D9)","price":7000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":140,"name":"\uAE30\uD0C0 \uD5EC\uC2A4\uAE30\uAD6C","standard":"\uC2A4\uD15D\uD37C,\uC2EF\uC5C5\uBCF4\uB4DC","price":4000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":141,"name":"\uB098\uBB34 \uD30C\uB808\uD2B8","standard":"1\u33A1\uB2F9","price":2000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":142,"name":"\uB098\uBB34 \uD569\uD310","standard":"1\u33A1\uB2F9","price":1000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":143,"name":"\uB77C\uCF13","standard":"\uD14C\uB2C8\uC2A4\uB77C\uCF13","price":1000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":144,"name":"\uB9C8\uB124\uD0B9","standard":"\uB192\uC7741m\uBBF8\uB9CC","price":2000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":145,"name":"\uB9C8\uB124\uD0B9","standard":"\uB192\uC7741m\uC774\uC0C1","price":4000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":146,"name":"\uBAA9\uBC1C","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":1000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":147,"name":"\uBC14\uB451\uD310","standard":"\uB450\uAED860mm\uBBF8\uB9CC","price":1000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":148,"name":"\uBC14\uB451\uD310","standard":"\uB450\uAED860mm\uC774\uC0C1","price":2000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":149,"name":"\uBC29\uC11D","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":1000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":150,"name":"\uBC30\uAE30\uD6C4\uB4DC(\uAC00\uC815\uC6A9\uD658\uD48D\uAE30)","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":2000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":151,"name":"\uC0CC\uB4DC\uC704\uCE58\uD328\uB110","standard":"1\u33A1\uB2F9","price":3000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":153,"name":"\uC11D\uACE0\uBCF4\uB4DC","standard":"1\u33A1\uB2F9","price":2000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":154,"name":"\uC138\uB2E8\uAE30 (\uD30C\uC1C4\uAE30)","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":5000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":158,"name":"\uC18C\uD654\uAE30","standard":"20kg\uC774\uC0C1","price":5000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":156,"name":"\uC18C\uD654\uAE30","standard":"3.3kg\uC774\uD558","price":2000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":157,"name":"\uC18C\uD654\uAE30","standard":"3.3kg\uCD08\uACFC","price":3000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":159,"name":"\uC218\uB3C4\uD638\uC2A4","standard":"10m\uB2F9","price":2000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":160,"name":"\uC2A4\uB178\uBCF4\uB4DC","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":2000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":162,"name":"\uC2A4\uCF00\uC774\uD2B8","standard":"\uC138\uD2B8","price":1000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":161,"name":"\uC2A4\uD0A4\/\uC2A4\uD0A4\uBD80\uCE20","standard":"\uC138\uD2B8","price":2000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":164,"name":"\uC2DC\uACC4","standard":"\uAD18\uC885\uC2DC\uACC4","price":3000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":163,"name":"\uC2DC\uACC4","standard":"\uBAA8\uB4E0\uADDC\uACA9 (\uAD18\uC885\uC2DC\uACC4 \uC81C\uC678)","price":1000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":165,"name":"\uCC9C\uB9C9","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":5000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":166,"name":"\uCE60\uD310","standard":"1\u33A1\uB2F9","price":2000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":167,"name":"\uCE74\uC2DC\uD2B8","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":2000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":168,"name":"\uCEA3\uD0C0\uC6CC","standard":"\uB192\uC7741m\uC774\uD558","price":2000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":169,"name":"\uCEA3\uD0C0\uC6CC","standard":"\uB192\uC7741m\uCD08\uACFC","price":4000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":170,"name":"\uCEEC\uB7EC\uBC15\uC2A4 (\uACF5\uAC04\uBC15\uC2A4)","standard":"2\uB2E8\uC774\uD558","price":1000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":171,"name":"\uCEEC\uB7EC\uBC15\uC2A4 (\uACF5\uAC04\uBC15\uC2A4)","standard":"3\uB2E8\uC774\uC0C1","price":2000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":152,"name":"\uD0DC\uC591\uAD11 \uD3D0\uD328\uB110","standard":"20kg\uB2F9","price":5000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":172,"name":"\uD150\uD2B8","standard":"1\uC778\uC6A9\uB2F9","price":1000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":173,"name":"\uD30C\uD2F0\uC158","standard":"1\u33A1\uB2F9","price":2000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":174,"name":"\uD50C\uB77C\uC2A4\uD2F1 \uD30C\uB808\uD2B8","standard":"1\u33A1\uB2F9","price":2000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":175,"name":"\uD5EC\uC2A4\uC0AC\uC774\uD074","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":7000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":176,"name":"\uD615\uAD11\uB4F1\uD2C0","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":1000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":177,"name":"\uD720\uCCB4\uC5B4","standard":"\uBAA8\uB4E0\uADDC\uACA9","price":2000.00,"deleted":false,"ordained":true,"categoryCode":3,"categoryName":"\uAE30\uD0C0","categoryDeleted":false,"active":true},{"code":179,"name":"\uAC00\uC2B5\uAE30","standard":"1M \uBBF8\uB9CC","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":180,"name":"\uAC10\uC2DC\uCE74\uBA54\uB77C","standard":"\uBAA8\uB4E0 \uADDC\uACA9","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":181,"name":"\uACF5\uAE30\uCCAD\uC815\uAE30","standard":"1M \uBBF8\uB9CC","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":183,"name":"\uB370\uC2A4\uD06C\uD0D1 PC","standard":"\uBCF8\uCCB4+\uBAA8\uB2C8\uD130","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":185,"name":"\uBAA8\uB2C8\uD130","standard":"1M \uBBF8\uB9CC","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":186,"name":"\uBBF9\uC11C\uAE30","standard":"\uBAA8\uB4E0 \uADDC\uACA9","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":187,"name":"\uBCF5\uC0AC\uAE30","standard":"1M \uBBF8\uB9CC","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":188,"name":"\uBE44\uB514\uC624\uD50C\uB808\uC774\uC5B4(DVD)","standard":"1M \uBBF8\uB9CC","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":189,"name":"\uBE54\uD504\uB85C\uC81D\uD130","standard":"\uBAA8\uB4E0 \uADDC\uACA9","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":190,"name":"\uC120\uD48D\uAE30","standard":"1M \uBBF8\uB9CC","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":191,"name":"\uC138\uD0C1\uAE30","standard":"1M \uBBF8\uB9CC","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":192,"name":"\uC2A4\uCE90\uB108","standard":"1M \uBBF8\uB9CC","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":193,"name":"\uC2DD\uAE30\uAC74\uC870\uAE30(\uC138\uCC99\uAE30)","standard":"1M \uBBF8\uB9CC","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":194,"name":"\uC2DD\uD488\uAC74\uC870\uAE30","standard":"\uBAA8\uB4E0 \uADDC\uACA9","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":195,"name":"\uC57D\uD0D5\uAE30","standard":"\uBAA8\uB4E0 \uADDC\uACA9","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":196,"name":"\uC5D0\uC5B4\uCEE8","standard":"1M \uBBF8\uB9CC","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":197,"name":"\uC5F0\uC218\uAE30","standard":"\uBAA8\uB4E0 \uADDC\uACA9","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":198,"name":"\uC601\uC0C1\uAC8C\uC784\uAE30","standard":"\uBAA8\uB4E0 \uADDC\uACA9","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":199,"name":"\uC624\uB514\uC624","standard":"1M \uBBF8\uB9CC","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":200,"name":"\uC624\uB514\uC624\uC138\uD2B8 (\uAD6C\uD615 \uC804\uCD95)","standard":"\uBAA8\uB4E0 \uADDC\uACA9","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":201,"name":"\uC720\uBB34\uC120\uACF5\uC720\uAE30","standard":"\uBAA8\uB4E0 \uADDC\uACA9","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":202,"name":"\uC74C\uC2DD\uBB3C\uCC98\uB9AC\uAE30","standard":"1M \uBBF8\uB9CC","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":203,"name":"\uC774\uB3D9\uC804\uD654\uB2E8\uB9D0\uAE30(\uD734\uB300\uD3F0)","standard":"\uBAA8\uB4E0 \uADDC\uACA9","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":204,"name":"\uC790\uB3D9\uD310\uB9E4\uAE30","standard":"1M \uBBF8\uB9CC","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":205,"name":"\uC7AC\uBD09\uD2C0","standard":"\uBAA8\uB4E0 \uADDC\uACA9","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":206,"name":"\uC804\uAE30\uB2E4\uB9AC\uBBF8","standard":"\uBAA8\uB4E0 \uADDC\uACA9","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":207,"name":"\uC804\uAE30\uBC25\uC1A5","standard":"\uBAA8\uB4E0 \uADDC\uACA9","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":208,"name":"\uC804\uAE30\uBE44\uB370","standard":"\uBAA8\uB4E0 \uADDC\uACA9","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":209,"name":"\uC804\uAE30\uC548\uB9C8\uAE30(\uC548\uB9C8\uC758\uC790 \uC81C\uC678)","standard":"1M \uBBF8\uB9CC","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":210,"name":"\uC804\uAE30\uC624\uBE10","standard":"1M \uBBF8\uB9CC","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":211,"name":"\uC804\uAE30\uC628\uC218\uAE30","standard":"\uBAA8\uB4E0 \uADDC\uACA9","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":212,"name":"\uC804\uAE30\uC815\uC218\uAE30(\uB0C9\uC628\uC218\uAE30)","standard":"\uBAA8\uB4E0 \uADDC\uACA9","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":213,"name":"\uC804\uAE30\uC8FC\uC804\uC790","standard":"\uBAA8\uB4E0 \uADDC\uACA9","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":214,"name":"\uC804\uAE30\uD6C4\uB77C\uC774\uD32C","standard":"\uBAA8\uB4E0 \uADDC\uACA9","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":215,"name":"\uC804\uAE30\uD788\uD130","standard":"1M \uBBF8\uB9CC","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":216,"name":"\uC804\uC790\uB808\uC778\uC9C0","standard":"\uBAA8\uB4E0 \uADDC\uACA9","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":217,"name":"\uC81C\uBE75\uAE30","standard":"\uBAA8\uB4E0 \uADDC\uACA9","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":218,"name":"\uC81C\uC2B5\uAE30","standard":"\uBAA8\uB4E0 \uADDC\uACA9","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":219,"name":"\uC871\uC695\uAE30","standard":"\uBAA8\uB4E0 \uADDC\uACA9","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":220,"name":"\uCCAD\uC18C\uAE30","standard":"1M \uBBF8\uB9CC","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":221,"name":"\uCEE4\uD53C\uBA54\uC774\uCEE4","standard":"1M \uBBF8\uB9CC","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":222,"name":"\uCEF4\uD4E8\uD130","standard":"\uBCF8\uCCB4, \uB178\uD2B8\uBD81","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":223,"name":"\uD0C8\uC218\uAE30","standard":"1M \uBBF8\uB9CC","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":225,"name":"\uD1A0\uC2A4\uD2B8\uAE30","standard":"\uBAA8\uB4E0 \uADDC\uACA9","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":226,"name":"\uD280\uAE40\uAE30","standard":"\uBAA8\uB4E0 \uADDC\uACA9","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":227,"name":"\uD329\uC2DC\uBC00\uB9AC(\uD329\uC2A4)","standard":"1M \uBBF8\uB9CC","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":228,"name":"\uD504\uB9B0\uD130","standard":"1M \uBBF8\uB9CC","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true},{"code":229,"name":"\uD5E4\uC5B4\uB4DC\uB77C\uC774\uC5B4","standard":"\uBAA8\uB4E0 \uADDC\uACA9","price":0.00,"deleted":false,"ordained":true,"categoryCode":4,"categoryName":"\uD3D0\uAC00\uC804\uC81C\uD488","categoryDeleted":false,"active":true}],
+                    },
+                    form: {
+                        categoryCode: 0,
+                        keyword: "",
+                    }
+                }
+            },
+            computed: {
+                items() {
+                    let items = _.cloneDeep(this.model.items);
+                    // 카테고리 필터링
+                    let categoryCode = Number(this.form.categoryCode);
+                    if (categoryCode !== 0) {
+                        items = items.filter(item => item.categoryCode === categoryCode);
+                    }
+                    // 키워드 필터링
+                    const keyword = (this.form.keyword ?? "").trim().toLowerCase();
+                    if (!LshUtil.isBlank(keyword)) {
+                        items = items.filter(item =>
+                            item.name.toLowerCase().includes(keyword) ||
+                            item.standard.toLowerCase().includes(keyword)
+                        );
+                    }
+                    // 정렬
+                    items.sort((a, b) => (a.standard ?? '').localeCompare(b.standard ?? ''));
+                    items.sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''));
+                    items.sort((a, b) => a.categoryCode - b.categoryCode);
+                    return items;
+                },
+                categories() {
+                    return Object.values(
+                        this.model.items.reduce((map, { categoryCode, categoryName }) => {
+                            if (!map[categoryCode]) {
+                                map[categoryCode] = {
+                                    code: categoryCode,
+                                    name: categoryName,
+                                };
+                            }
+                            return map;
+                            }, {})
+                    ).sort((a, b) => a.code - b.code);
+                },
+            },
+            mounted() {
+
+            },
+            methods: {
+
+            }
+        }).mount("#bulkyItemApp");
+
+    </script>
+
+
+                    
+                    
+                    <!-- MARKET -->
+                    
+                    <!-- MINWON -->
+                    
+                    
+                    
+                </main>
+            </div>
+        </div>
+    </div>
+    <div class="clearBoth"></div>
+    <div class="footerBox">
+        
+        
+        <div class="footerInner">
+            <div class="footerInfoBox">
+                <p class="footerInfo">사업장명 : 금천구청 | 대표자명 : 최기찬</p>
+                <p class="footerInfo">주소: 서울특별시 금천구 시흥대로73길 70(시흥동)</p>
+                <p class="footerInfo">대표전화 : 02-2627-1476 | 사업자등록번호 : 119-83-00549</p>
+            </div>
+            <p class="footerCopy">Copyright© 2025 GEUMCHEON-GU all rights reserved.</p>
+        </div>
+    
+    
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        // console.log("serverVersion", "103");
+        setTimeout(function() {
+            let windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+            let windowHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+            console.log("Window Width: " + windowWidth);
+            console.log("Window Height: " + windowHeight);
+        }, 1000);
+    });
+</script>
+</body>
+</html>

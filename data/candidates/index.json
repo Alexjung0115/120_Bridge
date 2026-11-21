@@ -1,0 +1,482 @@
+{
+  "retrievedAt": "2026-11-21",
+  "note": "원문 수집·정리만 완료된 후보. verified=false이며 AI1 원문 대조 전에는 rag-data 답변 근거로 승격하지 않는다. specScope=outside-spec 항목은 spec 범위(대형폐기물·주정차·정책변경·부서) 밖 신규 분야이며, SC-015 \"자료 없는 분야\" 시험 corpus에는 넣지 않는다.",
+  "documents": [
+    {
+      "path": "waste/gangdong-large-waste-apply-guide.md",
+      "title": "강동구 대형폐기물 처리신청 안내 및 유의사항",
+      "category": "대형폐기물",
+      "jurisdiction": "강동구",
+      "department": "청소행정과 도시청결팀",
+      "contact": "02-3425-5870",
+      "effective_date": "2024-12-31",
+      "date_basis": "페이지 최종수정일",
+      "source_url": "https://www.gangdong.go.kr/web/newportal/contents/gdp_001_006_004_004_001",
+      "retrieved_at": "2026-11-21",
+      "verified": false,
+      "collection_status": "candidate",
+      "raw_snapshots": [
+        {
+          "path": "data/sources/gangdong-large-waste-apply-guide/2026-11-21/raw.html",
+          "sha256": "53089b90bab358844a9542b2e5ea8ec5cf1a33545a863a712f088587e23af08d"
+        }
+      ],
+      "verificationStatus": "machine-checked",
+      "verification": {
+        "reviewer": "Claude (AI 보조 대조)",
+        "reviewedAt": "2026-11-21",
+        "docSha256": "533c35818c997ab7ace20c01883f8a06a9d4499de8d36c7ee3ec65ecefa1e47c",
+        "sourceRefetchedUnchanged": true,
+        "checkedClaims": "정의·5단계 분기·창구 번호 8개 수치 원문 일치",
+        "unresolvedConflicts": [],
+        "humanSignOff": null
+      }
+    },
+    {
+      "path": "waste/gangdong-large-waste-fee-table.md",
+      "title": "강동구 대형폐기물 수집·운반 수수료 품목별 부과기준",
+      "category": "대형폐기물",
+      "jurisdiction": "강동구",
+      "department": "청소행정과 도시청결팀",
+      "contact": "02-3425-5870",
+      "effective_date": "2021-10-19",
+      "date_basis": "페이지 최종수정일",
+      "source_url": "https://www.gangdong.go.kr/web/newportal/largeWaste/code/list",
+      "retrieved_at": "2026-11-21",
+      "verified": false,
+      "collection_status": "candidate",
+      "raw_snapshots": [
+        {
+          "path": "data/sources/gangdong-large-waste-fee-list/2026-11-21/raw.html",
+          "sha256": "dc07298b352fcfd43768a0184f4788ef80ebe854a3ba4603fd0c163161579c5a"
+        },
+        {
+          "path": "data/sources/gangdong-large-waste-fee-list/2026-11-21/pages/cp1.html",
+          "sha256": "bb3637310c1c0ecce9a6e8911a403fe9ec4401064ccdc72d131c43e3643915bc"
+        },
+        {
+          "path": "data/sources/gangdong-large-waste-fee-list/2026-11-21/pages/cp2.html",
+          "sha256": "f194cd52a38221c0a21e9846325e764004337fb4c4db848df11bf8af6b447e21"
+        },
+        {
+          "path": "data/sources/gangdong-large-waste-fee-list/2026-11-21/pages/cp3.html",
+          "sha256": "9899a94d645ed6d8789e5b48980dfe6455a97bff83d7132c71d4f877df2d10af"
+        },
+        {
+          "path": "data/sources/gangdong-large-waste-fee-list/2026-11-21/pages/cp4.html",
+          "sha256": "b2b4b6884f1922c1ca983e707257536cf5b6756b662d57a1f515a849fb1a0c22"
+        },
+        {
+          "path": "data/sources/gangdong-large-waste-fee-list/2026-11-21/pages/cp5.html",
+          "sha256": "99dd68f25ab58e485d868af98be4d28f883800bdc2f7db1df99437b5f53523f3"
+        },
+        {
+          "path": "data/sources/gangdong-large-waste-fee-list/2026-11-21/pages/cp6.html",
+          "sha256": "96820af4cef23268cbe059f68323d17cd814e531449052c5d14e650fca65c45a"
+        },
+        {
+          "path": "data/sources/gangdong-large-waste-fee-list/2026-11-21/pages/cp7.html",
+          "sha256": "ca6b9f8fb644bb69f28b0f0daa1ce618ba29c65c57671540fcb1755e414e0450"
+        },
+        {
+          "path": "data/sources/gangdong-large-waste-fee-list/2026-11-21/pages/cp8.html",
+          "sha256": "666ecb0c5566c417e75ccc4f33b590a053a0718d8e1720d3a4ba7df0fae72564"
+        },
+        {
+          "path": "data/sources/gangdong-large-waste-fee-list/2026-11-21/pages/cp9.html",
+          "sha256": "a039dc7ceba1a781e4a81bf2c35a057e550c70821c003aabd0f7736450e84380"
+        },
+        {
+          "path": "data/sources/gangdong-large-waste-fee-list/2026-11-21/pages/cp10.html",
+          "sha256": "183f22888597dc21c921c1f086f613d49625010b5530947be0688ff803eec4f3"
+        },
+        {
+          "path": "data/sources/gangdong-large-waste-fee-list/2026-11-21/pages/cp11.html",
+          "sha256": "935b76a266696892b7b81728184dd8733c545a19c260a9bf561b6cc1458852ab"
+        },
+        {
+          "path": "data/sources/gangdong-large-waste-fee-list/2026-11-21/pages/cp12.html",
+          "sha256": "0288f02003407e1a393de3de3d588d035e65d83390f03b408c7c6433e31f295a"
+        },
+        {
+          "path": "data/sources/gangdong-large-waste-fee-list/2026-11-21/pages/cp13.html",
+          "sha256": "dfd5f08f9d7bbc85ebb3a826924d67ec1d57bbc4932550036408ce06f8936db6"
+        },
+        {
+          "path": "data/sources/gangdong-large-waste-fee-list/2026-11-21/pages/cp14.html",
+          "sha256": "78cfbd595e1b5ec54016b4701cf72a6807941978f6f462d04bf2e0ba2224205a"
+        },
+        {
+          "path": "data/sources/gangdong-large-waste-fee-list/2026-11-21/pages/cp15.html",
+          "sha256": "675ef71d6217aebf46ab2c270c01c31a8967eb754b24e00419c3aaef2c98b0b1"
+        },
+        {
+          "path": "data/sources/gangdong-large-waste-fee-list/2026-11-21/pages/cp16.html",
+          "sha256": "7e0c04047ecd71d077919834b1070db1bf7173876751d90c30cd0666bb557934"
+        },
+        {
+          "path": "data/sources/gangdong-large-waste-fee-list/2026-11-21/pages/cp17.html",
+          "sha256": "c865d5b111e4fb7033f443e801f38ce9cc077d65150cacb737fc3a5c7312e740"
+        },
+        {
+          "path": "data/sources/gangdong-large-waste-fee-list/2026-11-21/pages/cp18.html",
+          "sha256": "442fae812a9ca094f78eeadf41d8d6885bb5718690b3d3840b42b38c59eca4ce"
+        },
+        {
+          "path": "data/sources/gangdong-large-waste-fee-list/2026-11-21/pages/cp19.html",
+          "sha256": "a8ac2cda7cd93464effc64928a7e0717cb840abfbfc6ee91ef7b110f276a8cb7"
+        },
+        {
+          "path": "data/sources/gangdong-large-waste-fee-list/2026-11-21/pages/cp20.html",
+          "sha256": "c9d086c0de61ec1aea6ac034e379b2e89be951ab4e0431acc2e0f85af9ccf741"
+        },
+        {
+          "path": "data/sources/gangdong-large-waste-fee-list/2026-11-21/pages/cp21.html",
+          "sha256": "b36330898c9f8d554579426f7de35cb96350950f9c9c81a963e67078c2b2c51c"
+        },
+        {
+          "path": "data/sources/gangdong-large-waste-fee-list/2026-11-21/pages/cp22.html",
+          "sha256": "10821fd9c7d6b5ea33a6e26da5a5c3ade9c8db9c76c44a3a5e6f9c7a909994cc"
+        },
+        {
+          "path": "data/sources/gangdong-large-waste-fee-list/2026-11-21/pages/cp23.html",
+          "sha256": "cb9d27d7f2b7e968566b8f97fc7e3eb8cbbd5e23462b4512ac84c771508ca9f7"
+        },
+        {
+          "path": "data/sources/gangdong-large-waste-fee-list/2026-11-21/pages/cp24.html",
+          "sha256": "08b2f480b9d0db7283e339276be63e30eab645714276688b26d56dac287419b2"
+        },
+        {
+          "path": "data/sources/gangdong-large-waste-fee-list/2026-11-21/pages/cp25.html",
+          "sha256": "e8f5ad327e91a7bca532eb47019a8e0094c9ebe4bf1c41af0eb6346991a5510d"
+        }
+      ],
+      "verificationStatus": "machine-checked-with-conflicts",
+      "verification": {
+        "reviewer": "Claude (AI 보조 대조)",
+        "reviewedAt": "2026-11-21",
+        "docSha256": "1893040dc4fe4aa511ae550b0d857e0b26cc8d4a5f0c59bd8bcf9573b556ccb0",
+        "sourceRefetchedUnchanged": true,
+        "checkedClaims": "25쪽 원문 셀 순서와 242행 전부 일치, 번호 1~242 누락 없음",
+        "unresolvedConflicts": [
+          "페이지 최종수정일 2021-10-19: 현행 조례 금액인지 미확인"
+        ],
+        "humanSignOff": null
+      }
+    },
+    {
+      "path": "waste/geumcheon-bulky-waste-guide.md",
+      "title": "금천구 대형생활폐기물 배출 이용 방법 (스마트클린 금천)",
+      "category": "대형폐기물",
+      "jurisdiction": "금천구",
+      "department": "청소행정과",
+      "contact": "02-2627-1476, 02-2627-2375, 02-2627-1946 (전화 배출 안내)",
+      "effective_date": "미확인",
+      "date_basis": "페이지에 기준일 표시 없음",
+      "source_url": "https://smartclean.geumcheon.go.kr/online/bulky/guide",
+      "retrieved_at": "2026-11-21",
+      "verified": false,
+      "collection_status": "candidate",
+      "raw_snapshots": [
+        {
+          "path": "data/sources/geumcheon-smartclean-bulky-guide/2026-11-21/raw.html",
+          "sha256": "cb95ebfefb785b3d602083899a208e7cce7fe77d7107fe510bf4b273dfd6e824"
+        }
+      ],
+      "supplementary_sources": [
+        {
+          "url": "https://www.geumcheon.go.kr/portal/contents.do?key=812",
+          "path": "data/sources/geumcheon-household-waste-disposal/2026-11-21/raw.html",
+          "sha256": "828ee97fafc93ffdf3f6400e92b672b4f190040d0728913333d23bb258f9b7ca"
+        }
+      ],
+      "verificationStatus": "machine-checked-with-conflicts",
+      "verification": {
+        "reviewer": "Claude (AI 보조 대조)",
+        "reviewedAt": "2026-11-21",
+        "docSha256": "836e0a400ea37b6e529d6e9c99bdd22aa4b2467cece63f789a7762c167cb6392",
+        "sourceRefetchedUnchanged": true,
+        "checkedClaims": "절차·취소·환불·무상수거·보충 페이지 10개 수치 원문 일치",
+        "unresolvedConflicts": [
+          "과태료 금액·내려드림 서비스 조건은 원문에 없음"
+        ],
+        "humanSignOff": null
+      }
+    },
+    {
+      "path": "waste/geumcheon-bulky-waste-fee-table.md",
+      "title": "금천구 대형생활폐기물 품목별 수수료 (스마트클린 금천)",
+      "category": "대형폐기물",
+      "jurisdiction": "금천구",
+      "department": "청소행정과",
+      "contact": "02-2627-1476",
+      "effective_date": "미확인",
+      "date_basis": "페이지에 기준일 표시 없음",
+      "source_url": "https://smartclean.geumcheon.go.kr/online/bulky/item",
+      "retrieved_at": "2026-11-21",
+      "verified": false,
+      "collection_status": "candidate",
+      "raw_snapshots": [
+        {
+          "path": "data/sources/geumcheon-smartclean-bulky-fee/2026-11-21/raw.html",
+          "sha256": "72a53d302f92ba4ac4edac133ff888928e306de5272fb00ff02acbb5b7c5bc3c"
+        }
+      ],
+      "verificationStatus": "machine-checked-with-conflicts",
+      "verification": {
+        "reviewer": "Claude (AI 보조 대조)",
+        "reviewedAt": "2026-11-21",
+        "docSha256": "bdb741d0c4bc45065231c49e2a7cd507d43edb292ba08224c46735ee149c3b87",
+        "sourceRefetchedUnchanged": true,
+        "checkedClaims": "원문 내장 JSON 235행(전부 active)과 235행 일치, 중복 없음",
+        "unresolvedConflicts": [
+          "기준일 표시 없음"
+        ],
+        "humanSignOff": null
+      }
+    },
+    {
+      "path": "parking/gwanak-parking-violation-inquiry.md",
+      "title": "관악구 주정차위반 조회·의견진술·이의신청 안내",
+      "category": "불법주정차",
+      "jurisdiction": "관악구",
+      "department": "교통지도과",
+      "contact": "의견진술 02-879-6957~6959 (FAX 02-879-7843), 법원이의신청 02-879-6981~6 (FAX 02-879-7846)",
+      "effective_date": "2025-12-17",
+      "date_basis": "페이지 최종업데이트",
+      "source_url": "https://www.gwanak.go.kr/site/gwanak/03/10302040000002016051203.jsp",
+      "retrieved_at": "2026-11-21",
+      "verified": false,
+      "collection_status": "candidate",
+      "raw_snapshots": [
+        {
+          "path": "data/sources/gwanak-parking-violation-inquiry/2026-11-21/raw.html",
+          "sha256": "12beae84c739f510f98281ec08fc168489c64a9d2d317908c02360e134030da2"
+        }
+      ],
+      "verificationStatus": "machine-checked-with-conflicts",
+      "verification": {
+        "reviewer": "Claude (AI 보조 대조)",
+        "reviewedAt": "2026-11-21",
+        "docSha256": "b844037ab28e105acb8552684dfdae63968de47a4c055af671c6b2035acb5c86",
+        "sourceRefetchedUnchanged": true,
+        "checkedClaims": "전화·팩스 6개 원문 일치",
+        "unresolvedConflicts": [
+          "의견진술 기한은 원문에 없음"
+        ],
+        "humanSignOff": null
+      }
+    },
+    {
+      "path": "departments/gwanak-traffic-guidance-division.md",
+      "title": "관악구 교통지도과 업무분장 (주차관리팀)",
+      "category": "부서업무분장",
+      "jurisdiction": "관악구",
+      "department": "교통지도과",
+      "contact": "02-879-6950 (과장), FAX 02-879-7843",
+      "effective_date": "미확인",
+      "date_basis": "페이지에 기준일 표시 없음",
+      "source_url": "https://www.gwanak.go.kr/site/gwanak/ex/dept/DeptMain.do?cdIdx=D3200253",
+      "retrieved_at": "2026-11-21",
+      "verified": false,
+      "collection_status": "candidate",
+      "raw_snapshots": [
+        {
+          "path": "data/sources/gwanak-traffic-guidance-division/2026-11-21/raw.html",
+          "sha256": "791b5eb0b286a09d7bab0b7429cf7eb2191bee73ead9f1f439855ecd6dec6322"
+        }
+      ],
+      "verificationStatus": "machine-checked",
+      "verification": {
+        "reviewer": "Claude (AI 보조 대조)",
+        "reviewedAt": "2026-11-21",
+        "docSha256": "3e13f89625d769c82438051dd509c1d89da862f6214a4b30829e1e73ec6d30b7",
+        "sourceRefetchedUnchanged": true,
+        "checkedClaims": "업무별 전화 13개 일치, 업무 문구 원문 그대로로 수정",
+        "unresolvedConflicts": [],
+        "humanSignOff": null
+      }
+    },
+    {
+      "path": "departments/seoul-autonomous-district-contacts.md",
+      "title": "서울시 25개 자치구 대표전화·누리집 주소",
+      "category": "부서업무분장",
+      "jurisdiction": "서울시",
+      "department": "서울시 (자치구 안내)",
+      "contact": "부서안내 02-120 (다산콜센터)",
+      "effective_date": "미확인",
+      "date_basis": "페이지에 기준일 표시 없음",
+      "source_url": "https://www.seoul.go.kr/seoul/autonomy.do",
+      "retrieved_at": "2026-11-21",
+      "verified": false,
+      "collection_status": "candidate",
+      "specScope": "outside-spec",
+      "raw_snapshots": [
+        {
+          "path": "data/sources/seoul-autonomous-districts/2026-11-21/raw.html",
+          "sha256": "3468822dcb81110f12a9e343036fd3e7539d6c90300fb2cb36e99b8aa805a989"
+        }
+      ],
+      "verificationStatus": "machine-checked-with-conflicts",
+      "verification": {
+        "reviewer": "Claude (AI 보조 대조)",
+        "reviewedAt": "2026-11-21",
+        "docSha256": "bbdfef362effda7703fe939f1f2d39b1d3674e3bbe91e39006d203af3d902027",
+        "sourceRefetchedUnchanged": true,
+        "checkedClaims": "25개 구 주소·전화·누리집 원문 일치",
+        "unresolvedConflicts": [
+          "강동구 02-1577-1188 표기 vs 강동구청 1577-1188/02-3425-5000"
+        ],
+        "humanSignOff": null
+      }
+    },
+    {
+      "path": "transport/seoul-ddareungi-fares.md",
+      "title": "서울 공공자전거 따릉이 이용요금·환불 안내",
+      "category": "공공자전거",
+      "jurisdiction": "서울시",
+      "department": "서울시설공단 따릉이 운영센터",
+      "contact": "1599-0120 (365일, 24시간)",
+      "effective_date": "미확인",
+      "date_basis": "페이지에 기준일 표시 없음",
+      "source_url": "https://www.bikeseoul.com/info/infoCoupon.do",
+      "retrieved_at": "2026-11-21",
+      "verified": false,
+      "collection_status": "candidate",
+      "specScope": "outside-spec",
+      "raw_snapshots": [
+        {
+          "path": "data/sources/seoul-ddareungi-fares/2026-11-21/raw.html",
+          "sha256": "775cdc0b9f57379c7c9542d015471c49bec233509035849080e156e968db6358"
+        }
+      ],
+      "verificationStatus": "machine-checked",
+      "verification": {
+        "reviewer": "Claude (AI 보조 대조)",
+        "reviewedAt": "2026-11-21",
+        "docSha256": "026ae37e5f3ba01b20738322fb98a113b18abab2cf39b6be9ca403181cacbb3f",
+        "sourceRefetchedUnchanged": true,
+        "checkedClaims": "요금·추가요금·유효기간 일치, 환불표 병합 셀을 HTML 구조로 풀어 재작성",
+        "unresolvedConflicts": [],
+        "humanSignOff": null
+      }
+    },
+    {
+      "path": "waste/seoul-waste-medicine-disposal.md",
+      "title": "서울시 폐의약품 분리배출 방법과 수거함 위치 찾기",
+      "category": "폐의약품",
+      "jurisdiction": "서울시",
+      "department": "기후환경본부 자원순환과",
+      "contact": "02-2133-3729 (자원순환과), 02-2133-3520 (기후환경정책과)",
+      "effective_date": "2025-09-30",
+      "date_basis": "기사 수정일 (최신 기사 기준)",
+      "source_url": "https://news.seoul.go.kr/env/archives/564807",
+      "retrieved_at": "2026-11-21",
+      "verified": false,
+      "collection_status": "candidate",
+      "specScope": "outside-spec",
+      "raw_snapshots": [
+        {
+          "path": "data/sources/seoul-waste-medicine-qr/2026-11-21/raw.html",
+          "sha256": "65dd3cedb10470bcc75d397a9252585a50c2f932df302039a6b927e10b31f99b"
+        }
+      ],
+      "supplementary_sources": [
+        {
+          "url": "https://news.seoul.go.kr/env/archives/563744",
+          "path": "data/sources/seoul-waste-medicine-disposal/2026-11-21/raw.html",
+          "sha256": "2aa93230aa1692ffac33c2ac7c1a273b8e75f0e22c417a82d814eaad50d1e0bb"
+        }
+      ],
+      "verificationStatus": "machine-checked-with-conflicts",
+      "verification": {
+        "reviewer": "Claude (AI 보조 대조)",
+        "reviewedAt": "2026-11-21",
+        "docSha256": "9e4d614ee7ec7d83ed4f7ac9a82bea7917d390c950341b0db49c7b0dda14a59e",
+        "sourceRefetchedUnchanged": true,
+        "checkedClaims": "주·보조 기사 수치 17개 일치",
+        "unresolvedConflicts": [
+          "알약 포장 제거(2025-07-31) vs 포장 그대로(2025-09-30)",
+          "수거함 824곳 vs 1,771개 집계 범위 상이"
+        ],
+        "humanSignOff": null
+      }
+    },
+    {
+      "path": "animal/animal-registration-national-guide.md",
+      "title": "동물등록제도 안내 (국가동물보호정보시스템)",
+      "category": "반려동물등록",
+      "jurisdiction": "전국",
+      "department": "농림축산검역본부 (국가동물보호정보시스템)",
+      "contact": "1577-0954 (시스템 문의 054-810-8627)",
+      "effective_date": "미확인",
+      "date_basis": "페이지에 기준일 표시 없음",
+      "source_url": "https://www.animal.go.kr/front/community/show.do?boardId=contents&menuNo=2000000016&seq=66",
+      "retrieved_at": "2026-11-21",
+      "verified": false,
+      "collection_status": "candidate",
+      "specScope": "outside-spec",
+      "raw_snapshots": [
+        {
+          "path": "data/sources/animal-registration-guide/2026-11-21/raw.html",
+          "sha256": "1c877e8a93c03125d49f146c33125b37d448467ff11cc4f89d858ddc938aa73d"
+        }
+      ],
+      "verificationStatus": "machine-checked-with-conflicts",
+      "verification": {
+        "reviewer": "Claude (AI 보조 대조)",
+        "reviewedAt": "2026-11-21",
+        "docSha256": "fc9a32a246487ff2c406b2902f4ec93818b7615532dd07ac86ed23585e7842b3",
+        "sourceRefetchedUnchanged": true,
+        "checkedClaims": "등록대상·절차·변경신고 기한 일치",
+        "unresolvedConflicts": [
+          "미등록 과태료 금액 원문에 없음"
+        ],
+        "humanSignOff": null
+      }
+    },
+    {
+      "path": "animal/seoul-animal-registration-2024-selfreport.md",
+      "title": "서울시 2024 동물등록 자진신고 기간 안내 (변경신고·과태료 기준 포함)",
+      "category": "반려동물등록",
+      "jurisdiction": "서울시",
+      "department": "정원도시국 동물보호과",
+      "contact": "02-2133-7645",
+      "effective_date": "2024-08-06",
+      "date_basis": "기사 수정일",
+      "source_url": "https://news.seoul.go.kr/env/archives/558879",
+      "retrieved_at": "2026-11-21",
+      "verified": false,
+      "collection_status": "candidate",
+      "specScope": "outside-spec",
+      "raw_snapshots": [
+        {
+          "path": "data/sources/seoul-animal-registration-selfreport/2026-11-21/raw.html",
+          "sha256": "0a9c3218efd04ff69aad7bc230415f1150c7b7115038228314b9f1ea7cd13e2a"
+        }
+      ],
+      "verificationStatus": "machine-checked-with-conflicts",
+      "verification": {
+        "reviewer": "Claude (AI 보조 대조)",
+        "reviewedAt": "2026-11-21",
+        "docSha256": "810e7217f8edce81ee45579788da4d61c69702205147f40e2357dcad31645e7c",
+        "sourceRefetchedUnchanged": true,
+        "checkedClaims": "변경신고 표 병합 셀 구조 일치, 과태료 금액 일치",
+        "unresolvedConflicts": [
+          "2024 자진신고·지원 종료(effectiveUntil 2024-09-30)",
+          "과태료는 2024-08 기준, 현행 법령 원문 미확인"
+        ],
+        "humanSignOff": null
+      }
+    }
+  ],
+  "blocked": [
+    {
+      "url": "https://parkingsms.mapo.go.kr/WizshotCarControl/member/n_con/con0201.php",
+      "intended": "마포구 주정차단속 문자알림 서비스",
+      "status": "blocked",
+      "reason": "HTTP 404 (2026-11-21)"
+    }
+  ],
+  "verificationNote": "2026-11-21 원문 재수집 결과 13페이지 모두 스냅샷과 본문 동일. 수치·전화·날짜를 원문과 자동 대조하고 수수료표 2개를 행 단위로 대조함. data-collection.md 규칙상 LLM이 verified=true를 부여하지 않으므로 AI1 승인(humanSignOff) 후에만 verified=true로 바꾼다."
+}

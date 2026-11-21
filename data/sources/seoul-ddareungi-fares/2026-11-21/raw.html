@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densityDpi=medium-dpi" name="viewport">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="description=" Content="" />
+<title>이용요금 안내 | 서울자전거 따릉이 - 무인대여시스템</title>
+<link href="/css/jquery-ui.css" rel="stylesheet" type="text/css" />
+<script src="/js/jquery.js"></script> 
+<script src="/js/jquery-ui.js"></script>
+<script src="/js/easing/jquery.easing.js"></script>
+<script src="/js/gibberish-aes.js"></script>
+<script src="/js/jquery.simpler-sidebar.min.js"></script>
+<script src="/js/jquery-confirm.js"></script>
+<script src="/js/comm.js"></script>
+<script src="/js/common_spb.js"></script>
+
+<link rel="stylesheet" href="/css/style_kr_v2.css?ver=0412" type="text/css">
+<link rel="stylesheet" href="/css/common.css" type="text/css">
+<link rel="stylesheet" href="/css/jquery-confirm.css">
+<!--[if lt IE 9]>
+<link href="/css/pw.css" title="ie8chn" rel="stylesheet" type="text/css" />
+<script src="/js/html5.js"></script>
+<script src="/js/respond.min.js"></script>
+<![endif]-->
+<style>
+		.pay {
+			margin : 0 auto;
+			max-width : 1030px;
+		}
+	</style>
+
+</head>
+<body>
+<div class="wrap pay" id="sub">
+	<div id="skip_navi">
+		<ul>
+			<!-- <li><a href="#pwPC"><span>주메뉴 바로가기</span></a></li> -->
+			<li><a href="#container"><span>본문 바로가기</span></a></li>
+		</ul>
+	</div>
+	<div id="skip_navi">
+	<ul>
+		<!-- <li><a href="#pwPC"><span>주메뉴 바로가기</span></a></li> -->
+		<li><a href="#container"><span>본문 바로가기</span></a></li>
+	</ul>
+</div><!--웹 : 헤더추가-->
+<script>
+$(function () {
+	$(document).on("click", "[data-role='app-join']", function (e) {
+        e.preventDefault();
+
+        alert("앱을 다운로드 받아 가입을 진행해주세요.");
+
+        var $target = $("#bike_info");
+
+        if ($target.length) {
+            $("html, body").animate({
+                scrollTop: $target.offset().top
+            }, 500, function () {
+            	setTimeout(function () {
+                    var $focusTarget = $target.find("a, button").first();
+                    if ($focusTarget.length) {
+                        $focusTarget.focus();
+                    }
+                }, 50);
+            });
+        }
+    });
+});
+</script>
+    <div class="header_wrap">
+        <div class="header">
+        	<div class="top">
+				<div class="m_sub_header_wrap">
+					<div class="m_sub_header">
+						<button type="button" class="back"><span class="hidden">이전 페이지로 이동</span></button>
+						<a href="/main.do" class="close"><span class="hidden">닫기</span></a>
+						<h1 id="title" tabindex="0"></h1>
+					</div>
+					<!-- //.m_sub_header -->
+				</div>
+				<!-- //.m_sub_header_wrap -->
+			
+        		<button type="button" class="m_menu"><i class="hidden">메뉴열기</i></button>
+				<button type="button" class="m_global"><i class="hidden">언어선택</i></button>
+				<!-- <div class="info"></div> -->
+				 
+				<a class="info" href="/info/infoReg.do">이용안내</a>
+						<a class="join" href="#bike_info" data-role="app-join">회원가입</a>
+						<a class="login" href="/login.do">
+							로그인</a>
+					<div class="global" id="changeLang">
+					<ul>
+						<li class="en"><a href="https://www.bikeseoul.com:457/main.do?lang=en">ENGLISH</a></li>
+							    <li class="ch"><a href="https://www.bikeseoul.com:457/main.do?lang=zh">中國語</a></li>
+							    <li class="ja"><a href="https://www.bikeseoul.com:457/main.do?lang=ja">日本語</a></li>
+							    <li class="ko"><a href="https://www.bikeseoul.com:457/main.do?lang=ko">한국어</a></li>
+							</ul>
+				</div>
+				
+			</div>
+			<!-- 모바일 화면 -->
+			<div class="logo"><img style="width:auto; padding-right:10px;" src="/images/ic_goSeoul_logo.png" alt="GO SEOUL LOGO"><a href="/main.do"><img src="/images/logo.png" alt="서울자전거 따릉이"></a></div>
+            
+            <!--메뉴(웹)-->
+            <div class="menu_web">
+                <ul>
+                    <li><a href="/info/movebikeSystemInfo.do">사업소개</a></li>
+                    <li><a href="/app/station/moveStationRealtimeStatus.do">대여소 안내</a></li>
+                    <li><a href="/customer/opinionBoard/opinionBoardList.do">문의/FAQ</a></li>
+                    <li><a href="/customer/notice/noticeList.do">공지사항</a></li>
+                    <li><a href="/customer/faq/faqList.do">안전수칙</a></li>
+                  
+                </ul>
+            </div>
+            <!--메뉴(웹)--> 
+        </div>
+        <!--
+        <div class="bike_tap">
+		  	<ul>
+				<li class="first"><span id="all">전체</span></li>
+				<li class="second"><span id="lcd">LCD형</span></li>
+				<li class="third"><span id="qr">QR형</span></li>
+				<li class="forth"><span id="yg">새싹</span></li>
+			</ul>
+		</div>
+ 		
+
+		<div class="remarks">
+			<ul>
+				<li class="title">&nbsp;</li>
+				<li class="place01">LCD형,&nbsp;QR형&nbsp;반납가능</li>
+				<li class="place02">QR형&nbsp;반납가능<span class="lcd">(LCD형&nbsp;반납불가)</span></li>
+			</ul>
+		</div> 
+		-->
+
+    </div>
+    
+    <!--웹 : 헤더추가-->
+<div class="container">
+    	<div class="content">
+
+        <div class="pay">
+            <div class="top" id="container">
+                <h3 class="info">이용요금 안내</h3>
+            </div>
+            
+            <div class="pay_info">
+	            <ul>
+	            	<li><span style="color:blue;font-weight: 600;">첫 대여 후 대여시간(1시간/2시간/3시간) 안에 정상 반납시 권종별 기간 동안은 대여횟수 제한없이 재대여 가능</span></li>
+	            	<li><strong>이용 가능시간</strong>은 첫 회 대여시점을 기준으로 계산합니다.</li>
+	                <li>서울자전거 <strong>모든 대여소에서 사용이 가능</strong>합니다.</li>
+	                <li>취소, 환불은 서울자전거 아래 <strong>환불규정</strong>에 따릅니다.</li>
+	                <li>이용권을 다른 사람에게 <strong>양도</strong>할 수 없으며, 양도로 인해 발생하는 불이익은 구매자가 책임지셔야 합니다.</li>
+	            </ul>
+         	</div>
+            
+            <div class="info_box">
+                <p class="stitle2">상품안내</p>
+                <table class="psboard3 mt10">
+                <caption><strong>상품안내</strong> 회원, 비회원 별 이용권을 나타낸 표</caption>
+                <colgroup>
+                    <col style="width:12%">
+                    <col style="width:12%">
+                    <col style="width:12%">
+                    <col style="width:12%">
+                    <col style="width:12%">
+                    <col style="width:12%"> 
+                    <col style="width:12%"> 
+        		</colgroup>
+                <thead>
+                    <tr>
+                        <th scope="col" style="text-align:center;font-weight:bold;font-size:13px">구분</th>
+                        <th colspan="3" style="text-align:center;font-weight:bold;font-size:13px" scope="col">정기권(회원전용)</th>
+                        <th colspan="3" style="text-align:center;font-weight:bold;font-size:13px" scope="col">일일권</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="2" scope="rowgroup" style="text-align:center;font-weight:bold;font-size:13px">상품</td>
+                        <td style="text-align:center;font-weight:bold;font-size:13px">종별</td>
+                        <td style="text-align:center;font-weight:bold;font-size:13px">1시간권</td>
+                        <td style="text-align:center;font-weight:bold;font-size:13px">2시간권</td>
+                        <td style="text-align:center;font-weight:bold;font-size:13px">1시간권</td>
+                        <td style="text-align:center;font-weight:bold;font-size:13px">2시간권</td>
+                        <td style="text-align:center;font-weight:bold;font-size:13px">3시간권</td>
+                    </tr>
+                    <tr>
+                        <td style="border-left:1px solid #d2d2d2;text-align:center;font-weight:bold;font-size:13px"">
+                        7일권<br>
+                        30일권<br>
+                        180일권<br>
+                        365일권<br>
+                        </td>
+                        <td style="text-align:center;font-weight:bold;font-size:13px">
+                        3,000원<br>
+                            5,000원<br>
+                            15,000원<br>
+                            30,000원<br>
+                            </td>
+                        <td style="text-align:center;font-weight:bold;font-size:13px">
+                        4,000원<br>
+                        7,000원<br>
+                        20,000원<br>
+                        40,000원<br>
+                        </td>
+                        
+                        <td style="text-align:center;font-weight:bold;font-size:13px">
+                        1,000원</td>
+                        <td style="text-align:center;font-weight:bold;font-size:13px">
+                        2,000원</td>
+                        <td style="text-align:center;font-weight:bold;font-size:13px">
+                        3,000원</td>
+                        
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;">결제</td>
+                        <td colspan="6" scope="col">휴대폰,신용카드,PAYCO, 카카오페이, 제로페이, Discover Pass(외국인전용)</td>
+                    </tr>
+                    <tr name="add">
+                        <td style="text-align:center;">추가요금</td>
+                        <td colspan="6" scope="col">
+                        · 1시간(2시간,3시간) 단위 반복 이용권을 1시간(2시간,3시간) 이내 대여소 미반납시 초과 5분당 200원씩 과금<br/>
+                        · 자전거 대여 후 기본 대여 시간 초과 시 추가 요금 부과(추가 요금 미납시 재대여 불가)<br>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;">이용시간</td>
+                        <td colspan="5">
+                        - [1시간권] 1시간 단위 반복 이용권<br> 
+                        - [2시간권] 2시간 단위 반복 이용권<br>
+                        - [3시간권] 3시간 단위 반복 이용권<br>
+                        </td>
+                    </tr>
+                </tbody>
+                </table>
+                
+                <p class="stitle2 mt30">주의사항</p>
+                <table class="psboard3 mt10">
+                <colgroup>
+                    <col style="width:auto">
+                    <col style="width:90%">
+                </colgroup>
+                <tbody>
+                    <tr>
+                        <td>01</td>
+                        <td class="tl">
+                        <b>- 이용권 사용가능기간은 첫 회 대여시점부터 계산합니다.</b><br>
+                        (예 : 1일권을 13시에 구매 한 후 15시에 처음으로 사용한 경우 사용가능기간은 다음날 15시까지입니다.)<br>
+                        - 1시간권 : 1회 대여 시 기본 대여시간은 60(분)입니다.  60(분)을 초과하는 경우 추가요금을 지불해야하므로 반납 후 다시 대여하여 이용하세요.<br>
+                        - 2시간권 : 1회 대여 시 기본 대여시간은 120(분)입니다. 120(분)을 초과하는 경우 추가요금을 지불해야하므로 반납 후 다시 대여하여 이용하세요.<br>
+                        - 3시간권 : 1회 대여 시 기본 대여시간은 180(분)입니다. 180(분)을 초과하는 경우 추가요금을 지불해야하므로 반납 후 다시 대여하여 이용하세요.<br>
+                        <span class="redt">(기본 대여시간이내에 반납하는 것을 반복하면 추가요금 없이 연속적으로 자전거를 이용할 수 있습니다.)</span><br>
+                        <span class="redt">※ 이용권 유효기간은 이용권 사용 전 결제일로부터 1년</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>02</td>
+                        <td class="tl">
+                        - 기본이용시간을 초과할 경우, 초과된 시간만큼의 비용이 처음 이용권 구매 시 사용된 결제수단이나 이용자가 설정한 추가 과금 지불수단을 통해 부과됩니다.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>03</td>
+                        <td class="tl">
+                        <span class="redt">
+                        - 대여 후 4시간동안 반납이 이루어지지 않을 경우 도난자전거로 간주되어, 경찰 신고 등이 이루어지므로, 반납이 어려울 경우 운영센터(1599-0120)로 연락하시기 바랍니다.
+                        </span>
+                        </td>
+                    </tr>
+                </tbody>
+                </table>
+                
+                <p class="stitle2 mt30" >환불규정</p>
+                <table class="psboard3 mt10" name="refund">
+                <caption> <strong>환불규정</strong> 사용시(이용개시일로부터 7일 이내, 이용개시일로부터 7일 초과), 미사용시, 정기권, 일일권을 나타낸 표</caption>
+                <colgroup>
+                    <col style="width:10%">
+                    <col style="width:15%">
+                    <col style="width:30%">
+                    <col style="width:30%">
+                    <col style="width:15%">
+                    
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th rowspan="2" colspan="2" scope="rowgroup">구분</th>
+                        <th colspan="2" scope="colgroup">사용시 </th>
+                        <th rowspan="2" scope="rowgroup">미사용시</th>
+                    </tr>
+                    <tr>
+                        <th scope="col" style="border-left:1px solid #d2d2d2;">이용개시일로부터<br>7일이내</th>
+                        <th scope="col">이용개시일로부터<br>7일초과</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="4" scope="rowgroup">정기권</td>
+                        <td>365일권</td>
+                        <td rowspan="3" scope="rowgroup">7일권 이용요금 공제</td>
+                        <td rowspan="2" scope="rowgroup">환불 요청일까지의 월별 이용요금 공제(사용월수 x 30일권 이용요금)</td>
+                        <td rowspan="5" scope="rowgroup">전액 환불</td>
+                    </tr>
+                    <tr>
+                        <td style="border-left:1px solid #d2d2d2;">180일권</td>
+                    </tr>
+                    <tr>
+                        <td style="border-left:1px solid #d2d2d2;">30일권</td>
+                        <td rowspan="2" scope="rowgroup">환불 불가</td>
+                    </tr>
+                    <tr>
+                        <td style="border-left:1px solid #d2d2d2;">7일권</td>
+                        <td>이용개시일로부터  2일이내 일일권 이용요금 공제</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">일일권</td>
+                        <td colspan="2">환불 불가</td>
+                    </tr>
+                    <tr>
+                    	<td colspan="5">
+                    		<font color="red">※ 이용권 사용한 경우(이용권 개시일 기준)<br/>
+                    		1일권 : 환불불가 , 7일권 : 2일이내, 30일권 : 7일이내, 180일권 : 60일이내, 365일권은 150일이내 신청해야만 환불이 가능합니다.</font>
+                    	</td>
+                    </tr>
+                </tbody>
+                </table>
+            </div>
+
+        </div>
+
+        
+        </div>
+    </div>  
+</div>
+<script type="text/javascript">
+	$(function(){	
+		$("#title").html('이용권 사용안내');	
+		
+		var urlParam = getUrlParams();
+		if (urlParam["part"] === "add") {
+			$("html,body").animate({
+				scrollTop: $('[name="add"]').offset().top - 50   //id가 target 인 일레먼트의 상단위치로 페이지 스크롤
+			}, 500);  
+		}else if(urlParam["part"] === "refund"){
+			$("html,body").animate({
+				scrollTop: $('[name="refund"]').offset().top    //id가 target 인 일레먼트의 상단위치로 페이지 스크롤
+			}, 500);
+		}		
+	});
+</script>
+<!--footer-->
+
+    <div class="footer_wrap">
+        <div class="footer">
+        	<div class="left">
+            <ul>
+                <!--<li><a href="">개인정보처리방침</a></li>
+                <li class="line"><a href="">이메일주소무단수집거부</a></li>-->
+                <li><a href="/app/use/moveUseMenuClauseInfo.do">이용약관</a></li>
+                
+                <li class="line"><a href="/app/use/moveUseMenuClauseInfo.do?tabInfo=4">위치정보관련 약관</a></li>
+                
+                <li class="line"><a style="color:#1A6ED8" href="/app/use/moveUseMenuClauseInfo.do?tabInfo=2">개인정보처리방침</a></li>
+                <li class="line"><a href="/app/use/moveUseMenuInsurance.do">보험안내</a></li>
+                <li class="line"><a href="/customer/donor/donorList.do">도움주신 분</a></li>
+            </ul>
+            <p>서울특별시 중구 세종대로 110 서울특별시 대표자 오세훈, Tel : 1599-0120(365일, 24시간) (사업자등록번호 : 104-83-00469) 우편번호 04524</p>
+            <p>COPYRIGHT ⓒ 2018 bikeseoul All RIGHTS RESERVED.</p>
+            </div>
+            <ul class="snslinks"> 
+               	<li style="background:url(/images/inc/instaLink.png) no-repeat; width:33px; height:33px; display:inline-block; cursor:pointer" class="instaLink" >
+                    <a href="javascript:void(0)" onclick="javascript:moveSnsViewPage('snsInsta')" title="새창열림"><span class="hidden">따릉이 인스타 페이지로 이동</span></a>
+                </li>
+               	<li style="background:url(/images/inc/facebookLink.png) no-repeat ; height:33px; display:inline-block; cursor:pointer" class="faceLink" title="새창열림">
+                    <a href="javascript:void(0)" onclick="javascript:moveSnsViewPage('snsFacebook')"><span class="hidden">따릉이 페이스북 페이지로 이동</span></a>
+                </li>
+               	<li style="background:url(/images/inc/naverblogLink.png) no-repeat; height:33px; display:inline-block; cursor:pointer" class="naverBlogLink">
+                    <a href="javascript:void(0)" onclick="javascript:moveSnsViewPage('snsNaverBlog')" title="새창열림"><span class="hidden">따릉이 네이버블로그 페이지로 이동</span></a>
+                </li>
+               	<li style="background:url(/images/inc/robloxLink.png) no-repeat; width:33px; height:33px; display:inline-block; cursor:pointer" class="robloxLink">
+                    <a href="javascript:void(0)" onclick="javascript:moveSnsViewPage('snsRoblox')" title="새창열림"><span class="hidden">따릉이 메타버스 페이지로 이동</span></a>
+                </li>
+            </ul>
+            <a href="/customer/notice/downloadFile.do?imgSeq=16860" target="_blank" rel="noopener noreferrer">
+                <img alt="과학기술정보통신부 WA(WEB접근성) 품질인증 마크,웹와치(WebWatch) 2026.10.22 ~ 2027.10.21" title="과학기술정보통신부 WA(WEB접근성) 품질인증 마크,웹와치(WebWatch) 2026.10.22 ~ 2027.10.21 새창열림" src="/img/main/webwatch.png" style="width: 10%;position: relative;top: -20px;left: 10px;">
+            </a>
+        </div>
+    </div>
+    <!-- 
+    <button id="frogue-container" class="position-right-bottom"
+              data-chatbot="be43e811-a4e0-4e6e-a400-27b72c0f31b9"
+              data-user="사용자ID" data-init-key="value" role="button" tabindex="0"></button> -->
+    <!-- data-init-식별키=값 으로 셋팅하면 챗플로우에 파라미터와 연동가능. 식별키는 소문자만 가능 -->
+
+    <script>
+    (function(d, s, id){
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {return;}
+        js = d.createElement(s); js.id = id;
+        js.src = "https:\/\/frogue.danbee.ai/js/embed/v20240201/frogue-embed.min.js";
+        js.title = "따릉이 챗봇 지원 프로그램";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'frogue-embed'));
+    </script>
+    
+    
+<!--footer-->
+
+<script>
+
+$(function() {
+    $(".back").on("click", goBack);
+});
+
+$(function() {
+    $(".back.left").on("click", goBackLeft);
+});
+
+$(function() {
+    $(".back.right").on("click", goBackRight);
+});
+
+$(function() {
+    $(".pwback").on("click", goBack);
+});
+$(function() {
+    $(".close").on("click", goHome);
+});
+$(function() {
+    $(".logo").on("click", goHome);
+});
+$(function() {
+    $(".alim").on("click", goAlim);
+});
+$(function() {
+    //$("#changeLang").on("click", changeLang);
+});
+function osInfo(pOSobj){
+    var obj = JSON.parse(pOSobj);
+    window.osType = obj.osInfo;
+    
+    //대여소 찿기 PDF 버튼 숨기기.
+    if($("#pdfDiv") !== 'undefined') {
+	    $("#pdfDiv").css("display","none");
+    }
+};
+
+function goBack(e) {
+	//e.preventDefault();
+    //alert("2->"+e.type +":"+ window.osType);
+    window.osType = '';
+    //alert(window.osType);
+    switch(window.osType){
+    case "web" :
+    	window.history.go(-1);      
+        break;
+    case "android" :
+        window.android.goBack();
+        break;
+    case "ios" : 
+        window.location = 'toApp://?{"call":"goBack"}';
+        break;
+    default :
+    	window.history.go(-1);      
+        break;
+    }
+}
+
+function goBackLeft(e) {
+    //e.preventDefault();
+    //alert("2->"+e.type +":"+ window.osType);
+   /*  switch(window.osType){
+    case "web" :
+        window.location.href='/main.do';     
+        break;
+    case "android" :
+    	window.location.href='/main.do';
+        break;
+    case "ios" : 
+    	window.location.href='/main.do';
+        break;
+    case "" :
+    	window.location.href='/main.do';      
+        break;    
+    } */
+}
+
+function goBackRight(e) {
+    //e.preventDefault();
+    //alert("2->"+e.type +":"+ window.osType);
+    /* switch(window.osType){
+    case "web" :
+        window.location.href='/main.do';     
+        break;
+    case "android" :
+    	window.location.href='/main.do';
+        break;
+    case "ios" : 
+    	window.location.href='/main.do';
+        break;
+    case "" :
+    	window.location.href='/main.do';      
+        break;    
+    } */
+	/* switch(window.osType){
+    case "web" :
+    	window.history.go(-1);      
+        break;
+    case "android" :
+        window.android.goBack();
+        break;
+    case "ios" : 
+        window.location = 'toApp://?{"call":"goBack"}';
+        break;
+    case "" :
+    	window.history.go(-1);      
+        break;
+    } */
+}
+
+function goHome(e) {
+	setCookie("step", 0);
+    //e.preventDefault();
+    //alert("2->"+e.type +":"+ window.osType);
+    switch(window.osType){
+    case "web" :
+        window.location.href='/main.do';     
+        break;
+    case "android" :
+    	window.location.href='/main.do';
+        break;
+    case "ios" : 
+    	window.location.href='/main.do';
+        break;
+    default :
+    	window.location.href='/main.do';      
+        break;    
+    }
+}
+
+function goAlim(e) {
+    //e.preventDefault();
+    //alert("2->"+e.type +":"+ window.osType);
+    switch(window.osType){
+    case "web" :
+        window.location.href='/app/mybike/getPushHistory.do';     
+        break;
+    case "android" :
+    	window.location.href='/app/mybike/getPushHistory.do';
+        break;
+    case "ios" : 
+    	window.location.href='/app/mybike/getPushHistory.do';
+        break;
+    default :
+        window.location.href='/app/mybike/getPushHistory.do';     
+        break;    
+    }
+}
+
+function changeLang(e) {
+	var lang = 'en'
+
+	switch(window.osType){
+    case "web" :
+        window.location.href='/main.do?lang='+lang;     
+        break;
+    case "android" :
+    	window.location.href='/main.do?lang='+lang;
+        break;
+    case "ios" : 
+    	window.location.href='/main.do?lang='+lang;
+        break;
+    default :
+        window.location.href='/main.do';     
+        break;    
+    }
+}
+
+function moveSnsViewPage(flag){
+
+    var tUrl = "";
+    
+    switch( flag ) {
+        case 'snsFacebook' : 
+        tUrl = "https://www.facebook.com/seoulbike";
+        break;
+        case "snsInsta" :
+        tUrl = "https://www.instagram.com/seoulbike_/"
+        break;
+        case "snsNaverBlog" :
+        tUrl = "https://blog.naver.com/2seoulbike"
+        break;
+        case "snsRoblox" :
+        tUrl = "https://www.roblox.com/ko/games/7594841232/seoulbike"
+        break;
+    }
+/*    
+    if(flag === 'snsFacebook') {
+        tUrl = "https://www.facebook.com/seoulbike";
+    } else {
+        tUrl = "https://twitter.com/seoulbike";
+    }
+ */   
+    switch(window.osType){
+        case "web" :
+            window.open(tUrl,"_blank");
+            break;
+        case "android" :
+            var pData = {targetUrl  :tUrl, returnFnc : "", title : "서울자전거sns" };
+            window.android.openWebviewPopup(JSON.stringify(pData));
+            break;
+        case "ios" : 
+            var iosUrl = 'toApp://?{"targetUrl" : "'+tUrl+'","title" : "서울자전거sns", "returnFnc" : "", "call":"openWebviewPopup"}';
+            window.location = iosUrl;
+            break;
+        // 20200914 추가
+        default :
+            window.open(tUrl,"_blank");
+            break;            
+    }
+}
+
+function fileDownload(e){
+	var pData = e.currentTarget.id.split(",");
+	$('[name="imgSeq"]').val(pData[0]);
+
+	var downUrlStr = pData[1].substring(7);
+	var fileUploadDir = "";
+	var downUrl = location.protocol + "//" + location.host + pData[1];
+	
+	$("#frm").attr({action : "/customer/notice/downloadFile.do", method : 'post'}).submit();
+};
+
+		
+</script>
+</body>
+</html>
+
+
+
+
