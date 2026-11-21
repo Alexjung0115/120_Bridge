@@ -18,7 +18,8 @@ const actionSchema = z.discriminatedUnion("action", [
   commandEnvelopeSchema.extend({ action: z.literal("complete_case"), outcome: outcomeSchema.optional() }),
 ]);
 
-type Command = z.infer<typeof actionSchema>;
+export type ConsoleCommand = z.infer<typeof actionSchema>;
+type Command = ConsoleCommand;
 type Result = { status: "committed" | "replayed"; data: unknown } |
   { status: "conflict"; revision: number } | { status: "not_found" | "invalid_candidate" };
 
