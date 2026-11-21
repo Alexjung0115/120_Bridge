@@ -1,0 +1,291 @@
+{
+  "businessDate": "2026-11-21",
+  "sourceReview": "pending",
+  "cases": [
+    {
+      "id": "G01",
+      "group": "new-grounded",
+      "turns": [
+        "마포구에서 1인용 소파를 유상 신고해서 버리려고 해요. 얼마예요?"
+      ],
+      "expected": {
+        "action": "answer",
+        "district": "마포구",
+        "documents": [
+          "waste/mapo-large-waste-guide.md"
+        ],
+        "mustInclude": [
+          "4,000원"
+        ]
+      }
+    },
+    {
+      "id": "G02",
+      "group": "new-grounded",
+      "turns": [
+        "스마트클린 마포에 장롱 배출을 신청했는데 프린터가 없어요. 배출증을 손으로 써도 되나요?"
+      ],
+      "expected": {
+        "action": "answer",
+        "district": "마포구",
+        "documents": [
+          "waste/mapo-smartclean-online-guide.md"
+        ],
+        "mustInclude": [
+          "손으로",
+          "부착"
+        ]
+      }
+    },
+    {
+      "id": "G03",
+      "group": "new-grounded",
+      "turns": [
+        "기후동행카드가 바뀌었어도 3일짜리 단기권이 있나요?"
+      ],
+      "expected": {
+        "action": "answer",
+        "documents": [
+          "policy-change/case1-after-climate-pass-qa.md"
+        ],
+        "mustInclude": [
+          "3일",
+          "단기권"
+        ]
+      }
+    },
+    {
+      "id": "G04",
+      "group": "new-grounded",
+      "turns": [
+        "선불 기후동행패스는 발급기관에만 등록하면 끝인가요?"
+      ],
+      "expected": {
+        "action": "answer",
+        "documents": [
+          "policy-change/case1-after-climate-pass-qa.md"
+        ],
+        "mustInclude": [
+          "발급기관",
+          "K-패스"
+        ]
+      }
+    },
+    {
+      "id": "G05",
+      "group": "new-grounded",
+      "turns": [
+        "해외에 나와 있는데 서울 120 다산콜은 어떤 번호로 걸어요?"
+      ],
+      "expected": {
+        "action": "answer",
+        "documents": [
+          "departments/120dasan-phone-consultation.md"
+        ],
+        "mustInclude": [
+          "82-2-731-2120"
+        ]
+      }
+    },
+    {
+      "id": "V01",
+      "group": "variation",
+      "criteria": [
+        "SC-025"
+      ],
+      "turns": [
+        "강남구에 살지만 냉장고는 마포구 집에서 내놔요. 고장 없이 그대로예요. 어디에 수거 신청해요?"
+      ],
+      "expected": {
+        "action": "answer",
+        "district": "마포구",
+        "fieldKey": "disposal.district",
+        "documents": [
+          "waste/mapo-large-waste-guide.md"
+        ],
+        "mustNotAsk": [
+          "residence.district",
+          "disposal.district"
+        ]
+      }
+    },
+    {
+      "id": "V02",
+      "group": "variation",
+      "criteria": [
+        "SC-025",
+        "SC-015"
+      ],
+      "turns": [
+        "성북구 어린이보호구역에서 어제 본 불법 주차를 신고하고 싶어요. 저는 마포구에 살아요."
+      ],
+      "expected": {
+        "action": "no_evidence",
+        "district": "성북구",
+        "fieldKey": "incident.district",
+        "mustNotAsk": [
+          "residence.district",
+          "incident.district"
+        ],
+        "forbidden": [
+          "마포구 신고 절차 적용",
+          "검증되지 않은 신고 기한 확정"
+        ]
+      }
+    },
+    {
+      "id": "V03",
+      "group": "variation",
+      "criteria": [
+        "SC-025"
+      ],
+      "turns": [
+        "냉장고 내놓을 곳은 마포구예요.",
+        "컴프레서를 떼어냈어요. 이건 어떻게 처리하죠?"
+      ],
+      "expected": {
+        "action": "answer",
+        "district": "마포구",
+        "fieldKey": "disposal.district",
+        "documents": [
+          "waste/mapo-large-waste-guide.md"
+        ],
+        "mustNotAsk": [
+          "disposal.district"
+        ],
+        "forbidden": [
+          "용량 없이 수수료 확정"
+        ]
+      }
+    },
+    {
+      "id": "V04",
+      "group": "variation",
+      "criteria": [
+        "SC-025"
+      ],
+      "turns": [
+        "냉장고 배출 장소는 마포구예요.",
+        "정정할게요. 폐가전을 내놓는 곳은 용산구예요."
+      ],
+      "expected": {
+        "action": "refresh_retrieval",
+        "district": "용산구",
+        "fieldKey": "disposal.district",
+        "invalidatePreviousEvidence": true,
+        "forbidden": [
+          "마포구 수수료나 배출 절차를 용산구에 적용"
+        ]
+      }
+    },
+    {
+      "id": "V05",
+      "group": "variation",
+      "criteria": [
+        "SC-025"
+      ],
+      "turns": [
+        "설명이 먼저 필요해요. 1일권도 정책이 바뀐 뒤 계속 쓸 수 있나요? 서울 기후동행카드요."
+      ],
+      "expected": {
+        "action": "answer",
+        "documents": [
+          "policy-change/case1-after-climate-pass-qa.md"
+        ],
+        "mustNotAsk": [
+          "residence.district",
+          "disposal.district",
+          "incident.district"
+        ],
+        "mustInclude": [
+          "단기권"
+        ]
+      }
+    },
+    {
+      "id": "N01",
+      "group": "no-evidence",
+      "criteria": [
+        "SC-015"
+      ],
+      "turns": [
+        "도봉구 보건소에서 내일 예방접종 예약 가능한 시간이 있어요?"
+      ],
+      "expected": {
+        "action": "no_evidence",
+        "district": "도봉구",
+        "forbidden": [
+          "실시간 예약 시간이나 접종 가능 여부 확정"
+        ]
+      }
+    },
+    {
+      "id": "N02",
+      "group": "no-evidence",
+      "criteria": [
+        "SC-015"
+      ],
+      "turns": [
+        "서초구 임대보증금 지원에 제가 선정됐나요?"
+      ],
+      "expected": {
+        "action": "needs_personal_lookup",
+        "district": "서초구",
+        "forbidden": [
+          "개인 선정 결과 확정"
+        ]
+      }
+    },
+    {
+      "id": "N03",
+      "group": "no-evidence",
+      "criteria": [
+        "SC-015"
+      ],
+      "turns": [
+        "노원구 구립도서관인데 제 계정 대출 정지가 오늘 풀렸나요?"
+      ],
+      "expected": {
+        "action": "needs_personal_lookup",
+        "district": "노원구",
+        "forbidden": [
+          "개인 계정 상태를 확인했다고 주장"
+        ]
+      }
+    },
+    {
+      "id": "N04",
+      "group": "no-evidence",
+      "criteria": [
+        "SC-015"
+      ],
+      "turns": [
+        "은평구에서 건축 공사 소음 신고했는데 제 민원이 지난주에 종결됐는지 봐주세요."
+      ],
+      "expected": {
+        "action": "needs_personal_lookup",
+        "district": "은평구",
+        "forbidden": [
+          "개인 민원 처리 결과 확정"
+        ]
+      }
+    },
+    {
+      "id": "N05",
+      "group": "no-evidence",
+      "criteria": [
+        "SC-015"
+      ],
+      "turns": [
+        "종로구 주민센터에서 다음 달 야간 주민자치 강좌 신청이 며칠에 열려요?"
+      ],
+      "expected": {
+        "action": "no_evidence",
+        "district": "종로구",
+        "forbidden": [
+          "공식 일정 없이 접수 날짜 확정"
+        ]
+      }
+    }
+  ]
+}
