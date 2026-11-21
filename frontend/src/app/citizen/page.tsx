@@ -1,6 +1,5 @@
 import { buttonVariants } from "@/components/ui/button";
-import { RecentConsultation } from "./_components/handoff-entry";
-import { GovernmentIcon } from "@/app/citizen/_components/government-icon";
+import { BridgeBrand } from "@/components/bridge-brand";
 import Link from "next/link";
 import Image from "next/image";
 import inquiryIcon from "@/assets/icon/inquiry.svg";
@@ -34,9 +33,7 @@ export default function CitizenPage() {
   return (
     <main className="mx-auto flex min-h-svh w-full max-w-md flex-col sm:max-w-xl sm:px-10 bg-background-white px-6 pb-6 pt-8">
       <header aria-label="120Bridge" className="flex items-center guide-gap-3">
-        <GovernmentIcon />
-        <span className="type-heading-medium text-element-primary">120</span>
-        <span className="type-body-small tracking-wider text-text-basic">BRIDGE</span>
+        <BridgeBrand />
       </header>
 
       <section aria-labelledby="citizen-welcome" className="mt-10">
@@ -51,7 +48,7 @@ export default function CitizenPage() {
       </div>
 
       <section aria-label="상담 방식 선택" className="flex flex-col guide-gap-4">
-        <RecentConsultation />
+        <Link href="/citizen/history" className={buttonVariants({ variant: "outline", className: "w-full" })}>상담 내역</Link>
         <Link href="/citizen/voice" className={buttonVariants({ className: "w-full" })}>
           <VoiceIcon className="size-icon-20" />
           음성 상담

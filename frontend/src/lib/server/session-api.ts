@@ -1,6 +1,6 @@
 import { createHash, createHmac } from "node:crypto";
 import { z } from "zod";
-import { createSessionRequestSchema, schemaVersion } from "../contracts";
+import { commandEnvelopeSchema, createSessionRequestSchema, schemaVersion } from "../contracts";
 import { sessionSchema, type Session } from "../schema/session";
 import { canAccessCitizenSession, readBearerToken } from "./auth";
 import { noStoreJson } from "./limits";
@@ -11,8 +11,12 @@ type OpenResult = { status: "created" | "existing"; snapshot: unknown } |
   { status: "limit" | "conflict" };
 
 export function createSessionApi(storage: {
-  open(mode: "voice" | "text", session: Session): Promise<OpenResult>;
+  open(mode: "voice" | "text", session: Session, request: Request): Promise<OpenResult>;
   load(id: string): Promise<unknown>;
+  end(id: string, commandId: string, base: number, hash: string): Promise<
+    { status: "committed" | "replayed"; data: unknown } |
+    { status: "conflict"; revision: number } | { status: "not_found" } | { status: "forbidden" }
+  >;
 }, secret: string, corpusVersion: string) {
   if (Buffer.byteLength(secret) < 32) throw new Error("Session signing secret is not configured.");
 
@@ -42,13 +46,42 @@ export function createSessionApi(storage: {
         handoffId: null, pendingRequestId: null, corpusVersion, outcome: "unknown", outcomeConfirmedAt: null,
       };
       try {
-        const result = await storage.open(parsed.data.inputMode, session);
+        const result = await storage.open(parsed.data.inputMode, session, request);
         if (result.status === "limit") return sessionError(requestId, 429, "session_limit");
         if (result.status !== "created" && result.status !== "existing") return sessionError(requestId, 409, "session_conflict");
         const stored = sessionSchema.parse(result.snapshot);
         if (stored.id !== id || stored.citizenTokenHash !== citizenTokenHash) return sessionError(requestId, 409, "session_conflict");
         return noStoreJson({ schemaVersion, requestId, data: sessionCreated(stored, token) },
           { status: result.status === "created" ? 201 : 200 });
+      } catch {
+        return sessionError(requestId, 503, "storage_unavailable");
+      }
+    },
+    async end(request: Request, id: string) {
+      const { requestId } = createRequestContext("session_end");
+      if (!z.uuid().safeParse(id).success) return sessionError(requestId, 400, "invalid_request");
+      const token = readBearerToken(request.headers);
+      if (!token) return sessionError(requestId, 401, "unauthorized");
+      let input: unknown;
+      try { input = await request.json(); } catch { return sessionError(requestId, 400, "invalid_request"); }
+      const parsed = commandEnvelopeSchema.safeParse(input);
+      if (!parsed.success) return sessionError(requestId, 400, "invalid_request");
+      try {
+        const raw = await storage.load(id);
+        if (raw === null) return sessionError(requestId, 404, "not_found");
+        const session = sessionSchema.parse(raw);
+        if (session.id !== id || !canAccessCitizenSession(request.headers, session.citizenTokenHash)) {
+          return sessionError(requestId, 403, "forbidden");
+        }
+        const result = await storage.end(id, parsed.data.commandId, parsed.data.baseRevision, session.citizenTokenHash);
+        if (result.status === "conflict") {
+          return noStoreJson({ schemaVersion, requestId, currentRevision: result.revision,
+            error: { code: "session_conflict", message: "최신 상담 상태를 확인해 주세요.", retryable: false },
+          }, { status: 409 });
+        }
+        if (result.status === "not_found") return sessionError(requestId, 404, "not_found");
+        if (result.status === "forbidden") return sessionError(requestId, 403, "forbidden");
+        return noStoreJson({ schemaVersion, requestId, data: result.data });
       } catch {
         return sessionError(requestId, 503, "storage_unavailable");
       }

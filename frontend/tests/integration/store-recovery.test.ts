@@ -256,11 +256,13 @@ test("session admission checks retries ahead of the five-session ceiling", async
   try {
     await seed(db);
     await db.exec(await readFile(new URL("20261121025000_open_session.sql", migrationDir), "utf8"));
+    await db.exec(await readFile(new URL("20261121030000_console_handoffs.sql", migrationDir), "utf8"));
+    await db.exec(await readFile(new URL("20261121030500_session_admission_review.sql", migrationDir), "utf8"));
     await db.exec("set role service_role");
-    async function open(id: string, mode = "text") {
+    async function open(id: string, mode = "text", source: string | null = null) {
       const { rows } = await db.query<{ result: { status: string } }>(
-        "select public.bridge_open_session($1, $2, $3, $4) as result",
-        [citizenId, id, mode, { ...initial, id, state: "active" }],
+        "select public.bridge_open_session_limited($1, $2, $3, $4, $5) as result",
+        [citizenId, id, mode, { ...initial, id, state: "active", updatedAt: new Date().toISOString() }, source],
       );
       return rows[0].result.status;
     }
@@ -268,6 +270,30 @@ test("session admission checks retries ahead of the five-session ceiling", async
     assert.equal(await open(uid(106)), "limit");
     assert.equal(await open(uid(101)), "existing");
     assert.equal(await open(uid(101), "voice"), "conflict");
+    await db.exec("reset role");
+    await db.exec(await readFile(new URL("20261121025500_end_session.sql", migrationDir), "utf8"));
+    await db.exec("set role service_role");
+    async function end(hash: string, base = 0) {
+      return (await db.query<{ data: { status: string } }>(
+        "select public.bridge_end_session($1,$2,$3,$4) as data",
+        [uid(101), uid(108), base, hash])).rows[0].data;
+    }
+    assert.equal((await end("wrong-hash")).status, "forbidden");
+    assert.equal(await open(uid(106)), "limit");
+    assert.equal((await end(initial.citizenTokenHash)).status, "committed");
+    assert.equal((await end(initial.citizenTokenHash)).status, "replayed");
+    assert.equal((await end(initial.citizenTokenHash, 1)).status, "conflict");
+    assert.equal(await open(uid(106)), "created");
+    assert.equal(await open(uid(109)), "limit");
+    await db.exec("reset role");
+    await db.exec("update public.bridge_session_snapshots set session_snapshot = session_snapshot || jsonb_build_object('updatedAt', clock_timestamp() - interval '16 minutes')");
+    await db.exec("set role service_role");
+    for (const index of [111, 112, 113]) assert.equal(await open(uid(index), "text", "source-a"), "created");
+    assert.equal(await open(uid(114), "text", "source-a"), "limit");
+    assert.equal(await open(uid(111), "text", "source-a"), "existing");
+    assert.equal(await open(uid(115), "text", "source-b"), "created");
+    assert.equal(await open(uid(116), "text", "source-b"), "created");
+    assert.equal(await open(uid(117), "text", "source-b"), "limit");
     await db.exec("reset role");
     await db.exec("set role anon");
     await assert.rejects(open(uid(107)), { code: "42501" });
@@ -280,6 +306,7 @@ test("approved handoff delivery atomically publishes one protected queue entry",
   try {
     await seed(db);
     await db.exec(await readFile(new URL("20261121030000_console_handoffs.sql", migrationDir), "utf8"));
+    await db.exec(await readFile(new URL("20261121030500_session_admission_review.sql", migrationDir), "utf8"));
     await db.exec(await readFile(new URL("20261121031000_console_actions.sql", migrationDir), "utf8"));
     await db.exec(await readFile(new URL("20261121031500_citizen_correction.sql", migrationDir), "utf8"));
     await db.exec("set role service_role");
@@ -348,6 +375,7 @@ test("approved handoff delivery atomically publishes one protected queue entry",
     assert.equal(await submit(payload.id, 1, initial.citizenTokenHash), "pending_confirmation");
     assert.equal(await submit(payload.id, 1, initial.citizenTokenHash, "다른 내용"), "conflict");
     assert.equal(await stage(uid(210), "정정 내용"), "pending_confirmation");
+    assert.equal(await stage(uid(210), "변경된 내용"), "conflict");
     const pending = (await db.query<{ data: Record<string, unknown> }>(
       "select public.bridge_console_detail($1) as data", [sessionId])).rows[0].data;
     assert.equal(pending.deliveryRevision, 2);
