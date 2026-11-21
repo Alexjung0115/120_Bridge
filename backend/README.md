@@ -4,7 +4,7 @@ Next.js가 상담 상태와 상담사 대기열을 관리한다. FastAPI는 화�
 
 ## 로컬 검증
 
-저장소 루트에서 실행한다. Python 3.12와 uv를 사용한다.
+저장소 루트에서 실행한다. Python 3.13과 uv를 사용한다.
 
 ```powershell
 python -B scripts/prepare_rag.py
