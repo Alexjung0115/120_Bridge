@@ -6,9 +6,9 @@ Next.js의 `POST /api/answer`가 FastAPI의 `POST /answer`로 요청을 전달�
 
 | 위치 | 임시 필드와 동작 |
 | --- | --- |
-| Next.js → FastAPI | 기존 `text`, `district`, `businessDate`, `corpusVersion`에 `context.recentTurns`, `context.knownFields`를 더한다. 서버에서 `AI_INTERNAL_TOKEN`을 Bearer 토큰으로 전달한다. |
-| FastAPI → Next.js | `outcome`과 `answerUnits`를 반환한다. `candidate`에는 AI2의 분류·추가 질문·개인 조회 필요 여부를 담는다. 인용 링크와 기준일은 가상 근거 자료에서 가져온다. |
-| 근거 없음 | `200 no_evidence`, 빈 `answerUnits`, `needsPersonalLookup: true`를 반환하는 예시를 검증한다. 상담사 버튼과 Supabase 저장은 #6에서 연결한다. |
+| Next.js → FastAPI | AI3 #4 합의에 따라 `text`, `recentTurns`, `knownFields`를 보낸다. 서버에서 `AI_INTERNAL_TOKEN`을 Bearer 토큰으로 전달한다. |
+| FastAPI → Next.js | `DialogueCandidate`의 의도·추가 질문·답변 단위·요약·창구 근거 후보를 반환한다. 임시 앱에서만 `temporary: true`를 더한다. |
+| 근거 없음 | 빈 `answerUnits`, `needsPersonalLookup: true`를 반환하는 예시를 검증한다. 상담사 버튼과 Supabase 저장은 #6에서 연결한다. |
 | 요청 거절 | 예시 목록에 없는 요청은 `422 temporary_fixture_only`, 인증 헤더 없이 FastAPI에 직접 보낸 요청은 `401 unauthorized`를 반환한다. |
 
 ## PowerShell에서 실행

@@ -20,19 +20,18 @@ for (const scenario of cases) {
   const result = await response.json()
   assert.equal(response.status, 200, JSON.stringify(result))
   assert.equal(result.temporary, true)
-  assert.equal(result.outcome, scenario.expectedOutcome)
-  assert.equal(result.answerUnits.length, result.candidate.answerUnits.length)
+  assert.equal(result.answerUnits.length > 0 ? "answer" : "no_evidence", scenario.expectedOutcome)
 
   if (scenario.expectedOutcome === "answer") {
-    const { excerpt, sourceUrl, basisDate } = scenario.evidence[0]
+    const { excerpt } = scenario.evidence[0]
     const { chunkId, claimKey, quote } = excerpt
     assert.ok(result.answerUnits.length > 0)
     for (const unit of result.answerUnits) {
-      assert.deepEqual(unit.citations, [{ chunkId, claimKey, quote, sourceUrl, basisDate }])
+      assert.deepEqual(unit.citations, [{ chunkId, claimKey, quote }])
     }
   } else {
     assert.deepEqual(result.answerUnits, [])
-    assert.equal(result.candidate.issues[0].needsPersonalLookup, true)
+    assert.equal(result.issues[0].needsPersonalLookup, true)
   }
   console.log(`200 ${scenario.name}`)
 }

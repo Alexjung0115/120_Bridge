@@ -5,23 +5,18 @@
       "name": "grounded",
       "request": {
         "text": "가상의 대형폐기물 안내에서 마포구 냉장고는 어디에 신청해요?",
-        "district": "마포구",
-        "businessDate": "2026-11-21",
-        "corpusVersion": "temporary-ai2-v1",
-        "context": {
-          "recentTurns": [
+        "recentTurns": [
             {
               "role": "citizen",
               "text": "냉장고는 마포구에 있어요."
             }
-          ],
-          "knownFields": [
+        ],
+        "knownFields": [
             {
               "fieldKey": "disposal.district",
               "value": "마포구"
             }
-          ]
-        }
+        ]
       },
       "expectedOutcome": "answer",
       "evidence": [
@@ -78,13 +73,8 @@
       "name": "no-evidence",
       "request": {
         "text": "가상의 복지 지원에 제가 선정됐는지 확인해 주세요.",
-        "district": "마포구",
-        "businessDate": "2026-11-21",
-        "corpusVersion": "temporary-ai2-v1",
-        "context": {
-          "recentTurns": [],
-          "knownFields": []
-        }
+        "recentTurns": [],
+        "knownFields": []
       },
       "expectedOutcome": "no_evidence",
       "evidence": [],
