@@ -1,0 +1,2 @@
+data/sources/seoul-welfare-OA-23014-*.json -text
+data/normalized/seoul-welfare.jsonl text eol=lf
