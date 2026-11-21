@@ -1,0 +1,85 @@
+{
+  "_comment": "TEMPORARY T040 fixture. Synthetic routing sources only. Replace with T039/T014 verified routing chunks before live integration.",
+  "sources": [
+    {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "name": "120다산콜",
+      "purpose": "일반 상담 안내",
+      "reason": "수도 문의의 일반 상담 창구",
+      "supportedPurposes": ["residence"],
+      "generalFallback": true,
+      "verified": true,
+      "routingEligible": true,
+      "evidence": [
+        {
+          "chunkId": "temporary/120",
+          "claimKey": "temporary.120",
+          "quote": "가상 120 상담 창구 안내",
+          "sourceUrl": "https://example.invalid/temporary-routing",
+          "basisDate": null,
+          "basisDateType": "unknown"
+        }
+      ]
+    },
+    {
+      "id": "22222222-2222-4222-8222-222222222222",
+      "name": "티머니",
+      "purpose": "교통카드 이용 문의",
+      "reason": "가상 교통카드 이용 근거",
+      "supportedPurposes": ["residence"],
+      "generalFallback": false,
+      "verified": true,
+      "routingEligible": true,
+      "evidence": [
+        {
+          "chunkId": "temporary/tmoney",
+          "claimKey": "temporary.tmoney",
+          "quote": "가상 티머니 상담 창구 안내",
+          "sourceUrl": "https://example.invalid/temporary-routing",
+          "basisDate": null,
+          "basisDateType": "unknown"
+        }
+      ]
+    },
+    {
+      "id": "33333333-3333-4333-8333-333333333333",
+      "name": "서울시 교통정책과",
+      "purpose": "교통 정책 문의",
+      "reason": "가상 정책 근거",
+      "supportedPurposes": ["residence"],
+      "generalFallback": false,
+      "verified": true,
+      "routingEligible": true,
+      "evidence": [
+        {
+          "chunkId": "temporary/policy",
+          "claimKey": "temporary.policy",
+          "quote": "가상 정책 담당 창구 안내",
+          "sourceUrl": "https://example.invalid/temporary-routing",
+          "basisDate": null,
+          "basisDateType": "unknown"
+        }
+      ]
+    },
+    {
+      "id": "44444444-4444-4444-8444-444444444444",
+      "name": "가상 수도과",
+      "purpose": "수도 문의",
+      "reason": "미검증 이름",
+      "supportedPurposes": ["residence"],
+      "generalFallback": false,
+      "verified": false,
+      "routingEligible": true,
+      "evidence": [
+        {
+          "chunkId": "temporary/water",
+          "claimKey": "temporary.water",
+          "quote": "미검증 수도과 안내",
+          "sourceUrl": "https://example.invalid/temporary-routing",
+          "basisDate": null,
+          "basisDateType": "unknown"
+        }
+      ]
+    }
+  ]
+}
