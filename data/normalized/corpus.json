@@ -1,6 +1,6 @@
 {
-  "corpusVersion": "corpus-a6452f316f1f",
-  "corpusHash": "a6452f316f1fbcb34f9c77e6064f9eab0f64a9da7037c11e07b1ea2c8d50de87",
+  "corpusVersion": "corpus-2c4dec36a103",
+  "corpusHash": "2c4dec36a103dfe8aac625b91b28513a5a93847d7001a0f02471b2d3c70279b7",
   "schemaVersion": 1,
   "documents": [
     {
@@ -2536,6 +2536,34 @@
         "policy-change/case1-after-climate-card-plus.md/section-2",
         "policy-change/case1-after-climate-pass-qa.md/section-5"
       ]
+    },
+    {
+      "id": "case2-village-bus-ride-time",
+      "predecessorDocId": "policy-change/case2-before-village-bus-regulation.md",
+      "successorDocId": "policy-change/case2-after-2026-h2-changes.md",
+      "claimKey": "policy.village-bus.max-ride-time",
+      "before": "탑승 후 기본요금으로 이용 가능한 최대 시간 1시간",
+      "after": "최대 이용 가능 시간 2시간",
+      "validFrom": "2026-07-01",
+      "validUntil": null,
+      "evidenceChunkIds": [
+        "policy-change/case2-before-village-bus-regulation.md/section-2",
+        "policy-change/case2-after-2026-h2-changes.md/section-2"
+      ]
+    },
+    {
+      "id": "case3-dadungi-householder",
+      "predecessorDocId": "policy-change/case3-before-dadungi-card.md",
+      "successorDocId": "policy-change/case3-after-2026-h2-changes.md",
+      "claimKey": "policy.dadungi-card.app-card.householder-requirement",
+      "before": "부모가 세대주인 경우에만 발급 가능",
+      "after": "부모가 세대주가 아니더라도 자녀와 같은 세대이면 발급 가능",
+      "validFrom": "2026-10-01",
+      "validUntil": null,
+      "evidenceChunkIds": [
+        "policy-change/case3-before-dadungi-card.md/section-3",
+        "policy-change/case3-after-2026-h2-changes.md/section-2"
+      ]
     }
   ],
   "sourceGroups": [
@@ -2585,7 +2613,7 @@
     "index": "7b7ea3f6ba7b3d477626c2aca2cf8b92389ebb74278362abf589c9588941958e",
     "claims": "2f7dd0eb0097a85909c631949057b010c7ba1507cdc1ab340b11239b6718c760",
     "evidenceLog": "a9e65c093c8ba9cc3c81d409f6a5cbad90617ad769e41ebd5a5dad9721cb2534",
-    "replacements": "f4fc3f8dbb522c782aace3c8f565b42dfcc5aabd09295b9e51ea270232fc8826",
+    "replacements": "b3061f01f9d36d135e27b328f311e98e8b7f1b42ea57828368609b112174d432",
     "audit": "8abb68e48aa083e288913828c26f622e83bf440df1be6243d978e8429ba06ab2",
     "manifest": "0a35fbf816d989a4f677f6c783972436b774dae578fc3ac98e7bdd1086d14f54",
     "welfare": "d04f26f21b9d0670e3711e2a0a3b0268b220a8eb6a5f96ae6d6daacda205ff97"
