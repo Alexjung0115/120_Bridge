@@ -1,6 +1,7 @@
 import { readStorage, writeStorage } from "./storage";
-import type { Channel } from "./handoff";
 import { isConsultationMessage, type ConsultationMessage } from "./messages";
+
+type Channel = "voice" | "text";
 
 export type HistoryStatus = "unresolved" | "ai-resolved" | "resolved";
 export type HistoryEntry = {

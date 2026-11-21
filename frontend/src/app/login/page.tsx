@@ -1,12 +1,11 @@
-import { LoginForm } from "./login-form";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
-async function LoginContent({ searchParams }: { searchParams: Promise<{ role?: string; error?: string }> }) {
-  const params = await searchParams;
-  const role = params.role === "counselor" ? "counselor" : "citizen";
-  return <LoginForm role={role} initialError={!!params.error} />;
+async function LoginRedirect({ searchParams }: { searchParams: Promise<{ role?: string }> }) {
+  const { role } = await searchParams;
+  return redirect(role === "counselor" ? "/counselor" : "/citizen");
 }
 
-export default function LoginPage(props: { searchParams: Promise<{ role?: string; error?: string }> }) {
-  return <Suspense fallback={<p>로그인 화면을 불러오고 있습니다.</p>}><LoginContent {...props} /></Suspense>;
+export default function LoginPage(props: { searchParams: Promise<{ role?: string }> }) {
+  return <Suspense fallback={<p>화면을 불러오는 중입니다.</p>}><LoginRedirect {...props} /></Suspense>;
 }

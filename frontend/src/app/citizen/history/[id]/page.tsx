@@ -5,7 +5,6 @@ import { Suspense, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { HandoffLink } from "../../_components/handoff-entry";
 import { historyDateFormat, parseHistory, readHistorySnapshot, saveHistoryEntry, statusLabel, subscribeHistory } from "../../_lib/history";
 import { speakerLabel } from "../../_lib/messages";
 
@@ -57,9 +56,7 @@ function HistoryDetail() {
       </section>
       {entry.status === "unresolved" && (
         <div className="flex flex-col gap-3">
-          <HandoffLink channel={entry.channel} summary={entry.summary} historyId={entry.id} className={buttonVariants()}>
-            상담사에게 연결
-          </HandoffLink>
+          <Link href="/citizen/text" className={buttonVariants()}>새 텍스트 상담 시작</Link>
           <Button type="button" variant="outline" onClick={() => setError(!saveHistoryEntry({ ...entry, status: "resolved" }))}>
             해결로 표시
           </Button>
