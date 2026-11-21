@@ -18,7 +18,7 @@ uv run --with-requirements requirements.txt python -B -m unittest discover -s te
 ## Next.js에 전달할 답변 계약
 
 - `GET /health`는 HTTP 200과 `{"ok":true}`를 반환한다. Vercel 경로는 `/api/ai/health`다.
-- Next.js 서버의 `POST /answer`는 `Authorization: Bearer <AI_INTERNAL_TOKEN>`을 요구한다. 요청 JSON은 `text`, `businessDate`(YYYY-MM-DD), `corpusVersion`, 선택 필드 `district`다.
+- Next.js 서버의 `POST /answer`는 `Authorization: Bearer <AI_INTERNAL_TOKEN>`을 요구한다. 요청 JSON은 `text`, `businessDate`(YYYY-MM-DD), `corpusVersion`, 선택 필드 `district`다. `district`는 현재 문의에 적용되는 구다. 배출지나 신고 발생지를 거주지로 덮어쓰지 않는다.
 
 | 응답 | Next.js의 처리 |
 | --- | --- |
