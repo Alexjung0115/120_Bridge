@@ -251,3 +251,27 @@ test("store distinguishes missing, stale and exhausted revisions", async () => {
   assert.deepEqual(await store.execute(sessionId, { ...command, baseRevision: Number.MAX_SAFE_INTEGER }, apply),
     { status: "conflict", revision: Number.MAX_SAFE_INTEGER });
 });
+test("session admission checks retries ahead of the five-session ceiling", async () => {
+  const db = await PGlite.create();
+  try {
+    await seed(db);
+    await db.exec(await readFile(new URL("20261121025000_open_session.sql", migrationDir), "utf8"));
+    await db.exec("set role service_role");
+    async function open(id: string, mode = "text") {
+      const { rows } = await db.query<{ result: { status: string } }>(
+        "select public.bridge_open_session($1, $2, $3, $4) as result",
+        [citizenId, id, mode, { ...initial, id, state: "active" }],
+      );
+      return rows[0].result.status;
+    }
+    for (const index of [101, 102, 103, 104, 105]) assert.equal(await open(uid(index)), "created");
+    assert.equal(await open(uid(106)), "limit");
+    assert.equal(await open(uid(101)), "existing");
+    assert.equal(await open(uid(101), "voice"), "conflict");
+    await db.exec("reset role");
+    await db.exec("set role anon");
+    await assert.rejects(open(uid(107)), { code: "42501" });
+  } finally {
+    await db.close();
+  }
+});
