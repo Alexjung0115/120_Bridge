@@ -25,8 +25,10 @@ await db.exec("set role service_role");
 
 const routes = {
   bridge_open_session: ["p_owner", "p_session", "p_mode", "p_snapshot"],
+  bridge_load_citizen_summary: ["p_session", "p_revision"],
   bridge_load_session: ["p_session"],
   bridge_end_session: ["p_session", "p_command", "p_base", "p_token_hash"],
+  bridge_citizen_summary_command: ["p_session", "p_command", "p_base", "p_hash", "p_summary_revision"],
   bridge_mvp_citizen_command: ["p_session", "p_command", "p_base", "p_hash", "p_kind", "p_text"],
   bridge_console_queue: ["p_after"],
   bridge_console_detail: ["p_session"],

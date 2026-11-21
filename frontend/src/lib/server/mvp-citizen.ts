@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { commandEnvelopeSchema, schemaVersion, turnRequestSchema } from "../contracts";
+import { requestHandoffSchema } from "../schema/citizen-handoff";
 import { decideHandoff } from "../policy/handoff";
 import { sessionSchema } from "../schema/session";
 import { createSupabaseRpc } from "../store/snapshot";
@@ -10,16 +11,19 @@ import { sessionError } from "./session-api";
 
 const directHandoff = commandEnvelopeSchema.extend({ trigger: z.literal("button"), skipConfirmation: z.literal(true) });
 
-export async function mvpCitizenCommand(request: Request, id: string, kind: "turn" | "direct_handoff") {
+const confirmSummary = commandEnvelopeSchema.extend({ action: z.literal("confirm"), summaryRevision: z.int().nonnegative() });
+
+export async function mvpCitizenCommand(request: Request, id: string, kind: "turn" | "direct_handoff" | "confirm_summary") {
   const { requestId } = createRequestContext(kind === "turn" ? "session_turn" : "handoff");
   if (!readBearerToken(request.headers)) return sessionError(requestId, 401, "unauthorized");
   if (!z.uuid().safeParse(id).success) return sessionError(requestId, 400, "invalid_request");
   const input = await request.json().catch(() => null);
   const parsed = (kind === "turn"
     ? turnRequestSchema.extend({ inputMode: z.literal("text") })
-    : directHandoff).safeParse(input);
+    : kind === "confirm_summary" ? confirmSummary : z.union([directHandoff, requestHandoffSchema])).safeParse(input);
   if (!parsed.success) return sessionError(requestId, 400, "invalid_request");
-  if (kind === "direct_handoff") {
+  const skips = "skipConfirmation" in parsed.data && parsed.data.skipConfirmation === true;
+  if (kind === "direct_handoff" && skips) {
     const decision = decideHandoff({
       explicitHumanRequest: true,
       skipConfirmation: "skipConfirmation" in parsed.data && parsed.data.skipConfirmation,
@@ -39,7 +43,13 @@ export async function mvpCitizenCommand(request: Request, id: string, kind: "tur
       return sessionError(requestId, 403, "forbidden");
     }
     const { commandId, baseRevision } = parsed.data;
-    const result = await rpc<{ status: string; data?: unknown; revision?: number }>("bridge_mvp_citizen_command", {
+    type Receipt = { status: string; data?: unknown; revision?: number };
+    const result = kind === "confirm_summary" || (kind === "direct_handoff" && !skips)
+      ? await rpc<Receipt>("bridge_citizen_summary_command", {
+        p_session: id, p_command: commandId, p_base: baseRevision, p_hash: session.citizenTokenHash,
+        p_summary_revision: "summaryRevision" in parsed.data ? parsed.data.summaryRevision : null,
+      })
+      : await rpc<Receipt>("bridge_mvp_citizen_command", {
       p_session: id, p_command: commandId, p_base: baseRevision, p_hash: session.citizenTokenHash,
       p_kind: kind, p_text: "text" in parsed.data ? parsed.data.text : null,
     });
