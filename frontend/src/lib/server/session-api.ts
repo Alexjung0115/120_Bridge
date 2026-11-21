@@ -11,7 +11,7 @@ type OpenResult = { status: "created" | "existing"; snapshot: unknown } |
   { status: "limit" | "conflict" };
 
 export function createSessionApi(storage: {
-  open(mode: "voice" | "text", session: Session): Promise<OpenResult>;
+  open(mode: "voice" | "text", session: Session, request: Request): Promise<OpenResult>;
   load(id: string): Promise<unknown>;
   end(id: string, commandId: string, base: number, hash: string): Promise<
     { status: "committed" | "replayed"; data: unknown } |
@@ -46,7 +46,7 @@ export function createSessionApi(storage: {
         handoffId: null, pendingRequestId: null, corpusVersion, outcome: "unknown", outcomeConfirmedAt: null,
       };
       try {
-        const result = await storage.open(parsed.data.inputMode, session);
+        const result = await storage.open(parsed.data.inputMode, session, request);
         if (result.status === "limit") return sessionError(requestId, 429, "session_limit");
         if (result.status !== "created" && result.status !== "existing") return sessionError(requestId, 409, "session_conflict");
         const stored = sessionSchema.parse(result.snapshot);

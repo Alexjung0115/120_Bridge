@@ -1,3 +1,5 @@
+import { createHmac } from "node:crypto";
+import { isIP } from "node:net";
 import { createSupabaseRpc } from "../store/snapshot";
 import { createSessionApi } from "./session-api";
 
@@ -11,9 +13,18 @@ export function configuredSessionApi() {
   const rpc = createSupabaseRpc(SUPABASE_URL, key);
 
   return createSessionApi({
-    open: (mode, session) => rpc("bridge_open_session", {
-      p_owner: BRIDGE_DEMO_OWNER_ID, p_mode: mode, p_session: session.id, p_snapshot: session,
-    }),
+    open: (mode, session, request) => {
+      const ip = process.env.VERCEL === "1" ? request.headers.get("x-vercel-forwarded-for") : null;
+      if (process.env.VERCEL === "1" && (!ip || !isIP(ip))) {
+        throw new Error("Client address is unavailable.");
+      }
+      const source = ip && createHmac("sha256", BRIDGE_SESSION_SIGNING_SECRET)
+        .update("admission-source:" + ip).digest("hex");
+      return rpc("bridge_open_session_limited", {
+        p_owner: BRIDGE_DEMO_OWNER_ID, p_mode: mode, p_session: session.id,
+        p_snapshot: session, p_source: source,
+      });
+    },
     load: (id) => rpc("bridge_load_session", { p_session: id }),
     end: (id, command, base, hash) => rpc("bridge_end_session", {
       p_session: id, p_command: command, p_base: base, p_token_hash: hash,
