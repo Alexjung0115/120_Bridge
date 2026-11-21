@@ -69,7 +69,7 @@
 
 ### Implementation
 
-- [ ] T012 [P] [US1] AI1·40분·선행 T011: data/source-manifest.json의 핵심 6건 공식 원문을 대조하고 rag-data/ 해당 정리본, data/evidence-log.jsonl, data/sources/에 발췌·hash·확인 범위·미확인을 보존한다. data-collection.md의 5분 차단 기록·금액/표/기한/연락처 규칙을 적용하고 기존 확인 기록을 이번 검증으로 위장하지 않는다.
+- [x] T012 [P] [US1] AI1·40분·선행 T011: data/source-manifest.json의 핵심 6건 공식 원문을 대조하고 rag-data/ 해당 정리본, data/evidence-log.jsonl, data/sources/에 발췌·hash·확인 범위·미확인을 보존한다. data-collection.md의 5분 차단 기록·금액/표/기한/연락처 규칙을 적용하고 기존 확인 기록을 이번 검증으로 위장하지 않는다. 【AI2 교차 검토 완료】29개 claim 전수 대조·대체 관계 5건·충돌 2건 격리 확인 및 AI2 검토 승인 완료.
 - [ ] T013 [US1] AI1·15분·선행 T009,T012: frontend/scripts/validate-data.ts와 frontend/scripts/build-corpus.ts에서 front matter/index 교차 검사·기관/관할 정규화·표 청크·검증 claim별 자격·중복 URL 통합·버전/hash 색인을 data/normalized/corpus.json과 data/validation-report.json으로 생성한다. 시행일과 게시/수정일을 혼용하지 않는다.
 - [ ] T014 [US1] AI1·20분·선행 T011,T013: frontend/src/lib/retrieval/search.ts와 frontend/src/lib/retrieval/validate-evidence.ts에 관할/유효성/검증 필터·한글 n-gram 랭킹·상위 청크·숫자/대상/인용 검증을 구현한다. data/retrieval-calibration.json에 개발 표본 결과와 고정 임계값을 기록하고 대본 ID 라우팅을 금지한다.
 - [x] T015 [P] [US1] AI2·20분·선행 T005,T008: frontend/src/lib/dialogue/interpret.ts와 frontend/src/lib/dialogue/answer.ts에 자유 표현·문맥·known/missing 정보 추출, 근거 단위별 짧은 응답·출처 후보·근거 없음 응답을 구현한다. frontend/tests/unit/interpret-answer.test.ts에서 품목/표현/순서 변경과 개인 조회 불가를 검증한다. 검색은 T014의 인터페이스 fixture로 독립 시험 후 통합한다.

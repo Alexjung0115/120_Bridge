@@ -16,7 +16,10 @@
     "note": "원문 표 7–10번 행: 업소용 1000ℓ이상 25,000 / 500ℓ이상 11,000 / 300ℓ이상 8,000 / 300ℓ미만 6,000. 업소용 행은 정리본 표에 없고 section-8에만 있다. 용량 미확인 시 금액 확정 금지.",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   },
   {
     "claimKey": "waste.mapo.appliance.free-pickup",
@@ -34,7 +37,10 @@
     "basisDateType": "updatedAt",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   },
   {
     "claimKey": "waste.mapo.appliance.damaged",
@@ -52,7 +58,10 @@
     "basisDateType": "updatedAt",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   },
   {
     "claimKey": "waste.mapo.bulky.report-procedure",
@@ -70,7 +79,10 @@
     "basisDateType": "updatedAt",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   },
   {
     "claimKey": "waste.mapo.bulky.cancel-window",
@@ -88,7 +100,10 @@
     "basisDateType": "updatedAt",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   },
   {
     "claimKey": "waste.mapo.sofa.fee",
@@ -106,7 +121,10 @@
     "basisDateType": "updatedAt",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   },
   {
     "claimKey": "routing.mapo.bulky-waste.contact",
@@ -124,7 +142,10 @@
     "basisDateType": "updatedAt",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   },
   {
     "claimKey": "contact.mapo.collector.pyeonghwa",
@@ -143,7 +164,10 @@
     "note": "스마트클린 마포 화면 표기 02-3142-6412와 다르다. 업체 목록은 스크립트로 그려져 정적 HTML로 재확인하지 못했다.",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   },
   {
     "claimKey": "waste.mapo.smartclean.label",
@@ -161,7 +185,10 @@
     "basisDateType": "unknown",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   },
   {
     "claimKey": "waste.mapo.smartclean.procedure",
@@ -179,7 +206,10 @@
     "basisDateType": "unknown",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   },
   {
     "claimKey": "routing.120.general-scope",
@@ -198,7 +228,10 @@
     "basisDateType": "unknown",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   },
   {
     "claimKey": "routing.120.water-menu",
@@ -218,7 +251,10 @@
     "note": "수도 요금 개인 조회의 일반 창구 근거. 개별 청구 내역 답변 근거가 아니며 이관 유지.",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   },
   {
     "claimKey": "contact.120.phone-numbers",
@@ -237,7 +273,10 @@
     "basisDateType": "unknown",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   },
   {
     "claimKey": "contact.120.hours",
@@ -256,7 +295,10 @@
     "basisDateType": "unknown",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-card.payback.eligibility",
@@ -273,7 +315,10 @@
     "basisDateType": "publishedAt",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-card.payback.application-period",
@@ -290,7 +335,10 @@
     "basisDateType": "publishedAt",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-card.payback.deposit-period",
@@ -307,7 +355,10 @@
     "basisDateType": "publishedAt",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-card.payback.fee-table",
@@ -325,7 +376,10 @@
     "note": "원문 표 머리글 7칸에 값 6칸. 저소득·두자녀·세자녀 배치 불명. 금액 청크 제외.",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-card.prepaid-30day.end",
@@ -342,7 +396,10 @@
     "basisDateType": "publishedAt",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-card.postpaid.end",
@@ -359,7 +416,10 @@
     "basisDateType": "publishedAt",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-card.payback.deposit-period",
@@ -376,7 +436,10 @@
     "basisDateType": "publishedAt",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-card.prepaid-30day.end",
@@ -393,7 +456,10 @@
     "basisDateType": "publishedAt",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-card.postpaid.end",
@@ -410,7 +476,10 @@
     "basisDateType": "publishedAt",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-card.payback.application-period",
@@ -427,7 +496,10 @@
     "basisDateType": "publishedAt",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-card.payback.deposit-period",
@@ -444,7 +516,10 @@
     "basisDateType": "publishedAt",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-card.payback.channel",
@@ -461,7 +536,10 @@
     "basisDateType": "publishedAt",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-card.short-term-pass",
@@ -478,7 +556,10 @@
     "basisDateType": "publishedAt",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-pass.prepaid-registration",
@@ -495,7 +576,10 @@
     "basisDateType": "publishedAt",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   },
   {
     "claimKey": "policy.climate-pass.youth-age",
@@ -512,6 +596,9 @@
     "basisDateType": "publishedAt",
     "reviewStatus": "approved",
     "approvedBy": "AI1",
-    "approvedAt": "2026-11-21"
+    "approvedAt": "2026-11-21",
+    "ai2ReviewStatus": "approved",
+    "ai2ApprovedBy": "AI2",
+    "ai2ApprovedAt": "2026-11-21"
   }
 ]
