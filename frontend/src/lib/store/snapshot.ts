@@ -20,10 +20,10 @@ export type SessionPersistence = {
   ): Promise<SavedCommand>;
 };
 
-export function createSupabaseSessionPersistence(
+export function createSupabaseRpc(
   serviceUrl: string,
   serviceRoleKey: string,
-): SessionPersistence {
+) {
   const rpcUrl = new URL("/rest/v1/rpc/", serviceUrl);
   const headers = new Headers({ apikey: serviceRoleKey, "Content-Type": "application/json" });
   // New Supabase secret keys are not JWTs. The gateway authenticates them via apikey.
@@ -46,6 +46,11 @@ export function createSupabaseSessionPersistence(
     return await response.json() as Result;
   }
 
+  return rpc;
+}
+
+export function createSupabaseSessionPersistence(serviceUrl: string, serviceRoleKey: string): SessionPersistence {
+  const rpc = createSupabaseRpc(serviceUrl, serviceRoleKey);
   return {
     load: (sessionId) => rpc("bridge_load_session", { p_session: sessionId }),
     initialize: (sessionId, snapshot) =>
