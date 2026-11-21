@@ -1,11 +1,28 @@
 # Tasks: 120 브릿지 — 자유 문의 상담과 맥락 이관
 
 **Input**: [plan.md](plan.md), [spec.md](spec.md), [data-model.md](data-model.md), [contracts/service.md](contracts/service.md), [research.md](research.md), [data-collection.md](data-collection.md), [quickstart.md](quickstart.md), [feedback-response.md](feedback-response.md).
-**범위**: 최초 6시간 예산에서 사용자 최신 알림 기준 남은 4시간 50분(290분)·프런트 1명·AI 3명. 이후 경과시간은 이 갱신 시점 기준으로 읽는다. 모든 체크박스는 미완료이며 이 문서는 구현 실행을 뜻하지 않는다.
+**범위**: 최초 6시간 예산에서 사용자 최신 알림 기준 남은 4시간 50분(290분)·프런트 1명·AI 3명. 이후 경과시간은 이 갱신 시점 기준으로 읽는다. 체크박스는 태스크 전체의 완료 여부다. 먼저 진행된 프런트 개발환경·스타일 기반은 아래 코드 확인표에 완료 부분으로 반영하며, 태스크 일부가 끝나도 남은 조건이 있으면 전체 체크는 하지 않는다.
 **Tests**: spec.md의 SC 수용 기준과 plan.md가 테스트를 요구하므로 시험 작업을 포함한다. 계약/정책 테스트를 구현 전에 작성하고 실패를 확인하되 테스트 파일 작성과 통과를 구별한다.
 **Organization**: Setup → Foundational → P1 US1·US2·US4·US5 → P2 US3 → 통합 검증. US 번호는 spec.md를 유지한다.
 
 **추가 명확화 반영**: FR-038/SC-024에 따라 T024·T028은 queued 동안 대기를 표시하고 T033의 claim 성공 시 ‘상담사 연결 완료’ 최종 화면으로 전환한다. 이후 상담 입력·상태 polling·TTS는 종료하고 complete_case/transfer_demo 결과는 시민에게 표시하지 않는다. T032·T033의 콘솔 처리·개선·지표는 계속 유지하며 T045·T048에서 수신/수락 구분·최종 화면 유지·시연 표기를 검증한다. 향후 문자 상담은 기존 sessionId/handoffId를 참조하는 별도 메시지 모듈로 확장하되 이번 task에 메시지 송수신·채팅 화면을 추가하지 않는다. 기존 51개 ID는 유지하고 시간은 사용자 요청에 따라 아래 단축 목표로 재산정한다.
+
+## 프런트 선행 진행 현황 — 코드 확인 기준
+
+프런트 담당자가 먼저 진행한 작업을 현재 진행분으로 기록한다. 별도의 재사용·리팩터링·재구축 작업을 새로 요구하지 않는다. 구현 코드는 이 점검에서 변경하지 않았다.
+
+| 먼저 진행된 항목 | 확인 근거 | 관련 태스크 / 남은 부분 |
+| --- | --- | --- |
+| Next.js 프로젝트 초기화·기본 페이지/레이아웃·lockfile | frontend/package.json, frontend/package-lock.json, frontend/src/app/page.tsx, frontend/src/app/layout.tsx | T001 부분 완료. 프로젝트 생성은 완료, 실행/검증 명령·환경변수·서비스 설정은 남음 |
+| Next.js 16.4.6·React 19.3.0·TypeScript·Tailwind·ESLint 설정 | frontend/package.json, frontend/tsconfig.json, frontend/eslint.config.mjs | T001 부분 완료. 현재 버전을 설치 전 상태로 오해하거나 다시 초기화하지 않음 |
+| 디자인/색상 토큰·전역 스타일·focus-visible·아이콘 파일 | frontend/src/app/design-tokens.css, frontend/src/app/color-tokens.css, frontend/src/app/globals.css, frontend/assets/icon/ | T004 부분 완료. 토큰/아이콘 준비는 완료, 두 서비스 화면·카드·모의 표기·연결 위치는 남음 |
+| TanStack Query 의존성 등록 | frontend/package.json | 라이브 API 연동 완료가 아님. Provider·조회/변경·polling은 T017·T028·T032·T045 진행 시 확인 |
+| AI 요청 프록시 설정 | frontend/next.config.ts의 /api/ai/:path* → Cloud Run rewrite | 설정 작성은 완료. T010·T047·T048에서 실제 경로·요청/응답·인증·상태 소유와 배포를 검증 |
+| 시민/상담사 서비스 화면·음성·서버 상태·시험 | 시민 page.tsx는 Next 기본 예제이며 console 페이지·components·api·tests 폴더는 현재 없음 | T017·T024·T026–T029·T032·T041·T045 등은 미완료 |
+
+확인 한계: 로컬 frontend/node_modules가 없어서 lint/build/브라우저 실행은 이번 문서 갱신에서 검증하지 않았다. 원격 Cloud Run 서비스의 소스와 실행 결과도 확인하지 않았다. frontend/DESIGN-SYSTEM.md에는 krds-react 설치 설명이 있지만 현재 package.json/lockfile에는 해당 의존성이 없어 설치 완료로 집계하지 않는다. 코드 확인과 실제 동작 검증을 구분한다.
+
+경로 반영: 이 저장소의 Next 앱 위치는 frontend/다. 아래 앱·시험·스크립트 경로는 실제 프로젝트 위치를 따라 frontend/src/, frontend/tests/, frontend/scripts/로 표기한다. 문서·근거 자료·검증 결과(data/)는 저장소 루트 기준이다. 이는 폴더 위치 정정이며 서버 배포 구성을 새로 결정했다는 뜻이 아니다.
 
 ## Format: `[ID] [P?] [Story] Description`
 
@@ -21,10 +38,10 @@
 
 **Goal**: 앱 골격·실모델·제출 환경 가능성·자료 목록을 확인한다. `.specify/memory/constitution.md` v1.0.0과 사용자 확정 명세를 기준으로 삼는다.
 
-- [ ] T001 AI3·10분·선행 없음: Next.js/TypeScript 단일 앱과 npm 스크립트·lockfile을 생성하고 .env.example·.gitignore·package.json에 계획의 실행/검증 명령과 비밀값·상담 스냅샷 제외를 설정한다. FE 소유 화면은 이후 넘기고 src/app/layout.tsx·src/app/page.tsx·src/app/console/page.tsx는 최소 골격만 생성한다. .env.example에 CONSOLE_AGENT_ID=demo-agent-1과 현존 모의/실행 변수만 기록한다.
-- [ ] T002 [P] AI2·10분·선행 T001: scripts/preflight-model.ts에서 실제 사용 가능한 모델 ID의 한국어·structured output·지연·형식 오류 시험을 수행하고 docs/runtime-preflight.md에 모델/버전/성공 여부만 기록한다. 키 원문은 기록하지 않는다. 실패 시 fixture와 실제 AI 완료를 분리해 보고한다.
+- [ ] T001 AI3·10분·선행 없음: 【부분 완료】frontend/package.json·frontend/package-lock.json·frontend/tsconfig.json과 기본 frontend/src/app/page.tsx·frontend/src/app/layout.tsx의 초기 생성은 프런트 선행 작업으로 완료되었다. 남은 범위는 frontend/package.json의 계획된 테스트/자료 검증 명령·필요 의존성 확인과 frontend/.env.example·.gitignore의 비밀값 제외, 저장소 루트 .gitignore의 data/snapshots 제외다. 현재 앱 버전을 기준으로 진행하고 프로젝트 초기화·기본 파일 생성을 다시 작업으로 잡지 않는다. frontend/.env.example에 CONSOLE_AGENT_ID=demo-agent-1 등 서버 설정 이름만 기록한다. 한국어 메타데이터와 lang 설정은 T004에서 담당한다.
+- [ ] T002 [P] AI2·10분·선행 T001: frontend/scripts/preflight-model.ts에서 실제 사용 가능한 모델 ID의 한국어·structured output·지연·형식 오류 시험을 수행하고 docs/runtime-preflight.md에 모델/버전/성공 여부만 기록한다. 키 원문은 기록하지 않는다. 실패 시 fixture와 실제 AI 완료를 분리해 보고한다.
 - [ ] T003 [P] AI1·10분·선행 T001: rag-data/index.json의 36건·고유 URL·검증 상태·관할·날짜 충돌을 감사해 data/source-manifest.json과 data/audit-report.json에 핵심 6건·미검증·차단·우선순위를 기록한다. data-collection.md의 수집 시간/허용 출처를 적용한다.
-- [ ] T004 [P] FE·15분·선행 T001: src/app/globals.css와 src/components/layout/DemoShell.tsx에 두 화면 레이아웃·모의 상담 표기·중립 확인 카드·텍스트 상태·상시 연결 위치를 작성하고 docs/deployment-preflight.md에 AI3와 제출 HTTPS/단일 인스턴스/지속 디스크/마이크 시험 가능 여부를 기록한다. 미확보 사항은 차단 항목으로 표시한다.
+- [ ] T004 [P] FE·15분·선행 T001: 【부분 완료】frontend/src/app/globals.css·color-tokens.css·design-tokens.css의 스타일 기반과 frontend/assets/icon/ 아이콘 준비는 프런트 선행 작업으로 완료되었다. 남은 범위는 frontend/src/components/layout/DemoShell.tsx의 두 서비스 화면 공통 골격·모의 상담 표기·중립 확인 카드·상시 연결 위치와 frontend/src/app/layout.tsx의 한국어 lang/서비스 메타데이터다. 기본 페이지는 서비스 화면 완료로 세지 않는다. 실제 제공되는 서체와 layout/globals의 폰트 적용을 확인하고 docs/deployment-preflight.md에 제출 HTTPS/마이크/상태 공유 검증 전제를 기록한다.
 
 **Checkpoint**: 명령 실행 골격, 실제 모델 가능 여부, 제출 환경 전제, 데이터 감사가 확인되어야 한다. 미확보 전제는 해결하지 않고 완료로 체크하지 않는다.
 
@@ -32,12 +49,12 @@
 
 **Goal**: 공통 타입·저장·접근·모델 어댑터·문서 스키마·요청 처리를 고정한다. 공통 타입이 고정되면 자료 수집·모델·화면 fixture 작업을 병행한다. 실제 API 통합은 해당 작업에 필요한 저장·인증·라우트 선행 작업을 완료한 후 진행한다.
 
-- [ ] T005 AI3·15분·선행 T001: src/lib/contracts.ts와 src/lib/schema/session.ts에 Session·Turn·명령 봉투·API 오류 스키마를 정의하고 tests/unit/schema-session.test.ts에서 경계값을 검증한다. 정식 제약 출처는 data-model.md의 Session.id, Session.revision, Session.state, Session.activeIssueId, Session.handoffId, Session.pendingRequestId, Session.outcome, Session.outcomeConfirmedAt 및 Turn.id, Turn.sessionId, Turn.role, Turn.inputMode, Turn.outputStatus, Turn.timestamp다. 계약의 commandId/baseRevision·문자/턴/세션 제한도 연결한다. 제약 참조 보완: data-model.md의 Session.createdAt, Session.updatedAt, Session.businessDate.
-- [ ] T006 AI3·15분·선행 T005: src/lib/store/session-store.ts와 src/lib/store/snapshot.ts에 세션별 직렬 명령·revision·멱등 결과·원자적 지속 스냅샷·재시작 복구를 구현하고 tests/integration/store-recovery.test.ts로 확인한다. data-model.md의 Session.citizenTokenHash, Session.revision, Session.pendingRequestId 및 Turn.outputStatus를 준수하며 모델 대기 동안 명령 잠금을 유지하지 않는다.
-- [ ] T007 AI3·10분·선행 T006: src/lib/server/auth.ts와 src/lib/server/limits.ts에 시민 세션 토큰/콘솔 토큰 분리·동일 세션 접근 검사·로그 비식별·요청/세션 제한·no-store를 구현한다. tests/integration/auth-limits.test.ts에서 다른 세션·콘솔 접근을 차단하고 키/원문/평문 토큰 비노출을 확인한다. 콘솔 토큰은 서버 환경 CONSOLE_AGENT_ID의 단일 가상 상담사로 매핑하고 클라이언트의 agentId는 신뢰하지 않는다.
-- [ ] T008 [P] AI2·15분·선행 T002,T005: src/lib/dialogue/model-client.ts와 src/lib/dialogue/candidate-schema.ts에 Responses 어댑터·구조화 출력 재검증·timeout·복구 1회·취소/늦은 결과 폐기를 구현한다. tests/unit/model-client.test.ts에서 오류·지연·문서 속 명령 무시를 확인하고 모델이 state를 직접 쓰지 못하게 한다.
-- [ ] T009 [P] AI1·10분·선행 T003,T005: src/lib/retrieval/document-schema.ts에 정규화 스키마를 구현하고 tests/unit/document-schema.test.ts로 확인한다. data-model.md의 Document.docId, Document.publishedAt, Document.updatedAt, Document.effectiveFrom, Document.effectiveUntil, Document.sourceVerifiedAt, Document.verificationStatus, Citation.basisDate, Citation.quote, Replacement.validFrom, Replacement.validUntil를 각각 인용하며 Chunk.answerEligible·Chunk.routingEligible·Chunk.conflicts는 별도 검증한다. docId는 기존 상대 경로, 시간 해석·기간 경계는 canonical 정의를 따른다. 제약 참조 보완: data-model.md의 Document.retrievedAt, Chunk.chunkId, Chunk.docId.
-- [ ] T010 AI3·20분·선행 T004,T005,T006,T007: src/app/api/sessions/route.ts와 src/app/api/sessions/[id]/route.ts 및 src/lib/server/http.ts에 생성/조회·clientSessionKey 재시도·봉투·오류 코드를 구현한다. tests/contract/sessions.test.ts에서 현재 상태·접근·중복 생성을 검증하고 시민/콘솔 fixture 경계를 src/lib/fixtures.ts로 제공한다. 확보된 보유 환경에 앱 골격의 HTTPS 배포를 먼저 시험하고 docs/deployment-runbook.md에 단일 인스턴스·지속 디스크를 기록한다. 이후 live API가 합쳐질 때 같은 환경을 갱신하고 T047은 최종 빌드 승격·재검증으로 수행한다.
+- [ ] T005 AI3·15분·선행 T001: frontend/src/lib/contracts.ts와 frontend/src/lib/schema/session.ts에 Session·Turn·명령 봉투·API 오류 스키마를 정의하고 frontend/tests/unit/schema-session.test.ts에서 경계값을 검증한다. 정식 제약 출처는 data-model.md의 Session.id, Session.revision, Session.state, Session.activeIssueId, Session.handoffId, Session.pendingRequestId, Session.outcome, Session.outcomeConfirmedAt 및 Turn.id, Turn.sessionId, Turn.role, Turn.inputMode, Turn.outputStatus, Turn.timestamp다. 계약의 commandId/baseRevision·문자/턴/세션 제한도 연결한다. 제약 참조 보완: data-model.md의 Session.createdAt, Session.updatedAt, Session.businessDate.
+- [ ] T006 AI3·15분·선행 T005: frontend/src/lib/store/session-store.ts와 frontend/src/lib/store/snapshot.ts에 세션별 직렬 명령·revision·멱등 결과·원자적 지속 스냅샷·재시작 복구를 구현하고 frontend/tests/integration/store-recovery.test.ts로 확인한다. data-model.md의 Session.citizenTokenHash, Session.revision, Session.pendingRequestId 및 Turn.outputStatus를 준수하며 모델 대기 동안 명령 잠금을 유지하지 않는다.
+- [ ] T007 AI3·10분·선행 T006: frontend/src/lib/server/auth.ts와 frontend/src/lib/server/limits.ts에 시민 세션 토큰/콘솔 토큰 분리·동일 세션 접근 검사·로그 비식별·요청/세션 제한·no-store를 구현한다. frontend/tests/integration/auth-limits.test.ts에서 다른 세션·콘솔 접근을 차단하고 키/원문/평문 토큰 비노출을 확인한다. 콘솔 토큰은 서버 환경 CONSOLE_AGENT_ID의 단일 가상 상담사로 매핑하고 클라이언트의 agentId는 신뢰하지 않는다.
+- [ ] T008 [P] AI2·15분·선행 T002,T005: frontend/src/lib/dialogue/model-client.ts와 frontend/src/lib/dialogue/candidate-schema.ts에 Responses 어댑터·구조화 출력 재검증·timeout·복구 1회·취소/늦은 결과 폐기를 구현한다. frontend/tests/unit/model-client.test.ts에서 오류·지연·문서 속 명령 무시를 확인하고 모델이 state를 직접 쓰지 못하게 한다.
+- [ ] T009 [P] AI1·10분·선행 T003,T005: frontend/src/lib/retrieval/document-schema.ts에 정규화 스키마를 구현하고 frontend/tests/unit/document-schema.test.ts로 확인한다. data-model.md의 Document.docId, Document.publishedAt, Document.updatedAt, Document.effectiveFrom, Document.effectiveUntil, Document.sourceVerifiedAt, Document.verificationStatus, Citation.basisDate, Citation.quote, Replacement.validFrom, Replacement.validUntil를 각각 인용하며 Chunk.answerEligible·Chunk.routingEligible·Chunk.conflicts는 별도 검증한다. docId는 기존 상대 경로, 시간 해석·기간 경계는 canonical 정의를 따른다. 제약 참조 보완: data-model.md의 Document.retrievedAt, Chunk.chunkId, Chunk.docId.
+- [ ] T010 AI3·20분·선행 T004,T005,T006,T007: frontend/src/app/api/sessions/route.ts와 frontend/src/app/api/sessions/[id]/route.ts 및 frontend/src/lib/server/http.ts에 생성/조회·clientSessionKey 재시도·봉투·오류 코드를 구현한다. frontend/tests/contract/sessions.test.ts에서 현재 상태·접근·중복 생성을 검증하고 시민/콘솔 fixture 경계를 frontend/src/lib/fixtures.ts로 제공한다. 확보된 보유 환경에 앱 골격의 HTTPS 배포를 먼저 시험하고 docs/deployment-runbook.md에 단일 인스턴스·지속 디스크를 기록한다. 이후 live API가 합쳐질 때 같은 환경을 갱신하고 T047은 최종 빌드 승격·재검증으로 수행한다. 코드에 이미 있는 frontend/next.config.ts의 AI rewrite 작성은 선행 완료 부분으로 인정한다. 서비스 세션 API와 /api/ai 프록시를 혼동하지 않고 실제 Cloud Run 요청 계약·상태 저장 주체·제출 환경을 확인해 docs/deployment-runbook.md에 기록한다. Vercel/서버리스가 세션 상태를 소유한다면 메모리/로컬 파일을 공유 저장으로 간주하지 않고 기존 계획과의 차이를 먼저 해결한다. 이 확인 전 원격 API·배포 완료로 체크하지 않는다.
 
 **Checkpoint**: T005–T010은 live 통합 기반이다. 모든 담당자가 전체 기반 완료를 기다리지는 않으며, 각 task에 적힌 최소 선행 조건을 충족한 자료/모델/fixture 구현을 병행한다. 스키마 변경은 AI3가 병합하며 각 담당자는 자신의 모듈 파일만 편집한다.
 
@@ -48,17 +65,17 @@
 
 ### Tests
 
-- [ ] T011 [P] [US1] AI1·10분·선행 T003,T009: tests/unit/retrieval.test.ts에 자치구/시 공통·미검증·미래 시행·상충 연락처·기준일 미확인·실제 인용 불일치의 음성/양성 검색 시험을 먼저 작성한다. 개발 보정 표본과 독립 평가 fixture를 분리한다.
+- [ ] T011 [P] [US1] AI1·10분·선행 T003,T009: frontend/tests/unit/retrieval.test.ts에 자치구/시 공통·미검증·미래 시행·상충 연락처·기준일 미확인·실제 인용 불일치의 음성/양성 검색 시험을 먼저 작성한다. 개발 보정 표본과 독립 평가 fixture를 분리한다.
 
 ### Implementation
 
 - [ ] T012 [P] [US1] AI1·40분·선행 T011: data/source-manifest.json의 핵심 6건 공식 원문을 대조하고 rag-data/ 해당 정리본, data/evidence-log.jsonl, data/sources/에 발췌·hash·확인 범위·미확인을 보존한다. data-collection.md의 5분 차단 기록·금액/표/기한/연락처 규칙을 적용하고 기존 확인 기록을 이번 검증으로 위장하지 않는다.
-- [ ] T013 [US1] AI1·15분·선행 T009,T012: scripts/validate-data.ts와 scripts/build-corpus.ts에서 front matter/index 교차 검사·기관/관할 정규화·표 청크·검증 claim별 자격·중복 URL 통합·버전/hash 색인을 data/normalized/corpus.json과 data/validation-report.json으로 생성한다. 시행일과 게시/수정일을 혼용하지 않는다.
-- [ ] T014 [US1] AI1·20분·선행 T011,T013: src/lib/retrieval/search.ts와 src/lib/retrieval/validate-evidence.ts에 관할/유효성/검증 필터·한글 n-gram 랭킹·상위 청크·숫자/대상/인용 검증을 구현한다. data/retrieval-calibration.json에 개발 표본 결과와 고정 임계값을 기록하고 대본 ID 라우팅을 금지한다.
-- [ ] T015 [P] [US1] AI2·20분·선행 T005,T008: src/lib/dialogue/interpret.ts와 src/lib/dialogue/answer.ts에 자유 표현·문맥·known/missing 정보 추출, 근거 단위별 짧은 응답·출처 후보·근거 없음 응답을 구현한다. tests/unit/interpret-answer.test.ts에서 품목/표현/순서 변경과 개인 조회 불가를 검증한다. 검색은 T014의 인터페이스 fixture로 독립 시험 후 통합한다.
-- [ ] T016 [US1] AI3·20분·선행 T010,T014,T015,T020: src/app/api/sessions/[id]/turns/route.ts와 src/app/api/sessions/[id]/outcome/route.ts 및 src/lib/dialogue/orchestrator.ts에서 추출→검색→답변→검증→저장과 200/202·polling을 연결한다. 모든 항목의 시민 완료 확인만 ai_confirmed로 기록하며 단순 종료는 unknown으로 남긴다.
-- [ ] T017 [P] [US1] FE·20분·선행 T004,T005: src/components/citizen/TextConsultation.tsx와 src/components/citizen/EvidenceCard.tsx에 텍스트 문의·자막·출처/기준일·한 질문·안내 완료/추가 도움을 구현한다. 계약 fixture로 독립 시험한다. src/app/page.tsx의 live API 전환과 전구간 확인은 T028·T045에서 수행한다. 명시 연결 후 AI 안내 재권유는 하지 않는다.
-- [ ] T018 [US1] AI2·15분·선행 T014,T015,T016,T017: tests/fixtures/generalization.json과 tests/integration/us1-guidance.test.ts에 독립 15문항·미확보 분야/자치구 표본의 기대 근거·금지 답변·상태를 고정하고 첫 안내 증분을 검증한다. 이후 독립 평가를 보고 검색 임계값을 맞추지 않는다.
+- [ ] T013 [US1] AI1·15분·선행 T009,T012: frontend/scripts/validate-data.ts와 frontend/scripts/build-corpus.ts에서 front matter/index 교차 검사·기관/관할 정규화·표 청크·검증 claim별 자격·중복 URL 통합·버전/hash 색인을 data/normalized/corpus.json과 data/validation-report.json으로 생성한다. 시행일과 게시/수정일을 혼용하지 않는다.
+- [ ] T014 [US1] AI1·20분·선행 T011,T013: frontend/src/lib/retrieval/search.ts와 frontend/src/lib/retrieval/validate-evidence.ts에 관할/유효성/검증 필터·한글 n-gram 랭킹·상위 청크·숫자/대상/인용 검증을 구현한다. data/retrieval-calibration.json에 개발 표본 결과와 고정 임계값을 기록하고 대본 ID 라우팅을 금지한다.
+- [ ] T015 [P] [US1] AI2·20분·선행 T005,T008: frontend/src/lib/dialogue/interpret.ts와 frontend/src/lib/dialogue/answer.ts에 자유 표현·문맥·known/missing 정보 추출, 근거 단위별 짧은 응답·출처 후보·근거 없음 응답을 구현한다. frontend/tests/unit/interpret-answer.test.ts에서 품목/표현/순서 변경과 개인 조회 불가를 검증한다. 검색은 T014의 인터페이스 fixture로 독립 시험 후 통합한다.
+- [ ] T016 [US1] AI3·20분·선행 T010,T014,T015,T020: frontend/src/app/api/sessions/[id]/turns/route.ts와 frontend/src/app/api/sessions/[id]/outcome/route.ts 및 frontend/src/lib/dialogue/orchestrator.ts에서 추출→검색→답변→검증→저장과 200/202·polling을 연결한다. 모든 항목의 시민 완료 확인만 ai_confirmed로 기록하며 단순 종료는 unknown으로 남긴다.
+- [ ] T017 [P] [US1] FE·20분·선행 T004,T005: frontend/src/components/citizen/TextConsultation.tsx와 frontend/src/components/citizen/EvidenceCard.tsx에 텍스트 문의·자막·출처/기준일·한 질문·안내 완료/추가 도움을 구현한다. 계약 fixture로 독립 시험한다. frontend/src/app/page.tsx의 live API 전환과 전구간 확인은 T028·T045에서 수행한다. 명시 연결 후 AI 안내 재권유는 하지 않는다. TanStack Query는 의존성만 등록된 상태다. frontend/src/app/providers.tsx의 QueryClientProvider와 frontend/src/lib/api-client.ts의 서버 계약 연결 여부를 함께 확인하고 프록시 설정만으로 API 연동 완료를 표시하지 않는다.
+- [ ] T018 [US1] AI2·15분·선행 T014,T015,T016,T017: frontend/tests/fixtures/generalization.json과 frontend/tests/integration/us1-guidance.test.ts에 독립 15문항·미확보 분야/자치구 표본의 기대 근거·금지 답변·상태를 고정하고 첫 안내 증분을 검증한다. 이후 독립 평가를 보고 검색 임계값을 맞추지 않는다.
 
 **Checkpoint**: 새 문의에도 같은 규칙이 적용되고 미확인 지역 비용·무근거 사실 안내가 없어야 한다. US1만으로 전체 제출 MVP 완료로 간주하지 않는다.
 
@@ -69,16 +86,16 @@
 
 ### Tests
 
-- [ ] T019 [P] [US2] AI3·10분·선행 T005,T007: tests/unit/handoff-policy.test.ts에 연결 우선순위·부정 표현·필수 정보 한도/낮은 신뢰 분리·무응답·매우 불만+연결 의사·전송 중 요청 경합 시험을 먼저 작성한다. 기존 수도 fixture의 일반 불만은 기본 확인으로 유지한다. 매우 불만+제안 수락은 FR-033대로 요약 확인 없이 unconfirmed 전달이며 감정만으로는 자동 이관하지 않는 시험을 명시한다.
+- [ ] T019 [P] [US2] AI3·10분·선행 T005,T007: frontend/tests/unit/handoff-policy.test.ts에 연결 우선순위·부정 표현·필수 정보 한도/낮은 신뢰 분리·무응답·매우 불만+연결 의사·전송 중 요청 경합 시험을 먼저 작성한다. 기존 수도 fixture의 일반 불만은 기본 확인으로 유지한다. 매우 불만+제안 수락은 FR-033대로 요약 확인 없이 unconfirmed 전달이며 감정만으로는 자동 이관하지 않는 시험을 명시한다.
 
 ### Implementation
 
-- [ ] T020 [P] [US2] AI2·15분·선행 T005: src/lib/dialogue/issues.ts와 src/lib/schema/issue.ts에 순차 항목·알려진 정보 재사용·미해결 보존을 구현한다. canonical 출처는 data-model.md의 Issue.id, Issue.sessionId, Issue.intent, Issue.status, Issue.fields.value, Issue.fields.status, Issue.questionCounts, Issue.noEvidenceQuestionCount, Issue.lowConfidenceStreak 및 Session.activeIssueId다. tests/unit/issues.test.ts에 두 복합 문의와 현재 active 항목 유일성을 검증한다. 제약 참조 보완: data-model.md의 Issue.fields.originTurnId, Issue.fields.confirmed, Issue.locations, Issue.locations.purpose, Issue.locations.district, Issue.locations.originTurnId, Issue.locations.confirmed, Issue.jurisdiction.
-- [ ] T021 [US2] AI3·15분·선행 T019,T020: src/lib/policy/reducer.ts와 src/lib/policy/handoff.ts에 서버 최종 판정·질문 한도·명시 요청 선점·늦은 응답 폐기·거절 시 반복 질문 금지를 구현한다. FR-033 생략은 연결 의사와 함께 판정하고 원문/확인 상태를 보존한다. 규칙 표와 무관하게 FR-033의 생략 조건을 동일 reducer 분기로 적용하고 tests/unit/handoff-policy.test.ts에서 이를 고정한다.
-- [ ] T022 [P] [US2] AI2·15분·선행 T008,T020: src/lib/schema/summary.ts와 src/lib/dialogue/summary.ts에 요약·중요 정보 확인·부분 수정·모델 실패 시 원문 초안을 구현한다. 제약 출처는 data-model.md의 Summary.id, Summary.revision, Summary.coreLines, Summary.sentiment, Summary.sentimentIsEstimate, Summary.confirmation, Summary.confirmedAt, Summary.skipReason, Summary.fieldConfirmations이며 계약의 필드별 수정 규약을 연결한다. 제약 참조 보완: data-model.md의 Summary.sessionRevision.
-- [ ] T023 [US2] AI3·20분·선행 T016,T021,T022,T031: src/app/api/sessions/[id]/handoff-request/route.ts, src/app/api/sessions/[id]/handoff-decision/route.ts, src/app/api/sessions/[id]/summary/route.ts, src/app/api/sessions/[id]/handoff-retry/route.ts를 구현한다. 최신 summaryRevision·confirm/edit/skip·미확인 생략·동일 handoff 재시도를 검증하고 T016 orchestrator에 정책을 연결한다. T031 전달 서비스 연결까지 끝나야 완료로 체크한다. 또한 src/app/api/sessions/[id]/corrections/route.ts에서 수락 전 정정→변경 항목 재확인→동일 handoff 재전달을 구현한다.
-- [ ] T024 [P] [US2] FE·15분·선행 T004,T005: src/components/citizen/SummaryConfirmation.tsx와 src/components/citizen/ConnectionStatus.tsx에 항목별 확인/미확인·한 필드 수정·승인/생략·접수/전송/대기/지연/실패 표시를 구현한다. 30초는 자동 승인이 아닌 선택지 표시이며 수신 전 완료 안내를 막는다. 컴포넌트는 fixture로 완료하고 T045에서 T023 live 경로를 연결·검증한다. 대기 중에는 새 AI 상담 대신 정정 입력·변경 확인·재전달 상태와 실패 재시도를 제공한다.
-- [ ] T025 [US2] AI2·10분·선행 T021,T022,T023,T024: tests/integration/us2-handoff.test.ts와 tests/fixtures/policy-cases.json으로 SC-016·018·019의 복합 문의·네 질문 한도 경로·다섯 확인/생략 경로를 통과시킨다. 처리된 항목은 맥락으로, 미해결은 이관 대상으로 구분되는지 확인한다.
+- [ ] T020 [P] [US2] AI2·15분·선행 T005: frontend/src/lib/dialogue/issues.ts와 frontend/src/lib/schema/issue.ts에 순차 항목·알려진 정보 재사용·미해결 보존을 구현한다. canonical 출처는 data-model.md의 Issue.id, Issue.sessionId, Issue.intent, Issue.status, Issue.fields.value, Issue.fields.status, Issue.questionCounts, Issue.noEvidenceQuestionCount, Issue.lowConfidenceStreak 및 Session.activeIssueId다. frontend/tests/unit/issues.test.ts에 두 복합 문의와 현재 active 항목 유일성을 검증한다. 제약 참조 보완: data-model.md의 Issue.fields.originTurnId, Issue.fields.confirmed, Issue.locations, Issue.locations.purpose, Issue.locations.district, Issue.locations.originTurnId, Issue.locations.confirmed, Issue.jurisdiction.
+- [ ] T021 [US2] AI3·15분·선행 T019,T020: frontend/src/lib/policy/reducer.ts와 frontend/src/lib/policy/handoff.ts에 서버 최종 판정·질문 한도·명시 요청 선점·늦은 응답 폐기·거절 시 반복 질문 금지를 구현한다. FR-033 생략은 연결 의사와 함께 판정하고 원문/확인 상태를 보존한다. 규칙 표와 무관하게 FR-033의 생략 조건을 동일 reducer 분기로 적용하고 frontend/tests/unit/handoff-policy.test.ts에서 이를 고정한다.
+- [ ] T022 [P] [US2] AI2·15분·선행 T008,T020: frontend/src/lib/schema/summary.ts와 frontend/src/lib/dialogue/summary.ts에 요약·중요 정보 확인·부분 수정·모델 실패 시 원문 초안을 구현한다. 제약 출처는 data-model.md의 Summary.id, Summary.revision, Summary.coreLines, Summary.sentiment, Summary.sentimentIsEstimate, Summary.confirmation, Summary.confirmedAt, Summary.skipReason, Summary.fieldConfirmations이며 계약의 필드별 수정 규약을 연결한다. 제약 참조 보완: data-model.md의 Summary.sessionRevision.
+- [ ] T023 [US2] AI3·20분·선행 T016,T021,T022,T031: frontend/src/app/api/sessions/[id]/handoff-request/route.ts, frontend/src/app/api/sessions/[id]/handoff-decision/route.ts, frontend/src/app/api/sessions/[id]/summary/route.ts, frontend/src/app/api/sessions/[id]/handoff-retry/route.ts를 구현한다. 최신 summaryRevision·confirm/edit/skip·미확인 생략·동일 handoff 재시도를 검증하고 T016 orchestrator에 정책을 연결한다. T031 전달 서비스 연결까지 끝나야 완료로 체크한다. 또한 frontend/src/app/api/sessions/[id]/corrections/route.ts에서 수락 전 정정→변경 항목 재확인→동일 handoff 재전달을 구현한다.
+- [ ] T024 [P] [US2] FE·15분·선행 T004,T005: frontend/src/components/citizen/SummaryConfirmation.tsx와 frontend/src/components/citizen/ConnectionStatus.tsx에 항목별 확인/미확인·한 필드 수정·승인/생략·접수/전송/대기/지연/실패 표시를 구현한다. 30초는 자동 승인이 아닌 선택지 표시이며 수신 전 완료 안내를 막는다. 컴포넌트는 fixture로 완료하고 T045에서 T023 live 경로를 연결·검증한다. 대기 중에는 새 AI 상담 대신 정정 입력·변경 확인·재전달 상태와 실패 재시도를 제공한다.
+- [ ] T025 [US2] AI2·10분·선행 T021,T022,T023,T024: frontend/tests/integration/us2-handoff.test.ts와 frontend/tests/fixtures/policy-cases.json으로 SC-016·018·019의 복합 문의·네 질문 한도 경로·다섯 확인/생략 경로를 통과시킨다. 처리된 항목은 맥락으로, 미해결은 이관 대상으로 구분되는지 확인한다.
 
 ## Phase 5: User Story 4 — 음성·텍스트 대체 (P1)
 
@@ -87,12 +104,12 @@
 
 ### Tests
 
-- [ ] T026 [P] [US4] FE·10분·선행 T001,T004: tests/unit/speech-controller.test.ts에 기능 미지원·권한 거부·동일 utterance 재조회 중복 재생·연결 시 재생 취소·입력창의 숫자 1 예외를 작성한다.
+- [ ] T026 [P] [US4] FE·10분·선행 T001,T004: frontend/tests/unit/speech-controller.test.ts에 기능 미지원·권한 거부·동일 utterance 재조회 중복 재생·연결 시 재생 취소·입력창의 숫자 1 예외를 작성한다.
 
 ### Implementation
 
-- [ ] T027 [US4] FE·20분·선행 T026: src/components/speech/useSpeechController.ts와 src/components/speech/MicrophoneControl.tsx에 ko-KR STT/TTS·두 문장 낭독 단위·자막·오류/무음·텍스트 전환을 구현한다. 지원 여부를 탐지하고 음성 실패를 상담 완료로 처리하지 않는다.
-- [ ] T028 [US4] FE·10분·선행 T017,T024,T027: src/app/page.tsx에 음성/텍스트 상담·항상 보이는 연결 버튼·1번 키·듣는 중/답변 중/확인 중을 통합한다. 모델 응답 중에도 연결 이벤트를 전송하고 늦은 응답을 재생하지 않는다.
+- [ ] T027 [US4] FE·20분·선행 T026: frontend/src/components/speech/useSpeechController.ts와 frontend/src/components/speech/MicrophoneControl.tsx에 ko-KR STT/TTS·두 문장 낭독 단위·자막·오류/무음·텍스트 전환을 구현한다. 지원 여부를 탐지하고 음성 실패를 상담 완료로 처리하지 않는다.
+- [ ] T028 [US4] FE·10분·선행 T017,T024,T027: frontend/src/app/page.tsx에 음성/텍스트 상담·항상 보이는 연결 버튼·1번 키·듣는 중/답변 중/확인 중을 통합한다. 모델 응답 중에도 연결 이벤트를 전송하고 늦은 응답을 재생하지 않는다.
 - [ ] T029 [US4] FE·10분·선행 T028: docs/voice-validation.md에 실제 Chrome/시연 기기의 인식→자막→음성 1회 이상, 권한 거부·무음·텍스트 대체 결과를 기록한다. 제출 HTTPS 재검증은 T048에서 수행하며 mock 시험 성공과 구분한다.
 
 ## Phase 6: User Story 5 — 상담사 인계·수정·개선 (P1)
@@ -102,17 +119,17 @@
 
 ### Tests
 
-- [ ] T030 [P] [US5] AI3·10분·선행 T005,T007: tests/contract/console.test.ts에 보호된 대기열/상세/claim/complete_case·세션별 단일 인계·오래된 요약 승인·재시도·중복 claim 계약 시험을 먼저 작성한다.
+- [ ] T030 [P] [US5] AI3·10분·선행 T005,T007: frontend/tests/contract/console.test.ts에 보호된 대기열/상세/claim/complete_case·세션별 단일 인계·오래된 요약 승인·재시도·중복 claim 계약 시험을 먼저 작성한다.
 
 ### Implementation
 
-- [ ] T031 [US5] AI3·15분·선행 T006,T030: src/lib/schema/handoff.ts, src/lib/store/handoff-store.ts, src/app/api/console/queue/route.ts, src/app/api/console/sessions/[id]/route.ts에 인계·큐·상세와 T023용 전달 서비스를 구현한다. canonical 출처는 data-model.md의 Handoff.id, Handoff.sessionId, Handoff.status, Handoff.receivedAt, Handoff.selectedCandidateId, Handoff.agentId, Handoff.claimedAt, Handoff.completedAt, Handoff.resolutionNote, Handoff.repeatExplanationCount다. 최신 요약의 승인/생략 근거와 고유성·원자 저장을 검증한다. 전달 후 정정 버전은 data-model.md의 Handoff.deliveryRevision, Handoff.acknowledgedRevision, Handoff.pendingCorrection, Handoff.summaryHistory를 직접 참조해 구현하고 이전 이력을 보존한다. 제약 참조 보완: data-model.md의 Handoff.summaryId, Handoff.summaryRevision. 최초 sending의 acknowledgedRevision=0, 첫 수신 후 1 및 현재 전달 버전 이하라는 조건과 정정 재전달/claim 경합을 검증한다. data-model.md의 Handoff.deliveryRevision, Handoff.acknowledgedRevision, Handoff.pendingCorrection을 정확히 따른다.
-- [ ] T032 [P] [US5] FE·20분·선행 T004,T005: src/app/console/page.tsx와 src/components/console/CasePanel.tsx에 토큰 입력·대기열/완료 필터·요약·확인/미확인·기존 안내·원문 접기·창구 카드·처리 결과 입력을 작성한다. fixture 두 건으로 컴포넌트를 검증하고 T045에서 T031,T033 live 경로와 연결한다. 별도 통계/관리 화면은 추가하지 않는다.
-- [ ] T033 [US5] AI3·15분·선행 T031: src/app/api/console/sessions/[id]/actions/route.ts와 src/lib/store/metric-events.ts에 claim/transfer_demo/complete_case·가명 담당·처리 시각·재설명 기록·중복 방지를 구현한다. 제약 출처는 data-model.md의 Session.state, Session.outcome, MetricEvent.id, MetricEvent.sessionId, MetricEvent.eventType, MetricEvent.actorPseudonym, MetricEvent.reason, MetricEvent.measurementMode 및 Handoff.completedAt다. 상담 완료를 외부 행정 처리 완료로 표시하지 않는다. 제약 참조 보완: data-model.md의 MetricEvent.timestamp. complete_case는 Session.state와 Handoff.status를 함께 completed_demo로 기록하고 실패는 Session.delivery_failed/Handoff.failed로 매핑한다. 단일 가상 담당자 ID와 session_ended terminal 이벤트의 중복 금지도 구현한다.
-- [ ] T034 [US5] AI3·15분·선행 T033,T016: src/lib/metrics/aggregate.ts와 src/app/api/console/metrics/route.ts에서 AI 확인 완료율·이관율/사유·처리 건수/시간·대기·재설명과 누락 수를 산출한다. data-model.md의 Session.outcomeConfirmedAt, MetricEvent.timestamp와 계약의 분모 0/null·미완료/미확인 분리·모의 표기를 적용하고 원문을 집계 응답에 넣지 않는다. 관찰 구간의 session_ended terminal 이벤트에 속한 세션 집합에서만 분모와 ai_confirmed/handoff 분자를 계산한다. queued/serving/transferred_demo는 별도 진행 중 수로 보고하고 종료 세션당 1회만 집계한다.
-- [ ] T035 [P] [US5] AI1·10분·선행 T005,T007: src/lib/improvements/candidates.ts와 src/lib/schema/improvement.ts에 비식별 개선 후보 생성·조회·보호된 내보내기를 구현한다. canonical 출처는 data-model.md의 ImprovementCandidate.id, ImprovementCandidate.sessionId, ImprovementCandidate.status, ImprovementCandidate.reviewer, ImprovementCandidate.approvedAt, ImprovementCandidate.publishedCorpusVersion, ImprovementCandidate.regressionResult다. T033 완료 결과에서 호출하고 src/app/api/console/improvements/route.ts는 콘솔 인증을 재사용한다.
-- [ ] T036 [US5] AI1·15분·선행 T013,T035,T033: scripts/review-improvement.ts와 tests/fixtures/improvement-case.json에서 근거 부족 모의 상담 1건의 비식별 후보→공식 원문 검증→AI2 검토→승인→별도 corpus 버전 생성→회귀/새 질문 통과를 실행한다. data/evidence-log.jsonl와 data/improvement-validation.json에 검토자·자료 버전·결과를 남기고 승인 전 검색 반영을 막는다.
-- [ ] T037 [US5] AI2·10분·선행 T031,T032,T033,T034,T035: tests/integration/us5-console-metrics.test.ts에 두 상담 기록 분리·부분 수정·전송 실패/중복·미확인·확인 완료·분모 0·미종료·처리량/시간 재계산을 검증하고 data/metrics-validation.json에 모의 결과를 기록한다. SC-026의 정정 재전달·실패/재시도·중복·claim 경합을 검증하고 정정 반영 중 오래된 요약 수락과 정정 유실을 막는다. 종료 1건·대기 2건 표본에서 이관율에 대기 상담이 섞이지 않는지, 서버 고정 담당자 식별·두 객체 완료/실패 매핑·후보 0개 사유·최초 수신 전 revision도 검증한다.
+- [ ] T031 [US5] AI3·15분·선행 T006,T030: frontend/src/lib/schema/handoff.ts, frontend/src/lib/store/handoff-store.ts, frontend/src/app/api/console/queue/route.ts, frontend/src/app/api/console/sessions/[id]/route.ts에 인계·큐·상세와 T023용 전달 서비스를 구현한다. canonical 출처는 data-model.md의 Handoff.id, Handoff.sessionId, Handoff.status, Handoff.receivedAt, Handoff.selectedCandidateId, Handoff.agentId, Handoff.claimedAt, Handoff.completedAt, Handoff.resolutionNote, Handoff.repeatExplanationCount다. 최신 요약의 승인/생략 근거와 고유성·원자 저장을 검증한다. 전달 후 정정 버전은 data-model.md의 Handoff.deliveryRevision, Handoff.acknowledgedRevision, Handoff.pendingCorrection, Handoff.summaryHistory를 직접 참조해 구현하고 이전 이력을 보존한다. 제약 참조 보완: data-model.md의 Handoff.summaryId, Handoff.summaryRevision. 최초 sending의 acknowledgedRevision=0, 첫 수신 후 1 및 현재 전달 버전 이하라는 조건과 정정 재전달/claim 경합을 검증한다. data-model.md의 Handoff.deliveryRevision, Handoff.acknowledgedRevision, Handoff.pendingCorrection을 정확히 따른다.
+- [ ] T032 [P] [US5] FE·20분·선행 T004,T005: frontend/src/app/console/page.tsx와 frontend/src/components/console/CasePanel.tsx에 토큰 입력·대기열/완료 필터·요약·확인/미확인·기존 안내·원문 접기·창구 카드·처리 결과 입력을 작성한다. fixture 두 건으로 컴포넌트를 검증하고 T045에서 T031,T033 live 경로와 연결한다. 별도 통계/관리 화면은 추가하지 않는다. 현재 console 페이지는 없으므로 상담사 화면 구현은 남은 작업이다. 전체 대화·완료 필터가 실제 동작하기 전 화면 완료로 체크하지 않는다.
+- [ ] T033 [US5] AI3·15분·선행 T031: frontend/src/app/api/console/sessions/[id]/actions/route.ts와 frontend/src/lib/store/metric-events.ts에 claim/transfer_demo/complete_case·가명 담당·처리 시각·재설명 기록·중복 방지를 구현한다. 제약 출처는 data-model.md의 Session.state, Session.outcome, MetricEvent.id, MetricEvent.sessionId, MetricEvent.eventType, MetricEvent.actorPseudonym, MetricEvent.reason, MetricEvent.measurementMode 및 Handoff.completedAt다. 상담 완료를 외부 행정 처리 완료로 표시하지 않는다. 제약 참조 보완: data-model.md의 MetricEvent.timestamp. complete_case는 Session.state와 Handoff.status를 함께 completed_demo로 기록하고 실패는 Session.delivery_failed/Handoff.failed로 매핑한다. 단일 가상 담당자 ID와 session_ended terminal 이벤트의 중복 금지도 구현한다.
+- [ ] T034 [US5] AI3·15분·선행 T033,T016: frontend/src/lib/metrics/aggregate.ts와 frontend/src/app/api/console/metrics/route.ts에서 AI 확인 완료율·이관율/사유·처리 건수/시간·대기·재설명과 누락 수를 산출한다. data-model.md의 Session.outcomeConfirmedAt, MetricEvent.timestamp와 계약의 분모 0/null·미완료/미확인 분리·모의 표기를 적용하고 원문을 집계 응답에 넣지 않는다. 관찰 구간의 session_ended terminal 이벤트에 속한 세션 집합에서만 분모와 ai_confirmed/handoff 분자를 계산한다. queued/serving/transferred_demo는 별도 진행 중 수로 보고하고 종료 세션당 1회만 집계한다.
+- [ ] T035 [P] [US5] AI1·10분·선행 T005,T007: frontend/src/lib/improvements/candidates.ts와 frontend/src/lib/schema/improvement.ts에 비식별 개선 후보 생성·조회·보호된 내보내기를 구현한다. canonical 출처는 data-model.md의 ImprovementCandidate.id, ImprovementCandidate.sessionId, ImprovementCandidate.status, ImprovementCandidate.reviewer, ImprovementCandidate.approvedAt, ImprovementCandidate.publishedCorpusVersion, ImprovementCandidate.regressionResult다. T033 완료 결과에서 호출하고 frontend/src/app/api/console/improvements/route.ts는 콘솔 인증을 재사용한다.
+- [ ] T036 [US5] AI1·15분·선행 T013,T035,T033: frontend/scripts/review-improvement.ts와 frontend/tests/fixtures/improvement-case.json에서 근거 부족 모의 상담 1건의 비식별 후보→공식 원문 검증→AI2 검토→승인→별도 corpus 버전 생성→회귀/새 질문 통과를 실행한다. data/evidence-log.jsonl와 data/improvement-validation.json에 검토자·자료 버전·결과를 남기고 승인 전 검색 반영을 막는다.
+- [ ] T037 [US5] AI2·10분·선행 T031,T032,T033,T034,T035: frontend/tests/integration/us5-console-metrics.test.ts에 두 상담 기록 분리·부분 수정·전송 실패/중복·미확인·확인 완료·분모 0·미종료·처리량/시간 재계산을 검증하고 data/metrics-validation.json에 모의 결과를 기록한다. SC-026의 정정 재전달·실패/재시도·중복·claim 경합을 검증하고 정정 반영 중 오래된 요약 수락과 정정 유실을 막는다. 종료 1건·대기 2건 표본에서 이관율에 대기 상담이 섞이지 않는지, 서버 고정 담당자 식별·두 객체 완료/실패 매핑·후보 0개 사유·최초 수신 전 revision도 검증한다.
 
 ## Phase 7: User Story 3 — 최신 정책과 처리 창구 (P2, 제출 필수)
 
@@ -121,24 +138,24 @@
 
 ### Tests
 
-- [ ] T038 [P] [US3] AI1·10분·선행 T003,T009: tests/unit/replacement-routing.test.ts에 항목별 일정 대체·미변경 업무분장 유지·선불/후불 구분·미래 시행·근거 없는 부서명 금지 시험을 작성한다.
+- [ ] T038 [P] [US3] AI1·10분·선행 T003,T009: frontend/tests/unit/replacement-routing.test.ts에 항목별 일정 대체·미변경 업무분장 유지·선불/후불 구분·미래 시행·근거 없는 부서명 금지 시험을 작성한다.
 
 ### Implementation
 
-- [ ] T039 [US3] AI1·10분·선행 T012,T013,T038: data/replacements.json과 src/lib/retrieval/replacements.ts에 정책 두 문서 쌍의 claimKey별 변경 전후·유효 기간·대체 근거를 정규화하고 T014 필터와 색인에 연결한다. canonical 출처는 data-model.md의 Replacement.id, Replacement.predecessorDocId, Replacement.successorDocId, Replacement.claimKey, Replacement.validFrom, Replacement.validUntil, Replacement.evidenceChunkIds다.
-- [ ] T040 [P] [US3] AI2·15분·선행 T005,T008: src/lib/schema/candidate.ts와 src/lib/dialogue/routing.ts에 미해결 목적별 후보 근거·순위·신뢰를 구현한다. canonical 출처는 data-model.md의 Candidate.id, Candidate.rank, Candidate.confidence, Candidate.issueIds, Candidate.evidence, Candidate.selectedByAgent 및 RoutingResult.candidates, RoutingResult.unknownReason이다. 최대 후보 개수와 근거 부재 규칙은 data-model.md Candidate 절을 따르고 T039 완료 전에는 검증 청크 fixture로 독립 시험한다. 빈 후보의 사유는 RoutingResult에만 저장하고 Candidate 배열 원소에 넣지 않는다. tests/unit/routing-result.test.ts에서 후보 유무와 nullable 사유의 관계를 검증한다.
-- [ ] T041 [US3] FE·10분·선행 T032,T039,T040: src/components/console/RoutingEvidenceCard.tsx와 src/components/console/PolicyChangeCard.tsx에 후보별 처리 이유·발췌·URL·기준일/시행일·신뢰·변경 항목을 표시하고 상담사의 최종 선택을 T033에 연결한다. 출처 미확인은 날짜를 지어내지 않고 표시한다.
-- [ ] T042 [US3] AI2·10분·선행 T039,T040,T041,T023,T031: tests/integration/us3-policy-handoff.test.ts에서 기후동행카드 시나리오의 두 일정 변경·티머니/정책과 후보 및 수도 분야 낮은 신뢰·부서 미생성을 실제 API/콘솔 payload로 확인한다.
+- [ ] T039 [US3] AI1·10분·선행 T012,T013,T038: data/replacements.json과 frontend/src/lib/retrieval/replacements.ts에 정책 두 문서 쌍의 claimKey별 변경 전후·유효 기간·대체 근거를 정규화하고 T014 필터와 색인에 연결한다. canonical 출처는 data-model.md의 Replacement.id, Replacement.predecessorDocId, Replacement.successorDocId, Replacement.claimKey, Replacement.validFrom, Replacement.validUntil, Replacement.evidenceChunkIds다.
+- [ ] T040 [P] [US3] AI2·15분·선행 T005,T008: frontend/src/lib/schema/candidate.ts와 frontend/src/lib/dialogue/routing.ts에 미해결 목적별 후보 근거·순위·신뢰를 구현한다. canonical 출처는 data-model.md의 Candidate.id, Candidate.rank, Candidate.confidence, Candidate.issueIds, Candidate.evidence, Candidate.selectedByAgent 및 RoutingResult.candidates, RoutingResult.unknownReason이다. 최대 후보 개수와 근거 부재 규칙은 data-model.md Candidate 절을 따르고 T039 완료 전에는 검증 청크 fixture로 독립 시험한다. 빈 후보의 사유는 RoutingResult에만 저장하고 Candidate 배열 원소에 넣지 않는다. frontend/tests/unit/routing-result.test.ts에서 후보 유무와 nullable 사유의 관계를 검증한다.
+- [ ] T041 [US3] FE·10분·선행 T032,T039,T040: frontend/src/components/console/RoutingEvidenceCard.tsx와 frontend/src/components/console/PolicyChangeCard.tsx에 후보별 처리 이유·발췌·URL·기준일/시행일·신뢰·변경 항목을 표시하고 상담사의 최종 선택을 T033에 연결한다. 출처 미확인은 날짜를 지어내지 않고 표시한다.
+- [ ] T042 [US3] AI2·10분·선행 T039,T040,T041,T023,T031: frontend/tests/integration/us3-policy-handoff.test.ts에서 기후동행카드 시나리오의 두 일정 변경·티머니/정책과 후보 및 수도 분야 낮은 신뢰·부서 미생성을 실제 API/콘솔 payload로 확인한다.
 
 ## Phase 8: Polish & Cross-Cutting — 제출 검증과 백업
 
 **Goal**: 다섯 여정을 통합하고 실제 제출 주소에서 검증한다. SC-011·014만 후순위이며 새 기능으로 필수 오류를 덮지 않는다.
 
-- [ ] T043 AI3·10분·선행 T023,T031,T033: tests/integration/recovery-security.test.ts에서 재시작·진행 중 요청 폐기·지연 모델 중 연결·동일 commandId·stale revision·다른 세션 접근·콘솔 인증·토큰/원문 로그 미노출을 실행하고 docs/recovery-validation.md에 결과를 남긴다.
-- [ ] T044 [P] AI2·15분·선행 T025,T037,T042: scripts/test-golden.ts와 tests/integration/golden-turns.test.ts에서 demo/golden-turns.json의 기존 3시나리오·필수/금지 표현·확인 상태·콘솔 데이터를 검증한다. data/golden-report.json에 live 결과와 모델 fixture 결과를 구분한다.
-- [ ] T045 [P] FE·15분·선행 T028,T032,T041,T023,T033: tests/e2e/consultation.spec.ts와 tests/e2e/console.spec.ts에서 텍스트 대체 세 시나리오·명시 요청 18조건·1번 입력창 예외·한 항목 수정·지연/실패·중립 카드·항상 보이는 연결을 검증한다.
-- [ ] T046 [P] AI1·15분·선행 T018,T025,T039: scripts/test-generalization.ts에서 고정한 독립 15문항·미확보 분야 3/구 3·복합 문의·무근거·검색 자격을 실행하고 data/generalization-report.json과 data/corpus-freeze.json에 자료 버전·hash·결과를 동결한다. SC-020 별도 버전 결과도 기존 자료와 구분한다.
-- [ ] T047 AI3·20분·선행 T004,T043,T044,T045,T046,T011,T012,T013,T014,T015,T016,T017,T018,T019,T020,T021,T022,T023,T024,T025,T026,T027,T028,T029,T030,T031,T032,T033,T034,T035,T036,T037,T038,T039,T040,T041,T042: deploy/ecosystem.config.cjs와 docs/deployment-runbook.md에 장기 실행 Node 1 replica·HTTPS·지속 DATA_DIR·보호된 콘솔·환경변수·재시작/이전 빌드 복구 절차를 구성하고 보유 제출 환경에 같은 빌드/자료 버전을 배포한다. 계정·권한·주소가 없으면 이를 차단 사유로 기록하며 임의 구매나 서버리스 메모리 대체를 하지 않는다.
+- [ ] T043 AI3·10분·선행 T023,T031,T033: frontend/tests/integration/recovery-security.test.ts에서 재시작·진행 중 요청 폐기·지연 모델 중 연결·동일 commandId·stale revision·다른 세션 접근·콘솔 인증·토큰/원문 로그 미노출을 실행하고 docs/recovery-validation.md에 결과를 남긴다.
+- [ ] T044 [P] AI2·15분·선행 T025,T037,T042: frontend/scripts/test-golden.ts와 frontend/tests/integration/golden-turns.test.ts에서 demo/golden-turns.json의 기존 3시나리오·필수/금지 표현·확인 상태·콘솔 데이터를 검증한다. data/golden-report.json에 live 결과와 모델 fixture 결과를 구분한다.
+- [ ] T045 [P] FE·15분·선행 T028,T032,T041,T023,T033: frontend/tests/e2e/consultation.spec.ts와 frontend/tests/e2e/console.spec.ts에서 텍스트 대체 세 시나리오·명시 요청 18조건·1번 입력창 예외·한 항목 수정·지연/실패·중립 카드·항상 보이는 연결을 검증한다.
+- [ ] T046 [P] AI1·15분·선행 T018,T025,T039: frontend/scripts/test-generalization.ts에서 고정한 독립 15문항·미확보 분야 3/구 3·복합 문의·무근거·검색 자격을 실행하고 data/generalization-report.json과 data/corpus-freeze.json에 자료 버전·hash·결과를 동결한다. SC-020 별도 버전 결과도 기존 자료와 구분한다.
+- [ ] T047 AI3·20분·선행 T004,T043,T044,T045,T046,T011,T012,T013,T014,T015,T016,T017,T018,T019,T020,T021,T022,T023,T024,T025,T026,T027,T028,T029,T030,T031,T032,T033,T034,T035,T036,T037,T038,T039,T040,T041,T042: frontend/deploy/ecosystem.config.cjs와 docs/deployment-runbook.md에 장기 실행 Node 1 replica·HTTPS·지속 DATA_DIR·보호된 콘솔·환경변수·재시작/이전 빌드 복구 절차를 구성하고 보유 제출 환경에 같은 빌드/자료 버전을 배포한다. 계정·권한·주소가 없으면 이를 차단 사유로 기록하며 임의 구매나 서버리스 메모리 대체를 하지 않는다. 현재 frontend/next.config.ts에 Cloud Run 프록시가 있다는 사실과 실제 Vercel/Cloud Run 배포 성공은 구분한다. T010에서 확인한 API/상태 저장 경계와 일치하는 배포만 검증한다.
 - [ ] T048 FE·10분·선행 T047,T029: docs/submission-validation.md에 제출 HTTPS의 서로 다른 브라우저 세션에서 한국어 음성·텍스트·콘솔 전달·새로고침·AI3의 서버 재시작 복구를 확인하고 URL·빌드·corpus 버전·접근/성공/실패를 기록한다. localhost 성공과 영상만으로 통과시키지 않는다.
 - [ ] T049 FE·10분·선행 T048: docs/usability-validation.md에서 팀 외 검토자 1명 이상에게 문의 시작·텍스트·사람 연결·요약 승인/부분 수정을 별도 설명 없이 찾게 하고 결과를 기록한다. 실제 정보 약자 대상 검증·접근성 인증으로 확대 주장하지 않는다.
 - [ ] T050 AI2·10분·선행 T044,T048: demo/recordings/와 demo/rehearsal.md에 세 시나리오 영상·시나리오2 오프라인 백업·3분 내부 리허설 결과를 준비하고 가상 민원·정책 자료·모의 지표·실제 제출 화면 여부를 검수한다. 공식 발표 시간/제출 규정은 확인된 내용만 반영한다.
@@ -180,7 +197,7 @@ US1..US5 -> T043..T046 -> T047 -> T048 -> {T049,T050} -> T051
 | 인계 통합 | T026–029 음성, T032 콘솔 순차 | T035–036 개선 | T040 창구/독립 평가 | T030–034 큐/처리/지표 |
 | 최종 검증 | T045 E2E | T046 일반화 | T044 회귀 | T043 복구 후 T047 배포 |
 
-src/lib/contracts.ts, package.json, snapshot/event/정책 공통 파일은 AI3 한 명이 수정한다. 다른 담당자가 같은 파일 변경을 필요로 하면 소유자에게 요청하고 자신의 branch/workspace에서 중복 편집하지 않는다. T014와 T039의 검색 통합, T017과 T028의 page 통합 등 동일 파일 단계는 같은 담당자가 순차 처리한다.
+frontend/src/lib/contracts.ts, package.json, snapshot/event/정책 공통 파일은 AI3 한 명이 수정한다. 다른 담당자가 같은 파일 변경을 필요로 하면 소유자에게 요청하고 자신의 branch/workspace에서 중복 편집하지 않는다. T014와 T039의 검색 통합, T017과 T028의 page 통합 등 동일 파일 단계는 같은 담당자가 순차 처리한다.
 
 ## Parallel Examples per User Story
 
@@ -202,6 +219,8 @@ src/lib/contracts.ts, package.json, snapshot/event/정책 공통 파일은 AI3 �
 6. 최소 제출 MVP는 US1만이 아니라 다섯 여정의 필수 연결·근거·포용성·개선/계측이다. SC-011 성능 대량 측정·SC-014 폭넓은 신규 분야 시험·선택 음성 끼어들기는 이번 필수 task로 늘리지 않는다.
 
 ### Time Budget
+
+아래 작업시간과 4인 시간표는 마지막 290분 알림 때의 기존 계획값이다. 이번 진행 현황 반영으로 시간을 다시 시작하거나 새로운 잔여시간을 확정하지 않는다. T001/T004에서 선행 완료된 초기화·스타일 준비를 다시 수행하거나 중복 산정하지 않는다. 남은 환경 설정·서비스 화면·연동·실행 검증 기준을 만족한 시점에 해당 task를 완료로 체크한다.
 
 | 담당 | 작업 수 | 순수 작업 예상 | 290분 대비 개인 여유 |
 | --- | --- | --- | --- |
@@ -271,6 +290,8 @@ src/lib/contracts.ts, package.json, snapshot/event/정책 공통 파일은 AI3 �
 - 정합성 점검의 지적 사항은 위 정의로 정리하되 실제 모델/호스팅/자료 접근·음성 동작은 구현 시 증거를 남겨야 한다. 헌법은 `.specify/memory/constitution.md` v1.0.0으로 제정되었다. 이 게이트는 문서 정합성 확인이며 실제 동작은 각 task의 시험 증거로 판단한다.
 
 ## Notes
+
+- 코드 진행 반영 결과: 선행 기반 완료 항목은 위 표에 기록했고 T001·T004는 부분 완료다. 원래 task의 모든 조건을 충족한 증거가 없어 이번 확인만으로 체크박스를 완료로 바꾸지는 않았다. 서비스 기능/시험의 미완료 상태와 기존 51개 ID·담당·병렬 순서는 유지한다.
 
 - T005/T009/T020/T022/T031/T033/T035/T040의 data-model.md 인용은 구현 task의 직접 참조다. nullable·enum·범위·ID·고유성·승인/게시 조건을 임의로 재정의하지 않는다.
 - 원문 검증과 실제 시험·배포는 구현 때 수행할 작업이다. 현재 task 체크는 모두 미완료로 둔다.
