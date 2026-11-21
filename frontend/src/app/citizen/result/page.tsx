@@ -14,7 +14,6 @@ import successIcon from "@/assets/icon/face_smile.svg";
 import { readStorage, writeStorage } from "../_lib/storage";
 import { parseSummary, summaryKey } from "../_lib/summary";
 import { parseHistory, readHistorySnapshot, resultHistoryIdKey, saveHistoryEntry, type HistoryStatus } from "../_lib/history";
-import { voiceMessages } from "../_lib/messages";
 
 const subscribe = () => () => {};
 
@@ -36,7 +35,6 @@ export default function ResultPage() {
       id, channel: "voice", title: business,
       summary: `지역 ${region}\n신청일 ${date}\n${summary}`,
       status: existing?.status === "resolved" ? existing.status : status,
-      messages: voiceMessages,
     })) {
       setError(true);
       return;

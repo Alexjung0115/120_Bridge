@@ -2,10 +2,10 @@ export type ConsultationSummary = { business: string; region: string; date: stri
 
 export const summaryKey = "120bridge:confirmed-summary";
 export const defaultSummary: ConsultationSummary = {
-  business: "1인가구 안심생활 키트",
-  region: "마포구",
-  date: "2026.10.15",
-  summary: "신청 후 처리 결과 미통보",
+  business: "",
+  region: "",
+  date: "",
+  summary: "",
 };
 
 export const summaryFields = [

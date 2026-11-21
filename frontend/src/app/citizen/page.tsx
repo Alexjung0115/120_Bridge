@@ -32,8 +32,9 @@ function SoundWave() {
 export default function CitizenPage() {
   return (
     <main className="mx-auto flex min-h-svh w-full max-w-md flex-col sm:max-w-xl sm:px-10 bg-background-white px-6 pb-6 pt-8">
-      <header aria-label="120Bridge" className="flex items-center guide-gap-3">
+      <header aria-label="120Bridge" className="flex items-center justify-between guide-gap-3">
         <BridgeBrand />
+        <Link href="/" className="type-body-small text-text-primary underline underline-offset-4">화면 선택</Link>
       </header>
 
       <section aria-labelledby="citizen-welcome" className="mt-10">

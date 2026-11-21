@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [{
       source: "/api/ai/:path*",
-      destination: "https://bridge-api-demo-129844172635.asia-northeast3.run.app/:path*",
+      destination: `${(process.env.BACKEND_API_URL ?? "https://bridge-api-demo-129844172635.asia-northeast3.run.app").replace(/\/+$/, "")}/:path*`,
     }];
   },
   ...(process.env.BRIDGE_LOCAL_DEMO === "1" && {

@@ -19,7 +19,7 @@ export async function mvpCitizenCommand(request: Request, id: string, kind: "tur
   if (!z.uuid().safeParse(id).success) return sessionError(requestId, 400, "invalid_request");
   const input = await request.json().catch(() => null);
   const parsed = (kind === "turn"
-    ? turnRequestSchema.extend({ inputMode: z.literal("text") })
+    ? turnRequestSchema
     : kind === "confirm_summary" ? confirmSummary : z.union([directHandoff, requestHandoffSchema])).safeParse(input);
   if (!parsed.success) return sessionError(requestId, 400, "invalid_request");
   const skips = "skipConfirmation" in parsed.data && parsed.data.skipConfirmation === true;
