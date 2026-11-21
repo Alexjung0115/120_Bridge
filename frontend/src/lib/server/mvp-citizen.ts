@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { commandEnvelopeSchema, schemaVersion, turnRequestSchema } from "../contracts";
+import { decideHandoff } from "../policy/handoff";
 import { sessionSchema } from "../schema/session";
 import { createSupabaseRpc } from "../store/snapshot";
 import { canAccessCitizenSession, readBearerToken } from "./auth";
@@ -18,6 +19,13 @@ export async function mvpCitizenCommand(request: Request, id: string, kind: "tur
     ? turnRequestSchema.extend({ inputMode: z.literal("text") })
     : directHandoff).safeParse(input);
   if (!parsed.success) return sessionError(requestId, 400, "invalid_request");
+  if (kind === "direct_handoff") {
+    const decision = decideHandoff({
+      explicitHumanRequest: true,
+      skipConfirmation: "skipConfirmation" in parsed.data && parsed.data.skipConfirmation,
+    });
+    if (decision.action !== "send_unconfirmed") return sessionError(requestId, 400, "invalid_request");
+  }
 
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SECRET_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
